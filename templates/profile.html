@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile Settings - Career DNA</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+.profile-page {
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #faf7ff, #f3e9ff);
+    padding: 30px 20px 60px;
+}
+
+.profile-wrap {
+    max-width: 1200px;
+    margin: 40px auto 0;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-header h1 {
+    font-size: 42px;
+    color: #2f1854;
+    font-weight: 800;
+}
+
+.profile-header p {
+    color: #7c6f96;
+    font-size: 17px;
+}
+
+.metrics-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(131, 70, 223, 0.08);
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+}
+
+.metric-card h3 {
+    font-size: 28px;
+    color: var(--lilac-700);
+    margin-bottom: 4px;
+}
+
+.metric-card p {
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    font-weight: 600;
+}
+
+.avatar-selector {
+    margin-bottom: 20px;
+}
+
+.avatar-selector p {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-bottom: 10px;
+}
+
+.settings-btn-save {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--lilac-500), var(--lilac-700));
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(131, 70, 223, 0.22);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.settings-btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(131, 70, 223, 0.3);
+}
+
+@media (max-width: 768px) {
+    .metrics-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="profile-page">
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="logo-wrap">
+                <div class="logo-badge career-logo">
+                    <div class="logo-circle"></div>
+                    <div class="logo-arrow arrow-1"></div>
+                    <div class="logo-arrow arrow-2"></div>
+                    <div class="logo-arrow arrow-3"></div>
+                </div>
+
+                <div class="logo-text">
+                    <span class="logo-main">Career</span>
+                    <span class="logo-accent">DNA</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a href="/welcome">Dashboard</a>
+            <a href="/assessment" class="nav-take-test-link">Take Test</a>
+            <a href="/career-paths">Career Paths</a>
+            <a href="/resources">Resources</a>
+            <a href="/history">History</a>
+            <a href="/profile">Profile</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a>
+        </div>
+    </header>
+
+    <div class="profile-wrap">
+        
+        <div class="profile-header">
+            <h1>Your Profile Settings</h1>
+            <p>Customize your personal dashboard appearance, update your details, and inspect earned credentials.</p>
+        </div>
+
+        <div class="metrics-row">
+            <div class="metric-card">
+                <h3>{{ results_count }}</h3>
+                <p>Assessments Completed</p>
+            </div>
+            <div class="metric-card">
+                <h3 style="font-size: 1.3rem; margin-top: 10px; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ latest_career }}
+                </h3>
+                <p>Top Career Match</p>
+            </div>
+            <div class="metric-card">
+                <h3>{{ 75 if results_count > 0 else 0 }}%</h3>
+                <p>Profile Completeness</p>
+            </div>
+        </div>
+
+        <div class="profile-grid">
+            
+            <!-- LEFT PANEL: PHOTO & BADGES -->
+            <div class="profile-card">
+                
+                <div class="profile-avatar-wrap">
+                    <img id="currentAvatar" class="profile-avatar" src="{{ user.photo_url }}" alt="Profile Avatar">
+                </div>
+                
+                <h3 style="font-size: 1.4rem; color: var(--text-dark); margin-bottom: 4px;">{{ user.username }}</h3>
+                <p style="font-size: 0.85rem; color: var(--text-soft); margin-bottom: 24px;">Member since 2026</p>
+                
+                <div class="avatar-selector">
+                    <p>Select Avatar Image</p>
+                    <div class="avatar-select-grid">
+                        <div class="avatar-option {% if user.photo_url == '/static/images/avatar1.png' %}selected{% endif %}" onclick="selectAvatar('/static/images/avatar1.png', this)">
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Felix&backgroundColor=b6e3f4" alt="Avatar 1">
+                        </div>
+                        <div class="avatar-option {% if user.photo_url == '/static/images/avatar2.png' %}selected{% endif %}" onclick="selectAvatar('/static/images/avatar2.png', this)">
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aneka&backgroundColor=c0aede" alt="Avatar 2">
+                        </div>
+                        <div class="avatar-option {% if user.photo_url == '/static/images/avatar3.png' %}selected{% endif %}" onclick="selectAvatar('/static/images/avatar3.png', this)">
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Buddy&backgroundColor=ffdf70" alt="Avatar 3">
+                        </div>
+                        <div class="avatar-option {% if user.photo_url == '/static/images/avatar4.png' %}selected{% endif %}" onclick="selectAvatar('/static/images/avatar4.png', this)">
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Ginger&backgroundColor=ffd5dc" alt="Avatar 4">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid rgba(131, 70, 223, 0.1); padding-top: 20px; margin-top: 20px; text-align: left;">
+                    <h4 style="font-size: 0.95rem; color: var(--text-dark); margin-bottom: 12px; font-weight: 700;">🏅 Earned Achievements</h4>
+                    <div class="profile-badge-grid">
+                        {% if not badges %}
+                            <p style="font-size: 0.85rem; color: var(--text-soft); text-align: center; width: 100%;">No achievements earned yet. Take the assessment to unlock!</p>
+                        {% endif %}
+                        {% for badge in badges %}
+                            <div class="profile-badge-card">
+                                {% if badge == "Completed Assessment" %}
+                                    <span class="badge-icon">🎯</span>
+                                    <span class="badge-title">First Step Done</span>
+                                {% elif badge == "Top Learner" %}
+                                    <span class="badge-icon">👑</span>
+                                    <span class="badge-title">Career Master</span>
+                                {% elif badge == "Problem Solver" %}
+                                    <span class="badge-icon">🔬</span>
+                                    <span class="badge-title">Logic Specialist</span>
+                                {% elif badge == "Quick Learner" %}
+                                    <span class="badge-icon">⚡</span>
+                                    <span class="badge-title">Active DNA</span>
+                                {% elif badge == "AI Explorer" %}
+                                    <span class="badge-icon">🤖</span>
+                                    <span class="badge-title">Future Explorer</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL: SETTINGS FORM -->
+            <div class="profile-card" style="text-align: left;">
+                <h3 style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 24px;">Account Settings</h3>
+                
+                <form class="profile-settings-form" action="/profile" method="POST">
+                    
+                    <!-- Hidden photo URL input -->
+                    <input type="hidden" name="photo_url" id="avatarInput" value="{{ user.photo_url }}">
+
+                    <label for="username">Username (Non-editable)</label>
+                    <input type="text" id="username" value="{{ user.username }}" readonly style="background: #f1ecff; color: var(--text-soft);">
+
+                    <label for="email">Email Address</label>
+                    <input type="email" name="email" id="email" value="{{ user.email }}" placeholder="Enter your email address" required>
+
+                    <label for="bio">Professional Bio</label>
+                    <textarea name="bio" id="bio" rows="4" placeholder="Briefly describe your career goals, background, or learning progress...">{{ user.bio }}</textarea>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <label for="theme">Dashboard Theme Color</label>
+                            <select name="theme" id="theme">
+                                <option value="purple" {% if user.theme == 'purple' %}selected{% endif %}>Classic Lavender (Purple)</option>
+                                <option value="blue" {% if user.theme == 'blue' %}selected{% endif %}>Ocean Wave (Blue)</option>
+                                <option value="dark" {% if user.theme == 'dark' %}selected{% endif %}>Carbon Space (Dark)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="visibility">Profile Visibility</label>
+                            <select name="profile_visibility" id="visibility">
+                                <option value="public" {% if user.profile_visibility == 'public' %}selected{% endif %}>Public (Show Recommendations)</option>
+                                <option value="private" {% if user.profile_visibility == 'private' %}selected{% endif %}>Private (Keep Private)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <button type="submit" class="settings-btn-save">Save Settings & Changes</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function selectAvatar(url, optionElement) {
+        // Update input
+        document.getElementById("avatarInput").value = url;
+        
+        // Update current avatar image view (using Dicebear links dynamically matching the seed/colors)
+        const imgSrc = optionElement.querySelector("img").src;
+        document.getElementById("currentAvatar").src = imgSrc;
+        
+        // Update selected option class
+        document.querySelectorAll(".avatar-option").forEach(opt => {
+            opt.classList.remove("selected");
+        });
+        optionElement.classList.add("selected");
+    }
+</script>
+</body>
+</html>

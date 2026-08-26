@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Achievements - Career DNA</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
+</head>
+<body>
+<div class="dashboard-wrapper">
+  <div class="dashboard-container">
+    <header class="navbar" style="margin-bottom: 40px;">
+      <div class="nav-left">
+        <a href="/welcome" class="nav-btn secondary-btn" style="text-decoration:none;">← Back to Dashboard</a>
+      </div>
+      <h2>My Achievements</h2>
+    </header>
+    <section class="dashboard-section">
+      <div class="dashboard-grid">
+        <!-- Badge cards will be populated dynamically if data is passed -->
+        {% if badges %}
+          {% for badge in badges %}
+            <div class="glass-card">
+              <h3 style="color: var(--text-dark); margin-bottom: 8px;">{{ badge }}</h3>
+              <p style="color: var(--text-soft); font-size: 0.95rem; line-height: 1.4;">Earned for completing milestones in your career journey.</p>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="glass-card">
+            <h3 style="color: var(--text-dark); margin-bottom: 8px;">No Achievements Yet</h3>
+            <p style="color: var(--text-soft); font-size: 0.95rem; line-height: 1.4;">Start assessments and explore features to earn badges.</p>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

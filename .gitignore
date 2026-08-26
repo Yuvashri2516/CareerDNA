@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+career_dna.db
+*.log
+.vscode/
+.idea/
+.DS_Store

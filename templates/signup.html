@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career DNA - Signup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body{
+            margin:0;
+            font-family:'Poppins',sans-serif;
+            background:linear-gradient(to bottom,#faf7ff,#f3e9ff);
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+        .auth-box{
+            width:100%;
+            max-width:420px;
+            background:rgba(255,255,255,0.92);
+            padding:36px;
+            border-radius:24px;
+            box-shadow:0 20px 40px rgba(0,0,0,0.08);
+        }
+        h1{
+            margin:0 0 10px;
+            color:#2f1854;
+            text-align:center;
+        }
+        p{
+            text-align:center;
+            color:#7c6f96;
+            margin-bottom:24px;
+        }
+        label{
+            display:block;
+            margin-bottom:8px;
+            color:#3d2a63;
+            font-weight:600;
+        }
+        input{
+            width:100%;
+            padding:14px 16px;
+            margin-bottom:18px;
+            border:1px solid #e7d7ff;
+            border-radius:14px;
+            font-size:15px;
+            box-sizing:border-box;
+            outline:none;
+        }
+        input:focus{
+            border-color:#9d5cff;
+        }
+        button{
+            width:100%;
+            padding:14px;
+            border:none;
+            border-radius:999px;
+            background:linear-gradient(135deg,#9d5cff,#6531b3);
+            color:white;
+            font-size:16px;
+            font-weight:700;
+            cursor:pointer;
+        }
+        .bottom-link{
+            margin-top:18px;
+            text-align:center;
+        }
+        .bottom-link a{
+            color:#6531b3;
+            text-decoration:none;
+            font-weight:600;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-box">
+        <h1>Create Account</h1>
+        <p>Join Career DNA to save your results</p>
+
+        <form method="POST" action="/signup">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" placeholder="Choose username" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" placeholder="Choose password" required>
+
+            <button type="submit">Signup</button>
+        </form>
+
+        <div class="bottom-link">
+            Already have an account? <a href="/login">Login</a>
+        </div>
+    </div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
