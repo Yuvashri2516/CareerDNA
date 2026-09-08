@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Preparation - Career DNA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <div class="dashboard-container">
+            <header class="navbar" style="margin-bottom: 40px;">
+                <div class="nav-left">
+                    <div class="logo-wrap">
+                        <div class="logo-badge career-logo">
+                            <div class="logo-circle"></div>
+                            <div class="logo-arrow arrow-1"></div>
+                            <div class="logo-arrow arrow-2"></div>
+                            <div class="logo-arrow arrow-3"></div>
+                        </div>
+                        <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
+                    </div>
+                </div>
+                <nav class="nav-links">
+                    <a href="/welcome">Dashboard</a>
+                    <a href="/assessment" class="nav-take-test-link">Take Test</a>
+                    <a href="/career-paths">Career Paths</a>
+                    <a href="/resources">Resources</a>
+                    <a href="/history">History</a>
+                    <a href="/profile">Profile</a>
+                </nav>
+                <div class="nav-actions"><a href="/logout" class="nav-btn secondary-btn" style="text-decoration:none;display:inline-block;">Logout</a></div>
+            </header>
+            <section class="dashboard-section">
+                <h2 class="section-header">Interview Preparation</h2>
+                <p style="color: var(--text-soft); font-size: 1rem; line-height: 1.6;">
+                    Access interview tips, mock question banks, and AI‑driven interview practice tools.
+                </p>
+                <!-- Placeholder for future interview content -->
+                <div class="glass-card" style="padding:24px;">
+                    <h3 style="color: var(--text-dark);">HR Interview Guide</h3>
+                    <p style="color: var(--text-soft);">Learn the STAR method, behavioral answer structures, and common HR questions.</p>
+                    <a href="https://www.indeed.com/career-advice/interviewing" target="_blank" class="nav-btn primary-btn" style="text-decoration:none;">Read More ↗</a>
+                </div>
+                <div class="glass-card" style="padding:24px; margin-top:20px;">
+                    <h3 style="color: var(--text-dark);">Technical Interview</h3>
+                    <p style="color: var(--text-soft);">Practice system design, algorithm problems, and coding drills.</p>
+                    <a href="https://leetcode.com" target="_blank" class="nav-btn primary-btn" style="text-decoration:none;">Practice LeetCode ↗</a>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

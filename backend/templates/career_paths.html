@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explore Career Paths - Career DNA</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+.career-page {
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #faf7ff, #f3e9ff);
+    padding: 30px 20px 60px;
+}
+
+.career-wrap {
+    max-width: 1200px;
+    margin: 40px auto 0;
+}
+
+.career-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.career-header h1 {
+    font-size: 48px;
+    color: #2f1854;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.career-header p {
+    font-size: 18px;
+    color: #6f6290;
+    max-width: 760px;
+    margin: 0 auto 30px;
+    line-height: 1.8;
+}
+
+.search-container {
+    max-width: 600px;
+    margin: 0 auto 40px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 16px 24px;
+    border-radius: 99px;
+    border: 2px solid rgba(131, 70, 223, 0.15);
+    background: rgba(255, 255, 255, 0.9);
+    font-family: inherit;
+    font-size: 1.05rem;
+    color: var(--text-main);
+    outline: none;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.25s;
+}
+
+.search-input:focus {
+    border-color: var(--lilac-500);
+    box-shadow: 0 10px 25px rgba(131, 70, 223, 0.12);
+    background: white;
+}
+
+.career-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.career-card {
+    background: rgba(255, 255, 255, 0.82);
+    border-radius: 28px;
+    padding: 30px;
+    border: 1px solid rgba(131, 70, 223, 0.12);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.career-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(95, 51, 156, 0.12);
+}
+
+.career-card h2 {
+    color: var(--text-dark);
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.career-card p.desc {
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-size: 0.98rem;
+}
+
+.career-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.career-stat {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    padding: 12px 16px;
+    border: 1px solid rgba(131, 70, 223, 0.06);
+}
+
+.career-stat span {
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    display: block;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.career-stat strong {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+.skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.skills-tags .tag {
+    background: #efe5ff;
+    color: #6531b3;
+    padding: 6px 12px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.details-panel {
+    display: none;
+    border-top: 1px solid rgba(131, 70, 223, 0.12);
+    padding-top: 20px;
+    margin-top: 10px;
+    animation: slideDown 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.details-section-title {
+    color: var(--lilac-700);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    margin-top: 16px;
+}
+
+.details-panel ul {
+    padding-left: 18px;
+    margin-bottom: 12px;
+}
+
+.details-panel li {
+    margin-bottom: 6px;
+    color: var(--text-main);
+    font-size: 0.92rem;
+}
+
+.details-panel p {
+    font-size: 0.92rem;
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+.details-panel .companies-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.details-panel .company-badge {
+    background: #f3ecff;
+    color: var(--lilac-800);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.expand-btn {
+    width: 100%;
+    margin-top: auto;
+    padding: 14px;
+    border: none;
+    border-radius: 16px;
+    background: rgba(157, 92, 255, 0.08);
+    color: var(--lilac-800);
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.expand-btn:hover {
+    background: rgba(157, 92, 255, 0.15);
+    color: var(--lilac-900);
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+    .career-grid {
+        grid-template-columns: 1fr;
+    }
+    .career-header h1 {
+        font-size: 34px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="career-page">
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="logo-wrap">
+                <div class="logo-badge career-logo">
+                    <div class="logo-circle"></div>
+                    <div class="logo-arrow arrow-1"></div>
+                    <div class="logo-arrow arrow-2"></div>
+                    <div class="logo-arrow arrow-3"></div>
+                </div>
+
+                <div class="logo-text">
+                    <span class="logo-main">Career</span>
+                    <span class="logo-accent">DNA</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a href="/welcome">Dashboard</a>
+            <a href="/assessment" class="nav-take-test-link">Take Test</a>
+            <a href="/career-paths">Career Paths</a>
+            <a href="/resources">Resources</a>
+            <a href="/history">History</a>
+            <a href="/profile">Profile</a>
+        </nav>
+
+        <div class="nav-actions">
+            {% if session.get('user') %}
+                <a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a>
+            {% else %}
+                <a href="/login" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Login</a>
+                <a href="/signup" class="nav-btn primary-btn" style="text-decoration: none; display: inline-block;">Register</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="career-wrap">
+        
+        <div class="career-header">
+            <h1>Explore Career Paths</h1>
+            <p>Search across 25+ key engineering, medical, analytical, and artistic careers. Expand any card to inspect salary ranges, required certifications, skills, and growth pathways.</p>
+            
+            <div class="search-container">
+                <input type="text" id="searchBar" class="search-input" placeholder="Search careers by name, skills, or stack...">
+            </div>
+        </div>
+
+        <div class="career-grid" id="careerGrid">
+            
+            {% for c in careers %}
+            <div class="career-card" data-name="{{ c.name | lower }}" data-skills="{{ c.skills | join(',') | lower }}" data-description="{{ c.description | lower }}">
+                <h2>{{ c.name }}</h2>
+                <p class="desc">{{ c.description }}</p>
+
+                <div class="career-stats-row">
+                    <div class="career-stat">
+                        <span>Avg Salary</span>
+                        <strong>{{ c.salary }}</strong>
+                    </div>
+                    <div class="career-stat">
+                        <span>Demand</span>
+                        <strong style="color: #2e7d32;">{{ c.demand }}</strong>
+                    </div>
+                </div>
+
+                <div class="skills-tags">
+                    {% for skill in c.skills %}
+                        <span class="tag">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Hidden details drawer -->
+                <div class="details-panel" id="details-{{ loop.index }}">
+                    
+                    <div class="details-section-title">🎓 Education</div>
+                    <p>{{ c.education }}</p>
+                    
+                    {% if c.tech_stack %}
+                    <div class="details-section-title">💻 Technology Stack</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
+                        {% for tech in c.tech_stack %}
+                            <span class="badge-item badge-purple" style="font-size: 0.75rem; padding: 4px 10px;">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="details-section-title">📊 Growth Pathway</div>
+                    <p>{{ c.growth }}</p>
+
+                    <div class="details-section-title">🗺️ Learning Steps</div>
+                    <ul>
+                        {% for step in c.roadmap %}
+                            <li>{{ step }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="details-section-title">🏅 Recommended Certifications</div>
+                    <ul>
+                        {% for cert in c.certifications %}
+                            <li>{{ cert }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <div class="details-section-title" style="color: #2e7d32;">👍 Advantages</div>
+                            <ul>
+                                {% for adv in c.advantages %}
+                                    <li style="font-size: 0.85rem; margin-bottom: 4px;">{{ adv }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="details-section-title" style="color: #c62828;">👎 Challenges</div>
+                            <ul>
+                                {% for ch in c.challenges %}
+                                    <li style="font-size: 0.85rem; margin-bottom: 4px;">{{ ch }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="details-section-title">🏢 Hiring Companies</div>
+                    <div class="companies-wrap">
+                        {% for comp in c.companies %}
+                            <span class="company-badge">{{ comp }}</span>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+                <button type="button" class="expand-btn" data-index="{{ loop.index }}" onclick="toggleDetails(this.dataset.index, this)">
+                    Show Details
+                </button>
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Toggle Details drawer
+    function toggleDetails(index, btn) {
+        const panel = document.getElementById('details-' + index);
+        if (panel.style.display === 'block') {
+            panel.style.display = 'none';
+            btn.textContent = 'Show Details';
+        } else {
+            panel.style.display = 'block';
+            btn.textContent = 'Hide Details';
+        }
+    }
+
+    // Client-side search filtration
+    document.getElementById('searchBar').addEventListener('keyup', function() {
+        const query = this.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.career-card');
+
+        cards.forEach(card => {
+            const name = card.getAttribute('data-name');
+            const skills = card.getAttribute('data-skills');
+            const desc = card.getAttribute('data-description');
+
+            if (name.includes(query) || skills.includes(query) || desc.includes(query)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+</script>
+</body>
+</html>

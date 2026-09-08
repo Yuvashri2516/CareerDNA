@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career DNA - History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        .history-page{
+            min-height:100vh;
+            padding:30px 20px 60px;
+            background:linear-gradient(to bottom,#faf7ff,#f3e9ff);
+        }
+
+        .history-wrap{
+            max-width:1100px;
+            margin:40px auto 0;
+        }
+
+        .history-card{
+            background:rgba(255,255,255,0.9);
+            border-radius:28px;
+            padding:28px;
+            box-shadow:0 20px 40px rgba(0,0,0,0.08);
+        }
+
+        .history-card h1{
+            color:#2f1854;
+            margin-bottom:20px;
+            text-align:center;
+        }
+
+        .table-wrap{
+            overflow-x:auto;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th, td{
+            padding:14px 12px;
+            text-align:left;
+            border-bottom:1px solid #eee;
+        }
+
+        th{
+            color:#6531b3;
+            font-size:15px;
+        }
+
+        td{
+            color:#4b4062;
+        }
+
+        .action-line{
+            margin-top:20px;
+            text-align:center;
+        }
+
+        .action-line a{
+            text-decoration:none;
+            display:inline-block;
+            padding:12px 20px;
+            border-radius:999px;
+            background:linear-gradient(135deg,#9d5cff,#6531b3);
+            color:white;
+            font-weight:600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="history-page">
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="logo-wrap">
+                <div class="logo-badge career-logo">
+                    <div class="logo-circle"></div>
+                    <div class="logo-arrow arrow-1"></div>
+                    <div class="logo-arrow arrow-2"></div>
+                    <div class="logo-arrow arrow-3"></div>
+                </div>
+
+                <div class="logo-text">
+                    <span class="logo-main">Career</span>
+                    <span class="logo-accent">DNA</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a href="/welcome">Dashboard</a>
+            <a href="/assessment" class="nav-take-test-link">Take Test</a>
+            <a href="/career-paths">Career Paths</a>
+            <a href="/resources">Resources</a>
+            <a href="/history">History</a>
+            <a href="/profile">Profile</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a>
+        </div>
+    </header>
+
+    <div class="history-wrap">
+        <div class="history-card">
+            <h1>Saved Assessment Results</h1>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Best Career</th>
+                            <th>Best Score</th>
+                            <th>Second Career</th>
+                            <th>Second Score</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td>{{ row[0] }}</td>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[3] }}</td>
+                            <td>{{ row[4] }}</td>
+                            <td>{{ row[5] }}</td>
+                            <td>{{ row[6] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-line">
+                <a href="/assessment">Take Assessment Again</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

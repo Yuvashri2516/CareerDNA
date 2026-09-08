@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Resources - Career DNA</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+.resources-page {
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #faf7ff, #f3e9ff);
+    padding: 30px 20px 60px;
+}
+
+.resources-wrap {
+    max-width: 1200px;
+    margin: 40px auto 0;
+}
+
+.resources-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.resources-header h1 {
+    font-size: 48px;
+    color: #2f1854;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.resources-header p {
+    font-size: 18px;
+    color: #6f6290;
+    max-width: 760px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.resource-card {
+    background: rgba(255, 255, 255, 0.82);
+    border-radius: 28px;
+    padding: 30px;
+    border: 1px solid rgba(131, 70, 223, 0.12);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.resource-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(95, 51, 156, 0.12);
+}
+
+.resource-card h2 {
+    color: var(--text-dark);
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.resource-card p {
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.resource-links-box {
+    margin-top: auto;
+    border-top: 1px solid rgba(131, 70, 223, 0.1);
+    padding-top: 20px;
+}
+
+.resource-link-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-radius: 14px;
+    padding: 12px 18px;
+    border: 1px solid rgba(131, 70, 223, 0.08);
+    margin-bottom: 10px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.resource-link-item:hover {
+    background: #f7f1ff;
+    border-color: var(--lilac-400);
+}
+
+.resource-link-item span {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.92rem;
+}
+
+.resource-link-item strong {
+    color: var(--lilac-700);
+    font-size: 0.85rem;
+}
+
+.meta-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    margin-top: 15px;
+}
+
+@media (max-width: 900px) {
+    .resources-grid {
+        grid-template-columns: 1fr;
+    }
+    .resources-header h1 {
+        font-size: 34px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="resources-page">
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="logo-wrap">
+                <div class="logo-badge career-logo">
+                    <div class="logo-circle"></div>
+                    <div class="logo-arrow arrow-1"></div>
+                    <div class="logo-arrow arrow-2"></div>
+                    <div class="logo-arrow arrow-3"></div>
+                </div>
+
+                <div class="logo-text">
+                    <span class="logo-main">Career</span>
+                    <span class="logo-accent">DNA</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a href="/welcome">Dashboard</a>
+            <a href="/assessment" class="nav-take-test-link">Take Test</a>
+            <a href="/career-paths">Career Paths</a>
+            <a href="/resources">Resources</a>
+            <a href="/history">History</a>
+            <a href="/profile">Profile</a>
+        </nav>
+
+        <div class="nav-actions">
+            {% if session.get('user') %}
+                <a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a>
+            {% else %}
+                <a href="/login" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Login</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="resources-wrap">
+        
+        <div class="resources-header">
+            <h1>Learning Resources</h1>
+            <p>Access high-quality curated learning roadmaps, tutorials, courses, and tool guides across 10 critical domains.</p>
+        </div>
+
+        <div class="resources-grid">
+            
+            <!-- 1. Programming -->
+            <div class="resource-card">
+                <h2>Programming</h2>
+                <p>Master the syntax, structures, and algorithmic principles of software engineering. Learn how to write clean code and build robust tools.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://docs.python.org/3/tutorial/" target="_blank">
+                        <span>Python Official Tutorial</span>
+                        <strong>Free Guide ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://www.freecodecamp.org/" target="_blank">
+                        <span>FreeCodeCamp Catalog</span>
+                        <strong>Interactive ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 40-60 Hours</span>
+                    <span style="color: #6531b3; font-weight: bold;">⭐ Beginner-Intermediate</span>
+                </div>
+            </div>
+
+            <!-- 2. AI & Data Science -->
+            <div class="resource-card">
+                <h2>Artificial Intelligence</h2>
+                <p>Understand neural network building blocks, generative AI integrations, Large Language Models, and deep learning framework configurations.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://www.deeplearning.ai/" target="_blank">
+                        <span>DeepLearning.AI Courses</span>
+                        <strong>Video Tutorials ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://huggingface.co/learn" target="_blank">
+                        <span>Hugging Face NLP Course</span>
+                        <strong>Code Guided ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 80 Hours</span>
+                    <span style="color: #c2185b; font-weight: bold;">⭐ Advanced</span>
+                </div>
+            </div>
+
+            <!-- 3. Cyber Security -->
+            <div class="resource-card">
+                <h2>Cyber Security</h2>
+                <p>Learn ethical hacking techniques, packet diagnostics, security tools execution, threat detections, and network penetration workflows.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://tryhackme.com/" target="_blank">
+                        <span>TryHackMe Security Labs</span>
+                        <strong>Gamified Labs ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://www.wireshark.org/docs/" target="_blank">
+                        <span>Wireshark Network Analysis</span>
+                        <strong>Manuals ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 50 Hours</span>
+                    <span style="color: #d32f2f; font-weight: bold;">⭐ Intermediate-Advanced</span>
+                </div>
+            </div>
+
+            <!-- 4. Cloud Computing -->
+            <div class="resource-card">
+                <h2>Cloud Infrastructure</h2>
+                <p>Explore virtual networking setups, automated container deployment pipelines, server scaling, and Infrastructure as Code using Terraform.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://aws.amazon.com/training/" target="_blank">
+                        <span>AWS Skill Builder Catalog</span>
+                        <strong>Official Training ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://developer.hashicorp.com/terraform/tutorials" target="_blank">
+                        <span>Terraform Infrastructure Guides</span>
+                        <strong>Practice Code ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 35 Hours</span>
+                    <span style="color: #6531b3; font-weight: bold;">⭐ Intermediate</span>
+                </div>
+            </div>
+
+            <!-- 5. UI UX Design -->
+            <div class="resource-card">
+                <h2>UI/UX Design</h2>
+                <p>Understand cognitive layout user psychology, typography grids, color harmony guides, Figma component systems, and wireframe prototypes.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://www.interaction-design.org/" target="_blank">
+                        <span>IDF Usability Guides</span>
+                        <strong>Theory Docs ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://help.figma.com/hc/en-us" target="_blank">
+                        <span>Figma Design Systems Help</span>
+                        <strong>Component Help ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 30 Hours</span>
+                    <span style="color: #6531b3; font-weight: bold;">⭐ Beginner-Intermediate</span>
+                </div>
+            </div>
+
+            <!-- 6. Interview Preparation -->
+            <div class="resource-card">
+                <h2>Interview Prep</h2>
+                <p>Practice answering behavioral prompts using the STAR methodology, prepare live whiteboard scripts, and review technical questions.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://leetcode.com/" target="_blank">
+                        <span>LeetCode Algorithmic Practice</span>
+                        <strong>Challenges ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://www.pramp.com/" target="_blank">
+                        <span>Pramp Mock Interviews</span>
+                        <strong>Live P2P Prep ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 45 Hours</span>
+                    <span style="color: #c2185b; font-weight: bold;">⭐ Advanced</span>
+                </div>
+            </div>
+
+            <!-- 7. Resume Writing -->
+            <div class="resource-card">
+                <h2>Resume Writing</h2>
+                <p>Learn how to format a single-page PDF resume using actionable verbs, document tangible metrics, and structure project portfolios.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://www.overleaf.com/gallery/tagged/cv" target="_blank">
+                        <span>LaTeX Overleaf CV Templates</span>
+                        <strong>Source Files ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://www.wonsulting.com/resumai" target="_blank">
+                        <span>ResumAI Alignment Tools</span>
+                        <strong>Interactive ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 8-12 Hours</span>
+                    <span style="color: #6531b3; font-weight: bold;">⭐ Beginner</span>
+                </div>
+            </div>
+
+            <!-- 8. Communication -->
+            <div class="resource-card">
+                <h2>Communication</h2>
+                <p>Enhance presentation clarity, write concise business emails, articulate complex code architectures, and lead team debates.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://www.toastmasters.org/" target="_blank">
+                        <span>Toastmasters Speeches</span>
+                        <strong>Guides ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://www.coursera.org/specializations/effective-communication" target="_blank">
+                        <span>Effective Business Communication</span>
+                        <strong>Specialization ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 15 Hours</span>
+                    <span style="color: #6531b3; font-weight: bold;">⭐ Beginner</span>
+                </div>
+            </div>
+
+            <!-- 9. Aptitude & Logic -->
+            <div class="resource-card">
+                <h2>Aptitude & Logic</h2>
+                <p>Train your logical deduction, quantitative problem solving, database analytics, spatial matching, and mathematical reasoning speed.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://www.indiabix.com/" target="_blank">
+                        <span>IndiaBIX Quantitative Prep</span>
+                        <strong>Practice Questions ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://www.geeksforgeeks.org/engineering-mathematics-tutorials/" target="_blank">
+                        <span>GFG Math & Gate Prep</span>
+                        <strong>Mathematical Docs ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 25 Hours</span>
+                    <span style="color: #6531b3; font-weight: bold;">⭐ Intermediate</span>
+                </div>
+            </div>
+
+            <!-- 10. Soft Skills -->
+            <div class="resource-card">
+                <h2>Soft Skills</h2>
+                <p>Develop critical skills in proactive collaboration, scrum timelines management, emotional intelligence, leadership feedback, and workspace adaptability.</p>
+                
+                <div class="resource-links-box">
+                    <a class="resource-link-item" href="https://www.mindtools.com/" target="_blank">
+                        <span>MindTools Leadership Hub</span>
+                        <strong>Skill Cards ↗</strong>
+                    </a>
+                    <a class="resource-link-item" href="https://www.ted.com/playlists/171/playlists_for_business" target="_blank">
+                        <span>TED Playlists for Leadership</span>
+                        <strong>Video Playlist ↗</strong>
+                    </a>
+                </div>
+                <div class="meta-info-row">
+                    <span>⏱️ Duration: 20 Hours</span>
+                    <span style="color: #6531b3; font-weight: bold;">⭐ Beginner</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

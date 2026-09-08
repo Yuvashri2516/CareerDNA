@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Match - Career DNA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar" style="margin-bottom: 40px;">
+        <div class="nav-left">
+            <div class="logo-wrap">
+                <div class="logo-badge career-logo">
+                    <div class="logo-circle"></div>
+                    <div class="logo-arrow arrow-1"></div>
+                    <div class="logo-arrow arrow-2"></div>
+                    <div class="logo-arrow arrow-3"></div>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-main">Career</span><span class="logo-accent">DNA</span>
+                </div>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a href="/welcome">Dashboard</a>
+            <a href="/assessment" class="nav-take-test-link">Take Test</a>
+            <a href="/career-paths">Career Paths</a>
+            <a href="/resources">Resources</a>
+            <a href="/history">History</a>
+            <a href="/profile">Profile</a>
+        </nav>
+        <div class="nav-actions">
+            <a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a>
+        </div>
+    </header>
+    <div class="dashboard-wrapper">
+        <div class="dashboard-container">
+            <section class="dashboard-section">
+                <h2 class="section-header">Career Match</h2>
+                <p style="color: var(--text-soft); font-size: 1rem; line-height: 1.6;">
+                    Based on your assessment results, here are personalized career recommendations with match percentages, expected salaries, and quick links to explore each path.
+                </p>
+                <div class="grid-4-col" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">
+                    <div class="glass-card" style="display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span class="badge-item badge-purple" style="font-weight: bold;">95% Match</span>
+                            <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ High Demand</span>
+                        </div>
+                        <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">Software Engineer</h3>
+                        <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; flex: 1;">
+                            Build applications and large‑scale systems using modern programming languages and cloud services.
+                        </p>
+                        <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">$115,000/yr</span>
+                            <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

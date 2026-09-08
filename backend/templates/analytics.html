@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Career DNA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <div class="dashboard-container">
+            <header class="navbar" style="margin-bottom: 40px;">
+                <div class="nav-left">
+                    <div class="logo-wrap">
+                        <div class="logo-badge career-logo">
+                            <div class="logo-circle"></div>
+                            <div class="logo-arrow arrow-1"></div>
+                            <div class="logo-arrow arrow-2"></div>
+                            <div class="logo-arrow arrow-3"></div>
+                        </div>
+                        <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
+                    </div>
+                </div>
+                <nav class="nav-links">
+                    <a href="/welcome">Dashboard</a>
+                    <a href="/assessment" class="nav-take-test-link">Take Test</a>
+                    <a href="/career-match">Career Match</a>
+                    <a href="/analytics">Analytics</a>
+                </nav>
+                <div class="nav-actions"><a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a></div>
+            </header>
+            <section class="dashboard-section">
+                <h2 class="section-header">Analytics</h2>
+                <div class="analytics-row">
+                    <div class="chart-card-box">
+                        <canvas id="careerChart"></canvas>
+                    </div>
+                    <div class="chart-card-box">
+                        <canvas id="skillChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('careerChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Software', 'Data', 'Design', 'Marketing'],
+                datasets: [{ data: [30, 25, 20, 15], backgroundColor: ['#9d5cff', '#6531b3', '#bd8cff', '#e7d7ff'] }]
+            }
+        });
+        const ctx2 = document.getElementById('skillChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Python', 'SQL', 'Java', 'Design'],
+                datasets: [{ label: 'Proficiency', data: [85, 70, 65, 60], backgroundColor: '#9d5cff' }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+    </script>
+</body>
+</html>

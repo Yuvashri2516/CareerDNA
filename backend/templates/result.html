@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career DNA - Assessment Result</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Chart.js CDN for interactive analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+.result-page {
+    min-height: 100vh;
+    padding: 30px 20px 60px;
+    background: linear-gradient(to bottom, #faf7ff, #f3e9ff);
+}
+
+.result-wrap {
+    max-width: 1200px;
+    margin: 40px auto 0;
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.result-header h1 {
+    font-size: 46px;
+    color: #2f1854;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.result-header p {
+    color: #7c6f96;
+    font-size: 18px;
+}
+
+.result-grid-layout {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.result-hero-box {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(246, 236, 255, 0.9));
+    border-radius: 28px;
+    padding: 36px;
+    border: 1px solid rgba(131, 70, 223, 0.15);
+    box-shadow: 0 20px 50px rgba(95, 51, 156, 0.1);
+    margin-bottom: 30px;
+}
+
+.result-hero-box h2 {
+    font-size: 38px;
+    color: #2f1854;
+    font-weight: 800;
+    margin: 10px 0;
+}
+
+.match-percentage-pill {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 99px;
+    background: linear-gradient(135deg, var(--lilac-500), var(--lilac-700));
+    color: white;
+    font-weight: 700;
+    font-size: 1.15rem;
+    box-shadow: 0 10px 24px rgba(131, 70, 223, 0.25);
+    margin-bottom: 20px;
+}
+
+.meta-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.meta-stat-item {
+    background: white;
+    border-radius: 20px;
+    padding: 16px 20px;
+    border: 1px solid rgba(131, 70, 223, 0.08);
+}
+
+.meta-stat-item span {
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.meta-stat-item strong {
+    font-size: 1.25rem;
+    color: var(--text-dark);
+}
+
+.badge-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.badge-item {
+    padding: 8px 14px;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.top-careers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.top-career-card {
+    background: white;
+    border-radius: 20px;
+    padding: 18px 24px;
+    border: 1px solid rgba(131, 70, 223, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.top-career-card:hover {
+    transform: translateX(5px);
+    border-color: var(--lilac-400);
+}
+
+.top-career-name h4 {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.top-career-name p {
+    font-size: 0.85rem;
+    color: var(--text-soft);
+}
+
+.top-career-meta {
+    text-align: right;
+}
+
+.top-career-meta .salary-tag {
+    font-weight: 700;
+    color: var(--lilac-700);
+    font-size: 0.95rem;
+    display: block;
+}
+
+.top-career-meta .demand-tag {
+    font-size: 0.8rem;
+    color: #4baf50;
+    font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .result-grid-layout {
+        grid-template-columns: 1fr;
+    }
+    .result-header h1 {
+        font-size: 34px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="result-page">
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="logo-wrap">
+                <div class="logo-badge career-logo">
+                    <div class="logo-circle"></div>
+                    <div class="logo-arrow arrow-1"></div>
+                    <div class="logo-arrow arrow-2"></div>
+                    <div class="logo-arrow arrow-3"></div>
+                </div>
+
+                <div class="logo-text">
+                    <span class="logo-main">Career</span>
+                    <span class="logo-accent">DNA</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a href="/welcome">Dashboard</a>
+            <a href="/assessment" class="nav-take-test-link">Take Test</a>
+            <a href="/career-paths">Career Paths</a>
+            <a href="/resources">Resources</a>
+            <a href="/history">History</a>
+            <a href="/profile">Profile</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a>
+        </div>
+    </header>
+
+    <div class="result-wrap">
+        
+        <div class="result-header">
+            <h1>Your Career DNA Result</h1>
+            <p>We've analyzed your strengths, soft skills, and interests. Here is your professional profile matching.</p>
+        </div>
+
+        <div class="result-grid-layout">
+            
+            <!-- LEFT MAIN CONTENT -->
+            <div class="result-main-pane">
+                
+                <!-- Hero match card -->
+                <div class="result-hero-box">
+                    <div class="match-percentage-pill">Match Score: {{ score }} points</div>
+                    <h2>{{ career }}</h2>
+                    <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text-soft); margin-bottom: 20px;">
+                        {{ info.description }}
+                    </p>
+
+                    <div class="badge-list">
+                        {% for skill in info.skills %}
+                            <div class="badge-item badge-purple">{{ skill }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="meta-stats-row">
+                        <div class="meta-stat-item">
+                            <span>Average Salary</span>
+                            <strong>{{ info.salary }}</strong>
+                        </div>
+                        <div class="meta-stat-item">
+                            <span>Future Demand</span>
+                            <strong style="color: #2e7d32;">{{ info.demand }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Reasoning -->
+                <div class="result-section">
+                    <h3>💡 Analysis & Reasoning</h3>
+                    <p style="line-height: 1.8; color: var(--text-main); font-size: 1rem;">
+                        {{ info.reasoning }}
+                    </p>
+                </div>
+
+                <!-- Strengths & Weaknesses -->
+                <div class="result-section">
+                    <h3>📈 Profile Evaluation</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4 style="color: #2e7d32; margin-bottom: 10px; font-weight: 700;">💪 Strengths</h4>
+                            <ul style="padding-left: 18px;">
+                                {% for str in info.strengths %}
+                                    <li style="margin-bottom: 8px; color: var(--text-main); font-size: 0.95rem;">{{ str }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #c62828; margin-bottom: 10px; font-weight: 700;">⚠️ Weaknesses / Gaps</h4>
+                            <ul style="padding-left: 18px;">
+                                {% for wk in info.weaknesses %}
+                                    <li style="margin-bottom: 8px; color: var(--text-main); font-size: 0.95rem;">{{ wk }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggested Next Steps & Learning Plan -->
+                <div class="result-section">
+                    <h3>📚 Recommended Learning Plan</h3>
+                    <p style="line-height: 1.8; color: var(--text-main); margin-bottom: 16px;">
+                        {{ info.learning_plan }}
+                    </p>
+                    <div class="result-list-item">
+                        <strong>Suggested Next Action:</strong> {{ info.next_step }}
+                    </div>
+                </div>
+
+                <!-- Roadmap Steps Timeline -->
+                <div class="result-section">
+                    <h3>🗺️ Step-by-Step Roadmap</h3>
+                    <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 15px;">
+                        {% for step in info.roadmap %}
+                            <div class="result-list-item" style="border-left-color: var(--lilac-600);">
+                                <strong style="color: var(--lilac-700);">Step {{ loop.index }}:</strong> {{ step }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Recommended Certifications -->
+                <div class="result-section">
+                    <h3>🎓 Recommended Certifications</h3>
+                    <div class="cert-card-grid">
+                        {% for cert in info.certifications %}
+                            <div class="cert-card">
+                                <div class="cert-provider">Target Academy</div>
+                                <div class="cert-name">{{ cert }}</div>
+                                <div class="cert-meta">
+                                    <span>Difficulty: Intermediate</span>
+                                    <span>3-6 Months</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Top Companies Hiring & Scopes -->
+                <div class="result-section">
+                    <h3>🏢 Market & Career Scope</h3>
+                    <div style="margin-bottom: 18px;">
+                        <h4 style="color: var(--text-dark); margin-bottom: 8px; font-weight: 600;">Top Companies Hiring</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            {% for comp in info.companies %}
+                                <span class="badge-item" style="background: #efe5ff; color: #4c2489; font-weight: bold;">{{ comp }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text-dark); margin-bottom: 6px; font-weight: 600;">Future Scope Overview</h4>
+                        <p style="line-height: 1.7; color: var(--text-soft); font-size: 0.95rem;">
+                            {{ info.future_scope }}
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL SIDEBAR -->
+            <div class="result-sidebar">
+                
+                <!-- Action Buttons -->
+                <div class="result-section" style="padding: 24px;">
+                    <h3 style="font-size: 1.2rem; margin-bottom: 15px;">Actions</h3>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <a href="/download?name={{ user_name }}&career={{ career }}&score={{ score }}" 
+                           class="nav-btn primary-btn" 
+                           style="text-decoration: none; text-align: center; font-weight: 700; width: 100%;">
+                            Download Report (PDF)
+                        </a>
+                        <a href="/assessment" class="nav-btn secondary-btn" style="text-decoration: none; text-align: center; width: 100%;">
+                            Retake Assessment
+                        </a>
+                        <a href="/welcome" class="nav-btn secondary-btn" style="text-decoration: none; text-align: center; width: 100%;">
+                            Go to Dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Personality traits charts -->
+                <div class="result-section" style="padding: 24px;">
+                    <h3>📊 Category Comparison</h3>
+                    <div style="width: 100%; height: 260px; position: relative;">
+                        <canvas id="scoresRadarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top 5 recommended careers -->
+                <div class="result-section" style="padding: 24px;">
+                    <h3 style="font-size: 1.2rem; margin-bottom: 15px;">Top 5 Career Matches</h3>
+                    <div class="top-careers-list">
+                        {% for item in top_five %}
+                            <div class="top-career-card">
+                                <div class="top-career-name">
+                                    <h4 style="font-size: 0.95rem; margin: 0;">{{ item.name }}</h4>
+                                    <p style="margin: 0; font-size: 0.8rem;">Score Match: {{ 95 - (loop.index0 * 5) }}%</p>
+                                </div>
+                                <div class="top-career-meta">
+                                    <span class="salary-tag" style="font-size: 0.85rem;">{{ item.salary }}</span>
+                                    <span class="demand-tag" style="font-size: 0.75rem;">High</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script id="scores-data" type="application/json">{{ scores|tojson }}</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Build interactive comparison chart using Chart.js
+        const ctx = document.getElementById('scoresRadarChart').getContext('2d');
+        
+        // Parse python variables securely
+        const scoresRaw = JSON.parse(document.getElementById('scores-data').textContent);
+        const scoreLabels = scoresRaw.map(item => item[0]);
+        const scoreData = scoresRaw.map(item => item[1]);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: scoreLabels,
+                datasets: [{
+                    label: 'Match Factor',
+                    data: scoreData,
+                    backgroundColor: [
+                        'rgba(157, 92, 255, 0.65)',
+                        'rgba(131, 70, 223, 0.65)',
+                        'rgba(101, 49, 179, 0.65)',
+                        'rgba(76, 36, 137, 0.65)'
+                    ],
+                    borderColor: [
+                        '#9d5cff',
+                        '#8346df',
+                        '#6531b3',
+                        '#4c2489'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(131, 70, 223, 0.08)'
+                        },
+                        ticks: {
+                            color: '#685786'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#685786',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

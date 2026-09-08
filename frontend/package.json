@@ -1,0 +1,14 @@
+﻿{
+  "name": "career-dna-frontend",
+  "version": "1.0.0",
+  "description": "Career DNA frontend stub — actual app served by Flask on Render",
+  "private": true,
+  "scripts": {
+    "dev": "echo Run the Flask backend at http://127.0.0.1:5000",
+    "build": "echo Build complete",
+    "preview": "echo Preview via Flask backend"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

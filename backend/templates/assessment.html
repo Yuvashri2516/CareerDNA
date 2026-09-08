@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career DNA - Assessment Wizard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+.assessment-page {
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #faf7ff, #f3e9ff);
+    padding: 30px 20px 60px;
+}
+
+.assessment-box {
+    max-width: 800px;
+    margin: 40px auto 0;
+}
+
+.assessment-top {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.assessment-top h1 {
+    font-size: 42px;
+    color: #2f1854;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.assessment-top p {
+    color: #7c6f96;
+    font-size: 17px;
+}
+
+.question {
+    margin-bottom: 24px;
+    padding: 28px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(131, 70, 223, 0.12);
+    border-radius: 24px;
+    box-shadow: var(--shadow-soft);
+}
+
+.question h3 {
+    font-size: 20px;
+    color: #2f1854;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.option-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.option-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #eadbff;
+    border-radius: 18px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-weight: 600;
+    color: #3d2a63;
+    position: relative;
+    user-select: none;
+}
+
+.option-card:hover {
+    border-color: #9d5cff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(157, 92, 255, 0.12);
+}
+
+.option-card.selected {
+    border-color: #7a42d8;
+    background: #f7f1ff;
+    box-shadow: 0 8px 20px rgba(122, 66, 216, 0.15);
+}
+
+.option-card input {
+    margin-right: 12px;
+    accent-color: #7a42d8;
+    transform: scale(1.15);
+}
+
+@media (max-width: 768px) {
+    .option-grid {
+        grid-template-columns: 1fr;
+    }
+    .assessment-top h1 {
+        font-size: 32px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="assessment-page">
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="logo-wrap">
+                <div class="logo-badge career-logo">
+                    <div class="logo-circle"></div>
+                    <div class="logo-arrow arrow-1"></div>
+                    <div class="logo-arrow arrow-2"></div>
+                    <div class="logo-arrow arrow-3"></div>
+                </div>
+
+                <div class="logo-text">
+                    <span class="logo-main">Career</span>
+                    <span class="logo-accent">DNA</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a href="/welcome">Dashboard</a>
+            <a href="/assessment" class="nav-take-test-link">Take Test</a>
+            <a href="/career-paths">Career Paths</a>
+            <a href="/resources">Resources</a>
+            <a href="/history">History</a>
+            <a href="/profile">Profile</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a>
+        </div>
+    </header>
+
+    <div class="assessment-box">
+        <div class="assessment-top">
+            <h1>Career Assessment</h1>
+            <p>Answer the 10 questions to map out your ultimate Career DNA path.</p>
+        </div>
+
+        <!-- Progress Track -->
+        <div class="wizard-progress-bar">
+            <div class="wizard-progress-fill" id="progressFill"></div>
+        </div>
+
+        <form id="assessmentForm" action="/result" method="POST">
+
+            <!-- STEP 1: PERSONALITY -->
+            <div class="wizard-step active" data-step="1">
+                <div class="category-badge">Category: Personality</div>
+                
+                <div class="question">
+                    <h3>1. What do you enjoy doing the most during your free time or work?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="coding" required>
+                            <span>Writing code and building systems</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="design" required>
+                            <span>Designing interfaces and layouts</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="business" required>
+                            <span>Formulating marketing and business ideas</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="technical" required>
+                            <span>Analyzing statistics and reports</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>2. Which of these environments makes you feel most energized?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="numbers" required>
+                            <span>Solving numeric puzzles and sorting data</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="creativity" required>
+                            <span>Designing custom illustrations and layouts</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="trends" required>
+                            <span>Studying consumer habits and trends</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="technical" required>
+                            <span>Configuring networks or cloud setups</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: INTERESTS -->
+            <div class="wizard-step" data-step="2">
+                <div class="category-badge">Category: Interests</div>
+                
+                <div class="question">
+                    <h3>3. What topics are you most likely to read about online?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="logic" required>
+                            <span>New tech stacks, servers, or logic systems</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="people" required>
+                            <span>Human behavior, communications, and marketing</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="creative" required>
+                            <span>Art styles, animations, and modern UI tools</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="analytical" required>
+                            <span>Financial models and global economic statistics</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>4. How do you prefer to collaborate on a new project?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q4" value="independent" required>
+                            <span>Independently concentrating on deep logic work</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q4" value="team" required>
+                            <span>Brainstorming strategies as an active team</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q4" value="creative" required>
+                            <span>Facilitating client styling design reviews</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q4" value="trends" required>
+                            <span>Presenting market data and strategy notes</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: STRENGTHS -->
+            <div class="wizard-step" data-step="3">
+                <div class="category-badge">Category: Strengths</div>
+                
+                <div class="question">
+                    <h3>5. If you were building an application, what would you focus on?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q5" value="apps" required>
+                            <span>Writing robust backend database routines</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q5" value="visuals" required>
+                            <span>Crafting beautiful animations and styling sheets</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q5" value="marketing" required>
+                            <span>Optimizing SEO and user acquisition campaigns</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q5" value="analysis" required>
+                            <span>Interpreting usage tables and analytics</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>6. When complex problems arise, what is your standard approach?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q6" value="technical" required>
+                            <span>Applying step-by-step technical debug routines</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q6" value="presenting" required>
+                            <span>Discussing options and brainstorming with team</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q6" value="creative" required>
+                            <span>Sketching flow structures to visualize solutions</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q6" value="analytical" required>
+                            <span>Creating spreadsheets to evaluate scenarios</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 4: TECHNICAL SKILLS -->
+            <div class="wizard-step" data-step="4">
+                <div class="category-badge">Category: Technical Skills</div>
+                
+                <div class="question">
+                    <h3>7. Which of these skill domains are you most interested in mastering?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q7" value="analytical" required>
+                            <span>Data structures, SQL queries, and database optimization</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q7" value="creative" required>
+                            <span>Figma component libraries and interface design systems</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q7" value="trends" required>
+                            <span>Social media analytics and Google AdWords tracking</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q7" value="technical" required>
+                            <span>Deploying servers on AWS and writing docker configurations</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>8. Which type of work product are you most proud of creating?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q8" value="visuals" required>
+                            <span>Polished UI mockups and user journey prototypes</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q8" value="reports" required>
+                            <span>Automated database reports and charts dashboards</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q8" value="technical" required>
+                            <span>Functional backend APIs and clean script systems</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q8" value="trends" required>
+                            <span>Viral content campaigns and high SEO blog traffic</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 5: SOFT SKILLS -->
+            <div class="wizard-step" data-step="5">
+                <div class="category-badge">Category: Soft Skills</div>
+                
+                <div class="question">
+                    <h3>9. What soft skill do you find most natural to apply?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q9" value="trends" required>
+                            <span>Understanding social dynamics and communication trends</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q9" value="systems" required>
+                            <span>Organizing workflows, systems, and guidelines</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q9" value="creative" required>
+                            <span>Visual storytelling and intuitive presentations</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q9" value="technical" required>
+                            <span>Logical debugging and system analysis</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>10. Which strategy defines your optimal planning style?</h3>
+                    <div class="option-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q10" value="research" required>
+                            <span>Conducting exploratory research and finding patterns</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q10" value="execution" required>
+                            <span>Setting timelines and driving fast execution tasks</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q10" value="creative" required>
+                            <span>Designing interactive wireframes and conceptualizing paths</span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q10" value="systems" required>
+                            <span>Structuring system procedures and writing standard templates</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wizard Controls -->
+            <div class="wizard-controls">
+                <button type="button" class="wizard-btn prev" id="prevBtn" disabled>Previous</button>
+                <button type="button" class="wizard-btn next" id="nextBtn">Next</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Dynamic Loading Animation Overlay -->
+<div class="assessment-loader" id="loaderOverlay">
+    <div class="loader-spinner"></div>
+    <div class="loader-text" id="loaderTitle">Analyzing Response Patterns...</div>
+    <div class="loader-sub" id="loaderSubtitle">Connecting inputs to 25+ career data matrices</div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const steps = document.querySelectorAll(".wizard-step");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const progressFill = document.getElementById("progressFill");
+        const form = document.getElementById("assessmentForm");
+        const loaderOverlay = document.getElementById("loaderOverlay");
+        const loaderTitle = document.getElementById("loaderTitle");
+        const loaderSubtitle = document.getElementById("loaderSubtitle");
+
+        let currentStep = 1;
+        const totalSteps = steps.length;
+
+        // Custom Radio Styling trigger
+        document.querySelectorAll(".option-card input").forEach(input => {
+            input.addEventListener("change", function() {
+                const parentGrid = this.closest(".option-grid");
+                parentGrid.querySelectorAll(".option-card").forEach(card => {
+                    card.classList.remove("selected");
+                });
+                if (this.checked) {
+                    this.closest(".option-card").classList.add("selected");
+                }
+            });
+        });
+
+        function updateWizard() {
+            // Update Active Step View
+            steps.forEach(step => {
+                step.classList.remove("active");
+                if (parseInt(step.getAttribute("data-step")) === currentStep) {
+                    step.classList.add("active");
+                }
+            });
+
+            // Update Progress Bar
+            const percent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            progressFill.style.width = percent + "%";
+
+            // Update Controls
+            if (currentStep === 1) {
+                prevBtn.disabled = true;
+            } else {
+                prevBtn.disabled = false;
+            }
+
+            if (currentStep === totalSteps) {
+                nextBtn.textContent = "Analyze Career DNA";
+                nextBtn.classList.add("bg-gradient-purple");
+            } else {
+                nextBtn.textContent = "Next";
+                nextBtn.classList.remove("bg-gradient-purple");
+            }
+        }
+
+        function validateStepInputs(stepNum) {
+            const stepEl = document.querySelector(`.wizard-step[data-step="${stepNum}"]`);
+            const radios = stepEl.querySelectorAll("input[type='radio']");
+            const names = new Set();
+            radios.forEach(r => names.add(r.name));
+            
+            for (let name of names) {
+                const checked = stepEl.querySelector(`input[name="${name}"]:checked`);
+                if (!checked) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        nextBtn.addEventListener("click", function() {
+            if (!validateStepInputs(currentStep)) {
+                alert("Please answer all questions in this category before moving forward.");
+                return;
+            }
+
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateWizard();
+            } else {
+                // Submit Form - Trigger Loading Overlay first
+                loaderOverlay.style.display = "flex";
+                
+                const messages = [
+                    { title: "Analyzing Response Patterns...", sub: "Extracting skills, interests, and personality variables." },
+                    { title: "Mapping Professional Archetypes...", sub: "Weighting logic, design, analytical, and marketing factors." },
+                    { title: "Calculating Match Scores...", sub: "Cross-referencing parameters across our catalog of 25+ careers." },
+                    { title: "Structuring Custom Roadmap...", sub: "Selecting ideal beginner, intermediate, and advanced certifications." },
+                    { title: "Generating PDF Report...", sub: "Finalizing career profile DNA details." }
+                ];
+
+                let idx = 0;
+                const interval = setInterval(() => {
+                    idx++;
+                    if (idx < messages.length) {
+                        loaderTitle.textContent = messages[idx].title;
+                        loaderSubtitle.textContent = messages[idx].sub;
+                    }
+                }, 700);
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                    form.submit();
+                }, 3500);
+            }
+        });
+
+        prevBtn.addEventListener("click", function() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateWizard();
+            }
+        });
+
+        updateWizard();
+    });
+</script>
+</body>
+</html>
