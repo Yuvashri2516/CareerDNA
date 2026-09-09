@@ -1,12 +1,15 @@
-﻿{
+{
   "name": "career-dna-frontend",
   "version": "1.0.0",
-  "description": "Career DNA frontend stub — actual app served by Flask on Render",
+  "description": "Career DNA — Vite static frontend for Vercel deployment",
   "private": true,
   "scripts": {
-    "dev": "echo Run the Flask backend at http://127.0.0.1:5000",
-    "build": "echo Build complete",
-    "preview": "echo Preview via Flask backend"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
   },
   "engines": {
     "node": ">=18"

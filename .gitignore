@@ -9,3 +9,4 @@ career_dna.db
 node_modules/
 frontend/node_modules/
 frontend/dist/
+*.env.local
