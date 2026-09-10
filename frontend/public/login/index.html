@@ -179,9 +179,6 @@
 
   <script>
     // ── Read backend API base URL from config.js (loaded in <head>) ──
-    // config.js sets window.CAREER_DNA_API_BASE before this script runs.
-    // public/ files are NOT processed by Vite, so import.meta.env is not
-    // available here. window.CAREER_DNA_API_BASE is the correct source.
     const API_BASE = window.CAREER_DNA_API_BASE || null;
 
     const form      = document.getElementById('loginForm');
@@ -191,6 +188,54 @@
     function showMsg(text, type) {
       msgEl.textContent = text;
       msgEl.className = 'msg ' + type;
+    }
+
+    /**
+     * Attempts a fetch with an AbortController timeout.
+     * On a cold-start timeout (first attempt), updates the UI and retries once
+     * with a longer timeout so Render free-tier has enough time to wake up.
+     *
+     * Render free-tier cold start: typically 30-60 s after inactivity.
+     * First attempt: 60 s timeout.  Retry attempt: 90 s timeout.
+     */
+    async function fetchWithRetry(url, options) {
+      const FIRST_TIMEOUT_MS  = 60000; // 60 s — enough for most cold starts
+      const RETRY_TIMEOUT_MS  = 90000; // 90 s — generous retry budget
+
+      // ── First attempt ────────────────────────────────────────────
+      const ctrl1 = new AbortController();
+      const id1   = setTimeout(() => ctrl1.abort(), FIRST_TIMEOUT_MS);
+      try {
+        const res = await fetch(url, { ...options, signal: ctrl1.signal });
+        clearTimeout(id1);
+        return res;
+      } catch (err1) {
+        clearTimeout(id1);
+        // If it wasn't a timeout abort, re-throw immediately (CORS/DNS/etc.)
+        if (err1.name !== 'AbortError') {
+          throw new Error(`Connection failed: ${err1.message}`);
+        }
+      }
+
+      // ── Cold-start detected — inform user and retry ───────────────
+      submitBtn.textContent = 'Waking up server…';
+      showMsg('Server is waking up (Render free-tier cold start). Retrying, please wait up to 90 s…', 'error');
+
+      const ctrl2 = new AbortController();
+      const id2   = setTimeout(() => ctrl2.abort(), RETRY_TIMEOUT_MS);
+      try {
+        const res = await fetch(url, { ...options, signal: ctrl2.signal });
+        clearTimeout(id2);
+        // Clear the "waking up" message so the response message shows cleanly
+        msgEl.className = 'msg';
+        return res;
+      } catch (err2) {
+        clearTimeout(id2);
+        if (err2.name === 'AbortError') {
+          throw new Error('Server did not respond within 90 s. Please try again in a moment.');
+        }
+        throw new Error(`Connection failed on retry: ${err2.message}`);
+      }
     }
 
     form.addEventListener('submit', async (e) => {
@@ -217,9 +262,7 @@
       submitBtn.textContent = 'Logging in…';
 
       try {
-        // ── API call to Render Flask backend ─────────────────────
-        // The browser URL stays on Vercel. Only this fetch() goes to Render.
-        const response = await fetch(`${API_BASE}/api/login`, {
+        const response = await fetchWithRetry(`${API_BASE}/api/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -230,18 +273,24 @@
 
         if (response.ok && (data.success || data.redirect)) {
           showMsg('Login successful! Redirecting…', 'success');
-          // Always redirect to the Vercel frontend home ("/").
-          // data.redirect from the backend is "/welcome" which is a Flask
-          // server-rendered route that only exists on Render — it does not
-          // exist as a static page on Vercel and causes a 404.
           setTimeout(() => {
             window.location.href = '/';
           }, 800);
+        } else if (response.status === 401) {
+          showMsg(data.message || 'Invalid username or password.', 'error');
+        } else if (response.status === 400) {
+          showMsg(data.message || 'Bad request — please check your input.', 'error');
+        } else if (response.status === 404) {
+          showMsg('API endpoint not found (HTTP 404). Please contact support.', 'error');
+        } else if (response.status === 405) {
+          showMsg('Method not allowed (HTTP 405). Please contact support.', 'error');
+        } else if (response.status >= 500) {
+          showMsg(`Server error (HTTP ${response.status}). Please try again later.`, 'error');
         } else {
-          showMsg(data.message || data.error || 'Invalid username or password.', 'error');
+          showMsg(data.message || data.error || `Unexpected error (HTTP ${response.status}).`, 'error');
         }
       } catch (err) {
-        showMsg('Network error. Please try again.', 'error');
+        showMsg(err.message || 'Network error. Please try again.', 'error');
         console.error('[Career DNA] Login fetch error:', err);
       } finally {
         submitBtn.disabled = false;
