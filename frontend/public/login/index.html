@@ -6,6 +6,8 @@
   <meta name="description" content="Login to Career DNA — your AI-powered career guidance platform.">
   <title>Login — Career DNA</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- config.js sets window.CAREER_DNA_API_BASE before any page script runs -->
+  <script src="/config.js"></script>
   <style>
     :root {
       --lilac-500: #9d5cff;
@@ -176,12 +178,11 @@
   </div>
 
   <script>
-    // ── Read backend API base URL injected by Vite build ──────────
-    // VITE_API_BASE_URL is replaced at build time by Vite.
-    // The browser stays on the Vercel domain — only fetch() calls go to Render.
-    const API_BASE = (typeof import_meta_env_VITE_API_BASE_URL !== 'undefined'
-      ? import_meta_env_VITE_API_BASE_URL
-      : null) || window.CAREER_DNA_API_BASE || null;
+    // ── Read backend API base URL from config.js (loaded in <head>) ──
+    // config.js sets window.CAREER_DNA_API_BASE before this script runs.
+    // public/ files are NOT processed by Vite, so import.meta.env is not
+    // available here. window.CAREER_DNA_API_BASE is the correct source.
+    const API_BASE = window.CAREER_DNA_API_BASE || null;
 
     const form      = document.getElementById('loginForm');
     const msgEl     = document.getElementById('msg');
