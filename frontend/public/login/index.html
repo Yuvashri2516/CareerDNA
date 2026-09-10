@@ -230,9 +230,12 @@
 
         if (response.ok && (data.success || data.redirect)) {
           showMsg('Login successful! Redirecting…', 'success');
-          // Redirect to frontend dashboard or welcome page (still Vercel domain)
+          // Always redirect to the Vercel frontend home ("/").
+          // data.redirect from the backend is "/welcome" which is a Flask
+          // server-rendered route that only exists on Render — it does not
+          // exist as a static page on Vercel and causes a 404.
           setTimeout(() => {
-            window.location.href = data.redirect || '/';
+            window.location.href = '/';
           }, 800);
         } else {
           showMsg(data.message || data.error || 'Invalid username or password.', 'error');
