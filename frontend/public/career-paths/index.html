@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore 25+ career paths — Career DNA helps you find your perfect career match.">
+  <title>Career Paths — Career DNA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .cp-page {
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #faf7ff, #f3e9ff);
+      padding: 30px 20px 60px;
+    }
+    .cp-wrap { max-width: 1200px; margin: 80px auto 0; }
+    .cp-header { text-align: center; margin-bottom: 48px; }
+    .cp-header h1 {
+      font-size: 48px; color: #2f1854; font-weight: 800; margin-bottom: 14px;
+    }
+    .cp-header p {
+      font-size: 18px; color: #6f6290; max-width: 680px;
+      margin: 0 auto 32px; line-height: 1.8;
+    }
+    .search-container { max-width: 600px; margin: 0 auto 44px; }
+    .search-input {
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 99px;
+      border: 2px solid rgba(131,70,223,0.15);
+      background: rgba(255,255,255,0.9);
+      font-family: inherit;
+      font-size: 1.05rem;
+      color: #3d2a63;
+      outline: none;
+      box-shadow: 0 20px 60px rgba(83,41,138,0.10);
+      transition: all 0.25s;
+    }
+    .search-input:focus {
+      border-color: #9d5cff;
+      box-shadow: 0 10px 25px rgba(131,70,223,0.12);
+      background: white;
+    }
+    .career-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+    .career-card {
+      background: rgba(255,255,255,0.85);
+      border-radius: 28px;
+      padding: 30px;
+      border: 1px solid rgba(131,70,223,0.12);
+      box-shadow: 0 20px 60px rgba(83,41,138,0.10);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.165,0.84,0.44,1);
+    }
+    .career-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(95,51,156,0.12); }
+    .career-card h2 { color: #24133f; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .career-card .desc { color: #685786; line-height: 1.7; margin-bottom: 18px; font-size: 0.96rem; }
+    .career-stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .career-stat {
+      background: rgba(255,255,255,0.6);
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(131,70,223,0.06);
+    }
+    .career-stat span { font-size: 0.76rem; color: #685786; display: block; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
+    .career-stat strong { font-size: 1rem; color: #24133f; }
+    .skills-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .tag {
+      background: #efe5ff; color: #6531b3;
+      padding: 5px 11px; border-radius: 99px; font-size: 0.8rem; font-weight: 600;
+    }
+    .cta-link {
+      display: block;
+      text-align: center;
+      margin-top: auto;
+      padding: 13px 20px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #9d5cff, #6531b3);
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.92rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 20px rgba(101,49,179,0.25);
+    }
+    .cta-link:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(101,49,179,0.35); }
+    @media (max-width: 900px) {
+      .career-grid { grid-template-columns: 1fr; }
+      .cp-header h1 { font-size: 34px; }
+    }
+    /* ── Navbar ── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 32px;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(131,70,223,0.10);
+      z-index: 100;
+    }
+    .logo-link { text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .logo-main  { font-size: 1.1rem; font-weight: 800; color: #24133f; }
+    .logo-accent{ font-size: 1.1rem; font-weight: 800; color: #9d5cff; }
+    .nav-links-row { display: flex; gap: 28px; list-style: none; }
+    .nav-links-row a { color: #3d2a63; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links-row a:hover, .nav-links-row a.active { color: #9d5cff; }
+    .nav-actions { display: flex; gap: 12px; }
+    .nav-btn {
+      padding: 8px 20px; border-radius: 999px; font-family: inherit;
+      font-weight: 700; font-size: 0.85rem; cursor: pointer; text-decoration: none; border: none;
+      transition: all 0.2s;
+    }
+    .secondary-btn { background: transparent; border: 2px solid #9d5cff; color: #6531b3; }
+    .secondary-btn:hover { background: #f3e9ff; }
+    .primary-btn { background: linear-gradient(135deg, #9d5cff, #6531b3); color: white; box-shadow: 0 6px 16px rgba(101,49,179,0.25); }
+    .primary-btn:hover { transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="/" class="logo-link">
+      <span class="logo-main">Career</span><span class="logo-accent">DNA</span>
+    </a>
+    <nav>
+      <ul class="nav-links-row">
+        <li><a href="/career-paths" class="active">Career Paths</a></li>
+        <li><a href="/resources">Resources</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a href="/login" class="nav-btn secondary-btn">Login</a>
+      <a href="/register" class="nav-btn primary-btn">Register</a>
+    </div>
+  </header>
+
+  <div class="cp-page">
+    <div class="cp-wrap">
+
+      <div class="cp-header">
+        <h1>Explore Career Paths</h1>
+        <p>Discover 25+ engineering, medical, analytical, and creative careers.
+           Search by name, skills, or field — then take the assessment to find your match.</p>
+        <div class="search-container">
+          <input type="text" id="searchBar" class="search-input" placeholder="Search careers by name, skills, or field…">
+        </div>
+      </div>
+
+      <div class="career-grid" id="careerGrid">
+
+        <!-- Software Development -->
+        <div class="career-card" data-tags="software developer programming python java javascript coding">
+          <h2>💻 Software Developer</h2>
+          <p class="desc">Design, build, and maintain software applications. Work across web, mobile, desktop, and backend systems.</p>
+          <div class="career-stats-row">
+            <div class="career-stat"><span>Avg Salary</span><strong>₹8–25 LPA</strong></div>
+            <div class="career-stat"><span>Demand</span><strong style="color:#2e7d32">Very High</strong></div>
+          </div>
+          <div class="skills-tags">
+            <span class="tag">Python</span><span class="tag">Java</span>
+            <span class="tag">JavaScript</span><span class="tag">React</span><span class="tag">Git</span>
+          </div>
+          <a href="/login" class="cta-link">Take Assessment → Find Your Match</a>
+        </div>
+
+        <!-- Data Analyst -->
+        <div class="career-card" data-tags="data analyst statistics excel sql power bi analytics">
+          <h2>📊 Data Analyst</h2>
+          <p class="desc">Collect, process, and analyze data to help organizations make better decisions using statistical methods and visualization tools.</p>
+          <div class="career-stats-row">
+            <div class="career-stat"><span>Avg Salary</span><strong>₹6–18 LPA</strong></div>
+            <div class="career-stat"><span>Demand</span><strong style="color:#2e7d32">High</strong></div>
+          </div>
+          <div class="skills-tags">
+            <span class="tag">SQL</span><span class="tag">Excel</span>
+            <span class="tag">Python</span><span class="tag">Power BI</span><span class="tag">Statistics</span>
+          </div>
+          <a href="/login" class="cta-link">Take Assessment → Find Your Match</a>
+        </div>
+
+        <!-- AI / ML Engineer -->
+        <div class="career-card" data-tags="ai machine learning deep learning neural network tensorflow pytorch">
+          <h2>🤖 AI / ML Engineer</h2>
+          <p class="desc">Build intelligent systems using machine learning algorithms, deep learning models, and AI frameworks to solve complex real-world problems.</p>
+          <div class="career-stats-row">
+            <div class="career-stat"><span>Avg Salary</span><strong>₹12–40 LPA</strong></div>
+            <div class="career-stat"><span>Demand</span><strong style="color:#2e7d32">Very High</strong></div>
+          </div>
+          <div class="skills-tags">
+            <span class="tag">Python</span><span class="tag">TensorFlow</span>
+            <span class="tag">PyTorch</span><span class="tag">Math/Stats</span>
+          </div>
+          <a href="/login" class="cta-link">Take Assessment → Find Your Match</a>
+        </div>
+
+        <!-- UI/UX Designer -->
+        <div class="career-card" data-tags="ui ux designer figma design user experience prototyping">
+          <h2>🎨 UI/UX Designer</h2>
+          <p class="desc">Create intuitive, beautiful digital experiences. Research user needs, create wireframes, prototypes, and deliver polished interfaces.</p>
+          <div class="career-stats-row">
+            <div class="career-stat"><span>Avg Salary</span><strong>₹5–16 LPA</strong></div>
+            <div class="career-stat"><span>Demand</span><strong style="color:#2e7d32">High</strong></div>
+          </div>
+          <div class="skills-tags">
+            <span class="tag">Figma</span><span class="tag">Prototyping</span>
+            <span class="tag">User Research</span><span class="tag">Wireframing</span>
+          </div>
+          <a href="/login" class="cta-link">Take Assessment → Find Your Match</a>
+        </div>
+
+        <!-- Cybersecurity -->
+        <div class="career-card" data-tags="cybersecurity security ethical hacking network penetration testing">
+          <h2>🔐 Cybersecurity Analyst</h2>
+          <p class="desc">Protect organizations from cyber threats by monitoring networks, identifying vulnerabilities, and implementing security measures.</p>
+          <div class="career-stats-row">
+            <div class="career-stat"><span>Avg Salary</span><strong>₹7–22 LPA</strong></div>
+            <div class="career-stat"><span>Demand</span><strong style="color:#2e7d32">Very High</strong></div>
+          </div>
+          <div class="skills-tags">
+            <span class="tag">Networking</span><span class="tag">Linux</span>
+            <span class="tag">Ethical Hacking</span><span class="tag">SIEM</span>
+          </div>
+          <a href="/login" class="cta-link">Take Assessment → Find Your Match</a>
+        </div>
+
+        <!-- Cloud / DevOps -->
+        <div class="career-card" data-tags="cloud devops aws azure docker kubernetes infrastructure">
+          <h2>☁️ Cloud / DevOps Engineer</h2>
+          <p class="desc">Design and manage scalable cloud infrastructure, CI/CD pipelines, and automated deployment systems for modern applications.</p>
+          <div class="career-stats-row">
+            <div class="career-stat"><span>Avg Salary</span><strong>₹9–28 LPA</strong></div>
+            <div class="career-stat"><span>Demand</span><strong style="color:#2e7d32">Very High</strong></div>
+          </div>
+          <div class="skills-tags">
+            <span class="tag">AWS</span><span class="tag">Docker</span>
+            <span class="tag">Kubernetes</span><span class="tag">CI/CD</span><span class="tag">Linux</span>
+          </div>
+          <a href="/login" class="cta-link">Take Assessment → Find Your Match</a>
+        </div>
+
+        <!-- Doctor / Medicine -->
+        <div class="career-card" data-tags="doctor medicine medical mbbs health clinical">
+          <h2>🩺 Doctor / Physician</h2>
+          <p class="desc">Diagnose and treat patients, provide preventive care, and contribute to public health through evidence-based medical practice.</p>
+          <div class="career-stats-row">
+            <div class="career-stat"><span>Avg Salary</span><strong>₹10–60 LPA</strong></div>
+            <div class="career-stat"><span>Demand</span><strong style="color:#2e7d32">Very High</strong></div>
+          </div>
+          <div class="skills-tags">
+            <span class="tag">Clinical Skills</span><span class="tag">Biology</span>
+            <span class="tag">MBBS</span><span class="tag">Research</span>
+          </div>
+          <a href="/login" class="cta-link">Take Assessment → Find Your Match</a>
+        </div>
+
+        <!-- Finance / Banking -->
+        <div class="career-card" data-tags="finance banking investment analyst ca accounting economics">
+          <h2>💰 Finance / Investment Analyst</h2>
+          <p class="desc">Analyze financial data, manage portfolios, assess investment opportunities, and guide businesses and individuals on financial decisions.</p>
+          <div class="career-stats-row">
+            <div class="career-stat"><span>Avg Salary</span><strong>₹6–20 LPA</strong></div>
+            <div class="career-stat"><span>Demand</span><strong style="color:#2e7d32">High</strong></div>
+          </div>
+          <div class="skills-tags">
+            <span class="tag">Excel</span><span class="tag">Financial Modeling</span>
+            <span class="tag">Economics</span><span class="tag">CFA/CA</span>
+          </div>
+          <a href="/login" class="cta-link">Take Assessment → Find Your Match</a>
+        </div>
+
+      </div><!-- /#careerGrid -->
+
+      <div style="text-align:center; margin-top: 52px; padding-bottom: 20px;">
+        <p style="color:#685786; margin-bottom:18px; font-size: 1rem;">
+          Not sure which career fits you best? Take our 15-minute AI assessment.
+        </p>
+        <a href="/login" style="
+          display: inline-block;
+          padding: 18px 42px;
+          background: linear-gradient(135deg, #9d5cff, #6531b3);
+          color: white;
+          border-radius: 999px;
+          font-weight: 800;
+          font-size: 1.05rem;
+          text-decoration: none;
+          box-shadow: 0 14px 34px rgba(101,49,179,0.30);
+          transition: transform 0.25s, box-shadow 0.25s;
+        " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          Take the Career Assessment &nbsp;→
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('searchBar').addEventListener('keyup', function () {
+      const query = this.value.toLowerCase().trim();
+      document.querySelectorAll('.career-card').forEach(card => {
+        const text = (card.textContent + ' ' + card.getAttribute('data-tags')).toLowerCase();
+        card.style.display = text.includes(query) ? 'flex' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

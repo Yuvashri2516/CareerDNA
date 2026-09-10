@@ -2,12 +2,17 @@
  * Career DNA — Vite frontend entry point
  *
  * VITE_API_BASE_URL must be set in Vercel environment variables
- * pointing to your Render Flask backend, e.g.:
+ * pointing to your Render Flask backend, e.g.
  *   https://your-careerdna-app.onrender.com
  *
  * Set this in: Vercel → Project → Settings → Environment Variables
  *   Key:   VITE_API_BASE_URL
  *   Value: https://your-careerdna-app.onrender.com
+ *
+ * IMPORTANT SEPARATION OF CONCERNS:
+ *   FRONTEND NAVIGATION → use relative frontend routes: /login, /register, etc.
+ *   BACKEND API CALLS   → use VITE_API_BASE_URL only inside fetch() / axios()
+ *   NEVER use VITE_API_BASE_URL as an href or window.location.href.
  */
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL
@@ -23,39 +28,30 @@ if (!API_BASE) {
 }
 
 /**
- * Build a full URL to a Flask backend route.
- * If API_BASE is not set, returns '#' so the link is inert
- * rather than navigating to a relative /login that Vercel rewrites back to index.html.
+ * Build a full URL to a Flask backend API endpoint.
+ * ONLY use this for fetch()/axios() API calls — NEVER for href navigation.
+ * Example: fetch(apiUrl('/api/login'), { method: 'POST', body: ... })
  */
-function backendUrl(path) {
-  return API_BASE ? `${API_BASE}${path}` : '#';
+function apiUrl(path) {
+  return API_BASE ? `${API_BASE}${path}` : null;
 }
 
-// ── Wire navbar links to Flask backend ──────────────────────────
-document.getElementById('nav-login-link').href     = backendUrl('/login');
-document.getElementById('nav-register-link').href  = backendUrl('/signup');
-document.getElementById('nav-career-paths').href   = backendUrl('/career-paths');
-document.getElementById('nav-resources').href      = backendUrl('/resources');
-document.getElementById('nav-contact').href        = backendUrl('/contact');
+// ── Wire navbar links to FRONTEND routes (Vercel pages) ──────────
+// These navigate within the Vercel frontend — they must NEVER point to the
+// Render backend URL. The browser stays on the Vercel domain at all times.
+document.getElementById('nav-login-link').href     = '/login';
+document.getElementById('nav-register-link').href  = '/register';
+document.getElementById('nav-career-paths').href   = '/career-paths';
+document.getElementById('nav-resources').href      = '/resources';
+document.getElementById('nav-contact').href        = '/contact';
 
-// Assessment CTA — send to login then redirect to assessment
-document.getElementById('assessment-cta-btn').href = backendUrl('/login?next=/assessment');
+// Assessment CTA — navigate to frontend login page, NOT the backend
+document.getElementById('assessment-cta-btn').href = '/login';
 
-// If backend URL is not configured, show a helpful message on click
-if (!API_BASE) {
-  document.querySelectorAll('a[href="#"]').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      alert(
-        'Backend not configured yet.\n\n' +
-        'To connect this frontend to the Flask backend:\n' +
-        '1. Go to Vercel → Project → Settings → Environment Variables\n' +
-        '2. Add: VITE_API_BASE_URL = https://your-app.onrender.com\n' +
-        '3. Redeploy'
-      );
-    });
-  });
-}
+// Expose API_BASE and apiUrl globally so frontend pages (login, register)
+// can use them for fetch() API calls to the Render backend.
+window.CAREER_DNA_API_BASE = API_BASE;
+window.careerDnaApiUrl = apiUrl;
 
 
 // ── Smooth scrolling for anchor links ───────────────────────────

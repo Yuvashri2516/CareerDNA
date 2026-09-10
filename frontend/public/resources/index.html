@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learning resources for career development — Career DNA curated guides, courses, and tools.">
+  <title>Resources — Career DNA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --lilac-500: #9d5cff;
+      --lilac-700: #6531b3;
+      --text-dark: #24133f;
+      --text-soft: #685786;
+      --text-main: #3d2a63;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #faf7ff, #f3e9ff);
+      min-height: 100vh;
+      padding: 30px 20px 60px;
+      color: var(--text-main);
+    }
+    /* Navbar */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 32px;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(131,70,223,0.10);
+      z-index: 100;
+    }
+    .logo-link { text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .logo-main  { font-size: 1.1rem; font-weight: 800; color: var(--text-dark); }
+    .logo-accent{ font-size: 1.1rem; font-weight: 800; color: var(--lilac-500); }
+    .nav-links-row { display: flex; gap: 28px; list-style: none; }
+    .nav-links-row a { color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links-row a:hover, .nav-links-row a.active { color: var(--lilac-500); }
+    .nav-actions { display: flex; gap: 12px; }
+    .nav-btn {
+      padding: 8px 20px; border-radius: 999px; font-family: inherit;
+      font-weight: 700; font-size: 0.85rem; cursor: pointer; text-decoration: none; border: none;
+      transition: all 0.2s; display: inline-block;
+    }
+    .secondary-btn { background: transparent; border: 2px solid var(--lilac-500); color: var(--lilac-700); }
+    .secondary-btn:hover { background: #f3e9ff; }
+    .primary-btn { background: linear-gradient(135deg, var(--lilac-500), var(--lilac-700)); color: white; box-shadow: 0 6px 16px rgba(101,49,179,0.25); }
+    .primary-btn:hover { transform: translateY(-1px); }
+    /* Page body */
+    .res-wrap { max-width: 1200px; margin: 100px auto 0; }
+    .res-header { text-align: center; margin-bottom: 48px; }
+    .res-header h1 { font-size: 48px; color: var(--text-dark); font-weight: 800; margin-bottom: 14px; }
+    .res-header p { font-size: 18px; color: var(--text-soft); max-width: 680px; margin: 0 auto; line-height: 1.8; }
+    /* Category tabs */
+    .res-tabs { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px; }
+    .res-tab {
+      padding: 9px 22px; border-radius: 99px; font-family: inherit;
+      font-weight: 600; font-size: 0.88rem; cursor: pointer; border: 2px solid rgba(131,70,223,0.15);
+      background: white; color: var(--text-main); transition: all 0.2s;
+    }
+    .res-tab.active, .res-tab:hover {
+      background: linear-gradient(135deg, var(--lilac-500), var(--lilac-700));
+      color: white; border-color: transparent;
+    }
+    /* Resource grid */
+    .res-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .res-card {
+      background: rgba(255,255,255,0.88);
+      border-radius: 24px;
+      padding: 26px;
+      border: 1px solid rgba(131,70,223,0.11);
+      box-shadow: 0 16px 40px rgba(83,41,138,0.09);
+      transition: transform 0.25s, box-shadow 0.25s;
+      display: flex;
+      flex-direction: column;
+    }
+    .res-card:hover { transform: translateY(-4px); box-shadow: 0 24px 50px rgba(83,41,138,0.15); }
+    .res-card-icon { font-size: 2rem; margin-bottom: 14px; }
+    .res-card-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 99px;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      background: #efe5ff; color: var(--lilac-700);
+    }
+    .res-card h3 { font-size: 1.05rem; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    .res-card p { font-size: 0.87rem; color: var(--text-soft); line-height: 1.65; margin-bottom: 18px; flex: 1; }
+    .res-link {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 12px;
+      background: rgba(157,92,255,0.09);
+      color: var(--lilac-700);
+      font-weight: 700;
+      font-size: 0.84rem;
+      text-decoration: none;
+      transition: background 0.2s;
+      align-self: flex-start;
+    }
+    .res-link:hover { background: rgba(157,92,255,0.18); }
+    @media (max-width: 1000px) { .res-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) {
+      .res-grid { grid-template-columns: 1fr; }
+      .res-header h1 { font-size: 34px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="/" class="logo-link">
+      <span class="logo-main">Career</span><span class="logo-accent">DNA</span>
+    </a>
+    <nav>
+      <ul class="nav-links-row">
+        <li><a href="/career-paths">Career Paths</a></li>
+        <li><a href="/resources" class="active">Resources</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a href="/login" class="nav-btn secondary-btn">Login</a>
+      <a href="/register" class="nav-btn primary-btn">Register</a>
+    </div>
+  </header>
+
+  <div class="res-wrap">
+
+    <div class="res-header">
+      <h1>Learning Resources</h1>
+      <p>Curated guides, courses, tools, and roadmaps to help you build skills and advance your career journey.</p>
+    </div>
+
+    <div class="res-tabs">
+      <button class="res-tab active" onclick="filterRes('all', this)">All</button>
+      <button class="res-tab" onclick="filterRes('course', this)">Courses</button>
+      <button class="res-tab" onclick="filterRes('guide', this)">Guides</button>
+      <button class="res-tab" onclick="filterRes('tool', this)">Tools</button>
+      <button class="res-tab" onclick="filterRes('community', this)">Community</button>
+    </div>
+
+    <div class="res-grid" id="resGrid">
+
+      <div class="res-card" data-cat="course">
+        <div class="res-card-icon">🎓</div>
+        <span class="res-card-badge">Course</span>
+        <h3>CS50 — Introduction to Computer Science</h3>
+        <p>Harvard's world-renowned free course. Covers Python, C, SQL, algorithms, and web development fundamentals for absolute beginners.</p>
+        <a href="https://cs50.harvard.edu" target="_blank" rel="noopener" class="res-link">Visit Resource →</a>
+      </div>
+
+      <div class="res-card" data-cat="course">
+        <div class="res-card-icon">📚</div>
+        <span class="res-card-badge">Course</span>
+        <h3>freeCodeCamp — Full Stack Development</h3>
+        <p>Free, self-paced curriculum covering HTML, CSS, JavaScript, React, Node.js, and databases with project certifications.</p>
+        <a href="https://freecodecamp.org" target="_blank" rel="noopener" class="res-link">Visit Resource →</a>
+      </div>
+
+      <div class="res-card" data-cat="course">
+        <div class="res-card-icon">🤖</div>
+        <span class="res-card-badge">Course</span>
+        <h3>fast.ai — Practical Deep Learning</h3>
+        <p>Top-down approach to machine learning and deep learning. Build real AI models from day one using PyTorch.</p>
+        <a href="https://fast.ai" target="_blank" rel="noopener" class="res-link">Visit Resource →</a>
+      </div>
+
+      <div class="res-card" data-cat="guide">
+        <div class="res-card-icon">🗺️</div>
+        <span class="res-card-badge">Guide</span>
+        <h3>Roadmap.sh — Developer Roadmaps</h3>
+        <p>Step-by-step visual roadmaps for becoming a Frontend, Backend, DevOps, Android, or AI/ML engineer.</p>
+        <a href="https://roadmap.sh" target="_blank" rel="noopener" class="res-link">Visit Resource →</a>
+      </div>
+
+      <div class="res-card" data-cat="guide">
+        <div class="res-card-icon">📖</div>
+        <span class="res-card-badge">Guide</span>
+        <h3>The Odin Project</h3>
+        <p>Comprehensive, free web development curriculum that takes you from zero to job-ready. Covers Ruby, JavaScript, and Rails.</p>
+        <a href="https://theodinproject.com" target="_blank" rel="noopener" class="res-link">Visit Resource →</a>
+      </div>
+
+      <div class="res-card" data-cat="tool">
+        <div class="res-card-icon">⚡</div>
+        <span class="res-card-badge">Tool</span>
+        <h3>LeetCode — Coding Practice</h3>
+        <p>Practice data structures, algorithms, and system design interview questions. 3000+ problems across all difficulty levels.</p>
+        <a href="https://leetcode.com" target="_blank" rel="noopener" class="res-link">Visit Resource →</a>
+      </div>
+
+      <div class="res-card" data-cat="tool">
+        <div class="res-card-icon">🎨</div>
+        <span class="res-card-badge">Tool</span>
+        <h3>Figma — Design Tool</h3>
+        <p>Industry-standard UI/UX design tool. Free tier available. Create wireframes, prototypes, and design systems collaboratively.</p>
+        <a href="https://figma.com" target="_blank" rel="noopener" class="res-link">Visit Resource →</a>
+      </div>
+
+      <div class="res-card" data-cat="community">
+        <div class="res-card-icon">🌐</div>
+        <span class="res-card-badge">Community</span>
+        <h3>Dev.to — Developer Community</h3>
+        <p>A community of software developers sharing articles, tutorials, discussions, and career advice. Great for networking and learning.</p>
+        <a href="https://dev.to" target="_blank" rel="noopener" class="res-link">Visit Resource →</a>
+      </div>
+
+      <div class="res-card" data-cat="course">
+        <div class="res-card-icon">📊</div>
+        <span class="res-card-badge">Course</span>
+        <h3>Kaggle Learn — Data Science</h3>
+        <p>Free micro-courses in Python, ML, deep learning, data visualization, and SQL. Includes real datasets and competitions.</p>
+        <a href="https://kaggle.com/learn" target="_blank" rel="noopener" class="res-link">Visit Resource →</a>
+      </div>
+
+    </div><!-- /#resGrid -->
+
+    <div style="text-align:center; margin-top: 52px; padding-bottom: 20px;">
+      <p style="color:#685786; margin-bottom:18px; font-size: 1rem;">
+        Ready to find out which career truly fits you?
+      </p>
+      <a href="/login" style="
+        display: inline-block;
+        padding: 18px 42px;
+        background: linear-gradient(135deg, #9d5cff, #6531b3);
+        color: white;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: 1.05rem;
+        text-decoration: none;
+        box-shadow: 0 14px 34px rgba(101,49,179,0.30);
+        transition: transform 0.25s;
+      " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+        Take the Career Assessment &nbsp;→
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    function filterRes(cat, btn) {
+      document.querySelectorAll('.res-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.res-card').forEach(card => {
+        if (cat === 'all' || card.getAttribute('data-cat') === cat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

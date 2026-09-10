@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login to Career DNA — your AI-powered career guidance platform.">
+  <title>Login — Career DNA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --lilac-500: #9d5cff;
+      --lilac-700: #6531b3;
+      --text-dark: #24133f;
+      --text-soft: #685786;
+      --text-main: #3d2a63;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #faf7ff 0%, #f3e9ff 50%, #ede0ff 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    /* ── Logo / Back link ── */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 32px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(131,70,223,0.10);
+      z-index: 100;
+    }
+    .logo-link {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-main { font-size: 1.1rem; font-weight: 800; color: var(--text-dark); }
+    .logo-accent { font-size: 1.1rem; font-weight: 800; color: var(--lilac-500); }
+    .back-link {
+      font-size: 0.85rem;
+      color: var(--lilac-700);
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 0.7; }
+
+    /* ── Auth box ── */
+    .auth-box {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255,255,255,0.94);
+      padding: 42px 38px;
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(83,41,138,0.16);
+      border: 1px solid rgba(157,92,255,0.12);
+      margin-top: 80px;
+    }
+    .auth-box h1 {
+      margin: 0 0 6px;
+      color: var(--text-dark);
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+    .auth-box .subtitle {
+      text-align: center;
+      color: var(--text-soft);
+      margin-bottom: 30px;
+      font-size: 0.9rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      border: 1.5px solid #e7d7ff;
+      border-radius: 14px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #fdfaff;
+    }
+    input:focus {
+      border-color: var(--lilac-500);
+      box-shadow: 0 0 0 3px rgba(157,92,255,0.12);
+      background: white;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--lilac-500), var(--lilac-700));
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 20px rgba(101,49,179,0.28);
+    }
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(101,49,179,0.36);
+    }
+    .submit-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+    .bottom-link {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--text-soft);
+    }
+    .bottom-link a { color: var(--lilac-700); text-decoration: none; font-weight: 600; }
+    .bottom-link a:hover { text-decoration: underline; }
+    /* ── Feedback messages ── */
+    .msg {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .msg.error  { background: #fff0f0; color: #c0392b; border: 1px solid #fcc; display: block; }
+    .msg.success{ background: #f0fff4; color: #1a7f37; border: 1px solid #b3f0c0; display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="/" class="logo-link">
+      <span class="logo-main">Career</span><span class="logo-accent">DNA</span>
+    </a>
+    <a href="/" class="back-link">← Back to Home</a>
+  </div>
+
+  <div class="auth-box">
+    <h1>Welcome Back</h1>
+    <p class="subtitle">Sign in to continue to Career DNA</p>
+
+    <div id="msg" class="msg"></div>
+
+    <form id="loginForm" novalidate>
+      <label for="username">Username</label>
+      <input id="username" type="text" name="username" placeholder="Enter your username" required autocomplete="username">
+
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+
+      <button type="submit" class="submit-btn" id="submitBtn">Login</button>
+    </form>
+
+    <div class="bottom-link">
+      Don't have an account? <a href="/register">Create one</a>
+    </div>
+  </div>
+
+  <script>
+    // ── Read backend API base URL injected by Vite build ──────────
+    // VITE_API_BASE_URL is replaced at build time by Vite.
+    // The browser stays on the Vercel domain — only fetch() calls go to Render.
+    const API_BASE = (typeof import_meta_env_VITE_API_BASE_URL !== 'undefined'
+      ? import_meta_env_VITE_API_BASE_URL
+      : null) || window.CAREER_DNA_API_BASE || null;
+
+    const form      = document.getElementById('loginForm');
+    const msgEl     = document.getElementById('msg');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showMsg(text, type) {
+      msgEl.textContent = text;
+      msgEl.className = 'msg ' + type;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msgEl.className = 'msg'; // hide
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        showMsg('Please fill in all fields.', 'error');
+        return;
+      }
+
+      if (!API_BASE) {
+        showMsg(
+          'Backend not configured. Set VITE_API_BASE_URL in Vercel environment variables.',
+          'error'
+        );
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in…';
+
+      try {
+        // ── API call to Render Flask backend ─────────────────────
+        // The browser URL stays on Vercel. Only this fetch() goes to Render.
+        const response = await fetch(`${API_BASE}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok && (data.success || data.redirect)) {
+          showMsg('Login successful! Redirecting…', 'success');
+          // Redirect to frontend dashboard or welcome page (still Vercel domain)
+          setTimeout(() => {
+            window.location.href = data.redirect || '/';
+          }, 800);
+        } else {
+          showMsg(data.message || data.error || 'Invalid username or password.', 'error');
+        }
+      } catch (err) {
+        showMsg('Network error. Please try again.', 'error');
+        console.error('[Career DNA] Login fetch error:', err);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Login';
+      }
+    });
+  </script>
+</body>
+</html>
