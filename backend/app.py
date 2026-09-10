@@ -3,6 +3,7 @@ import os
 import json
 import sqlite3
 from flask import Flask, render_template, request, redirect, session, send_file, jsonify
+from flask_cors import CORS
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 
@@ -13,9 +14,31 @@ app = Flask(
 )
 app.secret_key = "secret123"
 
-# Setup paths relative to backend directory
+# ── CORS — allow the Vercel frontend to call /api/* routes ─────────────────
+# Credentials (session cookies) are included by the frontend fetch() calls,
+# so we must specify the exact origin rather than "*".
+CORS(
+    app,
+    resources={r"/api/*": {"origins": [
+        "https://career-dna-vdzg.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ]}},
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "OPTIONS"],
+)
+
+# ── Database path — always absolute, derived from this file's location ────
+# Using __file__ guarantees the correct path regardless of the working
+# directory that Gunicorn or the OS sets when starting the process.
 backend_dir = os.path.dirname(os.path.abspath(__file__))
-db_path = os.path.join(backend_dir, 'database', 'career_dna.db')
+db_dir  = os.path.join(backend_dir, 'database')
+db_path = os.path.join(db_dir, 'career_dna.db')
+
+# Ensure the database directory exists before any sqlite3.connect() call.
+# This is critical on Render where the directory may not pre-exist.
+os.makedirs(db_dir, exist_ok=True)
 
 # Helper to fetch detailed career info from data/careers.json with fallbacks
 def get_career_details(name):
@@ -702,6 +725,111 @@ def achievements():
         return redirect('/login')
     return render_template('achievements.html')
 
-if __name__ == "__main__":
+# ── Initialise the database at module load time ───────────────────────────
+# When Gunicorn starts the app it imports this module directly; the
+# `if __name__ == "__main__"` block is NEVER executed.  We therefore call
+# init_db() here so the tables always exist when any worker starts.
+try:
     init_db()
+except Exception as _init_err:
+    print(f"[Career DNA] WARNING: init_db() failed at startup: {_init_err}")
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# JSON API ROUTES  (consumed by the Vercel frontend via fetch())
+# The browser stays on the Vercel domain; only these fetch() calls reach
+# Render.  All routes accept application/json and return application/json.
+# The existing HTML form routes (/login, /signup, /contact …) are preserved
+# unchanged so the backend website continues to work.
+# ─────────────────────────────────────────────────────────────────────────
+
+@app.route('/api/login', methods=['POST', 'OPTIONS'])
+def api_login():
+    """JSON login endpoint for the Vercel frontend."""
+    if request.method == 'OPTIONS':
+        # Preflight is handled automatically by Flask-CORS; returning 200 here
+        # as an explicit fallback.
+        return jsonify({}), 200
+
+    data = request.get_json(silent=True) or {}
+    username = (data.get('username') or '').strip()
+    password = data.get('password') or ''
+
+    if not username or not password:
+        return jsonify({'success': False, 'message': 'Username and password are required.'}), 400
+
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM users WHERE username=? AND password=?",
+            (username, password)
+        )
+        user = cursor.fetchone()
+        conn.close()
+    except Exception as e:
+        print(f"[Career DNA] /api/login DB error: {e}")
+        return jsonify({'success': False, 'message': 'Database error. Please try again.'}), 500
+
+    if user:
+        session['user'] = username
+        return jsonify({'success': True, 'redirect': '/welcome'}), 200
+    return jsonify({'success': False, 'message': 'Invalid username or password.'}), 401
+
+
+@app.route('/api/register', methods=['POST', 'OPTIONS'])
+def api_register():
+    """JSON registration endpoint for the Vercel frontend."""
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    data = request.get_json(silent=True) or {}
+    username = (data.get('username') or '').strip()
+    password = data.get('password') or ''
+
+    if not username or not password:
+        return jsonify({'success': False, 'message': 'Username and password are required.'}), 400
+    if len(password) < 6:
+        return jsonify({'success': False, 'message': 'Password must be at least 6 characters.'}), 400
+
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (?, ?)",
+            (username, password)
+        )
+        conn.commit()
+        conn.close()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({'success': False, 'message': 'Username already exists. Please choose another.'}), 409
+    except Exception as e:
+        print(f"[Career DNA] /api/register DB error: {e}")
+        return jsonify({'success': False, 'message': 'Database error. Please try again.'}), 500
+
+    return jsonify({'success': True, 'redirect': '/login'}), 201
+
+
+@app.route('/api/contact', methods=['POST', 'OPTIONS'])
+def api_contact():
+    """JSON contact form endpoint for the Vercel frontend."""
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    data = request.get_json(silent=True) or {}
+    name    = (data.get('name') or '').strip()
+    email   = (data.get('email') or '').strip()
+    message = (data.get('message') or '').strip()
+
+    if not name or not email:
+        return jsonify({'success': False, 'message': 'Name and email are required.'}), 400
+
+    # Contact messages are currently logged server-side.
+    # Extend this to send email / save to DB as needed.
+    print(f"[Career DNA] Contact form: name={name!r} email={email!r} msg={message[:80]!r}")
+    return jsonify({'success': True, 'message': 'Message received. We will get back to you soon.'}), 200
+
+
+if __name__ == "__main__":
     app.run(debug=True)
