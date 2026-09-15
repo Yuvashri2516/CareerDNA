@@ -1,15 +1,31 @@
+# Python
 .venv/
 __pycache__/
 *.pyc
-career_dna.db
 *.log
+
+# Database — do NOT commit live SQLite data
+career_dna.db
+
+# IDE
 .vscode/
 .idea/
 .DS_Store
+
+# Node
 node_modules/
 frontend/node_modules/
-frontend/dist/
-*.env.local
 
+# Vite production build — generated, not source
+frontend/dist/
+
+# Environment / secrets — NEVER commit these
+.env
+.env.*
+!.env.example
+
+# Vercel CLI local config
 .vercel
-.env*
+
+# Misc artefacts that shouldn't be committed
+frontend.zip

@@ -6,13 +6,16 @@ from flask import Flask, render_template, request, redirect, session, send_file,
 from flask_cors import CORS
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(
     __name__,
     template_folder="templates",
     static_folder="static"
 )
-app.secret_key = "secret123"
+# Secret key — MUST be set as SECRET_KEY env var on Render for production.
+# A weak fallback is provided for local dev ONLY; never deploy without the env var.
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
 
 # ── CORS — allow the Vercel frontend to call /api/* routes ─────────────────
 # Credentials (session cookies) are included by the frontend fetch() calls,
@@ -185,9 +188,10 @@ def signup():
         cursor = conn.cursor()
 
         try:
+            hashed = generate_password_hash(password)
             cursor.execute(
                 "INSERT INTO users (username, password) VALUES (?, ?)",
-                (username, password)
+                (username, hashed)
             )
             conn.commit()
         except sqlite3.IntegrityError:
@@ -214,14 +218,30 @@ def login():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        cursor.execute(
-            "SELECT * FROM users WHERE username=? AND password=?",
-            (username, password)
-        )
-        user = cursor.fetchone()
+        # Fetch by username only, then verify password (hash-aware)
+        cursor.execute("SELECT * FROM users WHERE username=?", (username,))
+        user_row = cursor.fetchone()
+
+        authenticated = False
+        if user_row:
+            stored_pw = user_row[2]  # password column
+            if stored_pw.startswith('pbkdf2:') or stored_pw.startswith('scrypt:'):
+                # Hashed password
+                authenticated = check_password_hash(stored_pw, password)
+            else:
+                # Legacy plaintext — verify then upgrade
+                if stored_pw == password:
+                    authenticated = True
+                    hashed = generate_password_hash(password)
+                    cursor.execute(
+                        "UPDATE users SET password=? WHERE username=?",
+                        (hashed, username)
+                    )
+                    conn.commit()
+
         conn.close()
 
-        if user:
+        if authenticated:
             session['user'] = username
             # Validate next_url to prevent open redirect
             if next_url and next_url.startswith('/'):
@@ -761,17 +781,33 @@ def api_login():
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT * FROM users WHERE username=? AND password=?",
-            (username, password)
-        )
-        user = cursor.fetchone()
+        # Fetch by username only, then verify password securely
+        cursor.execute("SELECT * FROM users WHERE username=?", (username,))
+        user_row = cursor.fetchone()
+
+        authenticated = False
+        if user_row:
+            stored_pw = user_row[2]  # password column
+            if stored_pw.startswith('pbkdf2:') or stored_pw.startswith('scrypt:'):
+                # Hashed password — standard secure check
+                authenticated = check_password_hash(stored_pw, password)
+            else:
+                # Legacy plaintext — verify and silently upgrade to hash
+                if stored_pw == password:
+                    authenticated = True
+                    hashed = generate_password_hash(password)
+                    cursor.execute(
+                        "UPDATE users SET password=? WHERE username=?",
+                        (hashed, username)
+                    )
+                    conn.commit()
+
         conn.close()
     except Exception as e:
         print(f"[Career DNA] /api/login DB error: {e}")
         return jsonify({'success': False, 'message': 'Database error. Please try again.'}), 500
 
-    if user:
+    if authenticated:
         session['user'] = username
         return jsonify({'success': True, 'redirect': '/welcome'}), 200
     return jsonify({'success': False, 'message': 'Invalid username or password.'}), 401
@@ -792,12 +828,14 @@ def api_register():
     if len(password) < 6:
         return jsonify({'success': False, 'message': 'Password must be at least 6 characters.'}), 400
 
+    hashed = generate_password_hash(password)
+
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO users (username, password) VALUES (?, ?)",
-            (username, password)
+            (username, hashed)
         )
         conn.commit()
         conn.close()
