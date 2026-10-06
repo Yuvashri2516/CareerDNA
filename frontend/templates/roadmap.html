@@ -3,19 +3,167 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Learning Roadmap - Career DNA</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
+  <meta name="description" content="Step-by-step personalized learning roadmap tailored for your target career path on Career DNA.">
+  <title>Learning Roadmap — Career DNA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/features.css">
+  <style>
+    .roadmap-hero {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 24px;
+      padding: 32px;
+      border: 1px solid rgba(131, 70, 223, 0.12);
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 36px;
+      backdrop-filter: blur(18px);
+    }
+    .timeline-wrapper {
+      position: relative;
+      padding-left: 30px;
+      margin-top: 20px;
+    }
+    .timeline-wrapper::before {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 20px;
+      bottom: 20px;
+      width: 4px;
+      background: linear-gradient(180deg, var(--lilac-600) 0%, rgba(131,70,223,0.15) 100%);
+      border-radius: 4px;
+    }
+    .timeline-step {
+      position: relative;
+      margin-bottom: 36px;
+    }
+    .timeline-node {
+      position: absolute;
+      left: -30px;
+      top: 24px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--lilac-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: var(--lilac-700);
+      box-shadow: 0 4px 12px rgba(131,70,223,0.2);
+      z-index: 2;
+    }
+    .timeline-node.completed {
+      background: var(--lilac-600);
+      color: #ffffff;
+      border-color: var(--lilac-600);
+    }
+    .timeline-node.in-progress {
+      background: var(--lilac-100);
+      border-color: var(--lilac-600);
+      box-shadow: 0 0 0 4px rgba(157, 92, 255, 0.25);
+    }
+    .step-card {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      padding: 28px;
+      border: 1px solid rgba(131, 70, 223, 0.12);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(14px);
+      transition: transform 0.25s ease;
+    }
+    .step-card:hover {
+      transform: translateY(-3px);
+    }
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .step-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+    .status-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 99px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-completed { background: rgba(16, 185, 129, 0.15); color: #059669; }
+    .status-progress { background: rgba(157, 92, 255, 0.18); color: var(--lilac-700); }
+    .status-upcoming { background: rgba(107, 114, 128, 0.15); color: #4b5563; }
+
+    .skills-pill-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .skill-pill {
+      background: var(--lilac-100);
+      color: var(--lilac-800);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 99px;
+    }
+    .meta-box-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(131, 70, 223, 0.2);
+    }
+    .meta-box {
+      background: rgba(247, 242, 255, 0.7);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .meta-box h5 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--lilac-700);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .resource-link {
+      display: block;
+      color: var(--text-dark);
+      font-size: 0.88rem;
+      text-decoration: none;
+      margin-bottom: 4px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .resource-link:hover { color: var(--lilac-600); }
+  </style>
 </head>
 <body>
-  <div class="dashboard-wrapper">
-    <div class="dashboard-container">
-      <header class="navbar" style="margin-bottom: 40px;">
+  <div class="dashboard-wrapper page-shell">
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="dashboard-container" style="max-width: 1240px; margin: 0 auto; position: relative; z-index: 1;">
+
+      <!-- Navbar -->
+      <header class="navbar" style="margin-bottom: 36px;">
         <div class="nav-left">
-          <div class="logo-wrap">
+          <a href="/welcome" class="logo-wrap" style="text-decoration: none;">
             <div class="logo-badge career-logo"><div class="logo-circle"></div><div class="logo-arrow arrow-1"></div><div class="logo-arrow arrow-2"></div><div class="logo-arrow arrow-3"></div></div>
             <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
-          </div>
+          </a>
         </div>
         <nav class="nav-links">
           <a href="/welcome">Dashboard</a>
@@ -25,16 +173,196 @@
           <a href="/history">History</a>
           <a href="/profile">Profile</a>
         </nav>
-        <div class="nav-actions"><a href="/logout" class="nav-btn secondary-btn" style="text-decoration:none;display:inline-block;">Logout</a></div>
+        <div class="nav-actions">
+          <a href="/welcome" class="nav-btn secondary-btn" style="text-decoration:none;">← Dashboard</a>
+        </div>
       </header>
-      <section class="dashboard-section">
-        <h2 class="section-header">Learning Roadmap</h2>
-        <p style="color: var(--text-soft); font-size: 1rem; line-height: 1.6;">Your personalized learning path will be displayed here. Stay tuned for step‑by‑step guidance.</p>
-        <div class="glass-card" style="padding:30px;">
-          <p style="color: var(--text-soft);">Content coming soon.</p>
+
+      <!-- Roadmap Header & Summary -->
+      <section class="roadmap-hero">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h1 class="section-header" style="font-size: 2.2rem; margin-bottom: 8px;">Personalized Learning Roadmap</h1>
+            <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 760px; line-height: 1.6;">
+              A structured step-by-step career path for <strong style="color: var(--lilac-800);">Full-Stack & Data Software Engineering</strong>. Track your milestones from fundamentals to career readiness.
+            </p>
+          </div>
+          <div style="text-align: right; min-width: 200px;">
+            <span style="font-size: 0.85rem; color: var(--text-soft); font-weight: 600;">Roadmap Progress</span>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--lilac-700);" id="overallRoadmapPct">40%</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; background: rgba(131, 70, 223, 0.1); height: 12px; border-radius: 99px; overflow: hidden;">
+          <div id="overallProgressFill" style="width: 40%; height: 100%; background: linear-gradient(90deg, var(--lilac-500), var(--lilac-700)); transition: width 0.5s ease;"></div>
         </div>
       </section>
+
+      <!-- Vertical Roadmap Timeline -->
+      <section class="timeline-wrapper" id="roadmapTimeline">
+        <!-- Rendered dynamically -->
+      </section>
+
     </div>
   </div>
+
+  <script>
+    const defaultSteps = [
+      {
+        step: 1,
+        title: 'Step 1 — Foundations',
+        duration: '4 Weeks',
+        status: 'Completed',
+        pct: 100,
+        desc: 'Master core programming fundamentals, control structures, version control with Git, and data structure basics.',
+        skills: ['Python Fundamentals', 'Algorithms & Logic', 'Git & GitHub', 'Terminal CLI'],
+        projects: ['CLI Task & Task Tracker Tool', 'Algorithm Benchmark Suite'],
+        resources: [
+          { name: 'Python Basics (FreeCodeCamp)', url: 'https://www.freecodecamp.org' },
+          { name: 'Git & Version Control Primer', url: 'https://git-scm.com/doc' }
+        ]
+      },
+      {
+        step: 2,
+        title: 'Step 2 — Core Skills',
+        duration: '6 Weeks',
+        status: 'In Progress',
+        pct: 65,
+        desc: 'Build proficiency in backend RESTful APIs, database design, relational modeling, and clean web application structure.',
+        skills: ['SQL & Relational DBs', 'Flask / FastAPI Framework', 'RESTful API Architecture', 'Database Normalization'],
+        projects: ['E-Commerce RESTful Backend Service', 'User Auth & JWT Session System'],
+        resources: [
+          { name: 'PostgreSQL & SQL Tutorial', url: 'https://www.postgresql.org/docs/' },
+          { name: 'REST API Best Practices', url: 'https://restfulapi.net' }
+        ]
+      },
+      {
+        step: 3,
+        title: 'Step 3 — Advanced Skills',
+        duration: '6 Weeks',
+        status: 'Up Next',
+        pct: 0,
+        desc: 'Dive into reactive modern frontend frameworks, containerization with Docker, and CI/CD automated build pipelines.',
+        skills: ['JavaScript (ES6+) & Vite', 'Docker Containerization', 'CI/CD Automated Testing', 'Cloud Deployment'],
+        projects: ['Interactive Dashboard Application', 'Dockerized Microservices Suite'],
+        resources: [
+          { name: 'Full Stack Open Guide', url: 'https://fullstackopen.com/en/' },
+          { name: 'Docker Hands-on Handbook', url: 'https://docs.docker.com' }
+        ]
+      },
+      {
+        step: 4,
+        title: 'Step 4 — Real-World Projects',
+        duration: '5 Weeks',
+        status: 'Up Next',
+        pct: 0,
+        desc: 'Construct portfolio-ready full-stack applications with high code coverage, architectural documentation, and real performance metrics.',
+        skills: ['System Architecture Design', 'Performance Optimization', 'Automated Integration Testing', 'API Security'],
+        projects: ['Real-Time Analytics Engine', 'Open Source Contribution'],
+        resources: [
+          { name: 'GitHub Developer Showcase', url: 'https://github.com' },
+          { name: 'Clean Architecture Principles', url: 'https://refactoring.guru' }
+        ]
+      },
+      {
+        step: 5,
+        title: 'Step 5 — Career Preparation',
+        duration: '3 Weeks',
+        status: 'Up Next',
+        pct: 0,
+        desc: 'Polish your ATS-optimized resume, sharpen behavioral STAR answers, perform mock coding interviews, and submit job applications.',
+        skills: ['Behavioral STAR Method', 'System Design Interviewing', 'ATS Resume Optimization', 'LinkedIn Branding'],
+        projects: ['Interactive Web Portfolio Site', 'Mock Technical Drills'],
+        resources: [
+          { name: 'Tech Resume Blueprint Guide', url: '/resume-builder' },
+          { name: 'Mock Interview Practice Studio', url: '/interview' }
+        ]
+      }
+    ];
+
+    let steps = JSON.parse(localStorage.getItem('careerDNA_roadmap')) || defaultSteps;
+
+    function renderRoadmap() {
+      const container = document.getElementById('roadmapTimeline');
+      container.innerHTML = '';
+
+      let completedSteps = 0;
+
+      steps.forEach((s, idx) => {
+        if (s.status === 'Completed') completedSteps++;
+
+        let nodeClass = '';
+        let statusTagClass = 'status-upcoming';
+        let statusIcon = '<i class="fas fa-clock"></i>';
+
+        if (s.status === 'Completed') {
+          nodeClass = 'completed';
+          statusTagClass = 'status-completed';
+          statusIcon = '<i class="fas fa-check-circle"></i>';
+        } else if (s.status === 'In Progress') {
+          nodeClass = 'in-progress';
+          statusTagClass = 'status-progress';
+          statusIcon = '<i class="fas fa-spinner fa-spin"></i>';
+        }
+
+        const stepElem = document.createElement('div');
+        stepElem.className = 'timeline-step';
+        stepElem.innerHTML = `
+          <div class="timeline-node ${nodeClass}">${s.status === 'Completed' ? '✓' : s.step}</div>
+          <div class="step-card">
+            <div class="step-header">
+              <div>
+                <span class="status-tag ${statusTagClass}">${statusIcon} ${s.status}</span>
+                <span style="font-size: 0.85rem; color: var(--text-soft); font-weight: 600; margin-left: 10px;">Est. Duration: ${s.duration}</span>
+                <h3 class="step-title" style="margin-top: 6px;">${s.title}</h3>
+              </div>
+              <button class="nav-btn secondary-btn" style="padding: 6px 14px; font-size: 0.85rem;" onclick="cycleStepStatus(${idx})">
+                Update Status
+              </button>
+            </div>
+
+            <p style="color: var(--text-soft); font-size: 0.95rem; line-height: 1.6;">${s.desc}</p>
+
+            <div class="skills-pill-wrap">
+              ${s.skills.map(sk => `<span class="skill-pill"><i class="fas fa-check" style="font-size:0.75rem; margin-right:4px;"></i>${sk}</span>`).join('')}
+            </div>
+
+            <div class="meta-box-grid">
+              <div class="meta-box">
+                <h5><i class="fas fa-laptop-code" style="margin-right: 6px;"></i>Suggested Projects</h5>
+                ${s.projects.map(p => `<div style="font-size: 0.88rem; color: var(--text-dark); margin-bottom: 4px; font-weight: 500;">• ${p}</div>`).join('')}
+              </div>
+
+              <div class="meta-box">
+                <h5><i class="fas fa-book-open" style="margin-right: 6px;"></i>Learning Resources</h5>
+                ${s.resources.map(r => `<a href="${r.url}" target="_blank" class="resource-link"><i class="fas fa-external-link-alt" style="font-size:0.75rem; margin-right:4px;"></i>${r.name}</a>`).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(stepElem);
+      });
+
+      const totalPct = Math.round((completedSteps / steps.length) * 100);
+      document.getElementById('overallRoadmapPct').innerText = `${totalPct}%`;
+      document.getElementById('overallProgressFill').style.width = `${totalPct}%`;
+
+      localStorage.setItem('careerDNA_roadmap', JSON.stringify(steps));
+    }
+
+    function cycleStepStatus(index) {
+      const order = ['Up Next', 'In Progress', 'Completed'];
+      const curIdx = order.indexOf(steps[index].status);
+      const nextStatus = order[(curIdx + 1) % order.length];
+      steps[index].status = nextStatus;
+      if (nextStatus === 'Completed') steps[index].pct = 100;
+      else if (nextStatus === 'In Progress') steps[index].pct = 50;
+      else steps[index].pct = 0;
+
+      renderRoadmap();
+    }
+
+    window.addEventListener('DOMContentLoaded', renderRoadmap);
+  </script>
 </body>
 </html>

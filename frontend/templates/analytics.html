@@ -1,67 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics - Career DNA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View comprehensive career analytics, skill growth graphs, and readiness scores on Career DNA.">
+  <title>Career Analytics — Career DNA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/features.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .analytics-hero {
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: 24px;
+      padding: 32px;
+      border: 1px solid rgba(131, 70, 223, 0.12);
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 36px;
+      backdrop-filter: blur(18px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .readiness-ring-wrap {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: rgba(247, 242, 255, 0.9);
+      padding: 20px 28px;
+      border-radius: 20px;
+      border: 1px solid rgba(131, 70, 223, 0.15);
+    }
+    .readiness-val {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--lilac-700);
+      line-height: 1;
+    }
+    .metrics-row-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+    .metric-card-box {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      padding: 22px;
+      border: 1px solid rgba(131, 70, 223, 0.12);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .metric-card-box:hover { transform: translateY(-3px); }
+    .metric-card-icon {
+      font-size: 1.8rem;
+      color: var(--lilac-600);
+      margin-bottom: 10px;
+    }
+    .metric-card-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+    .metric-card-lbl {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 900px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    .chart-box-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 24px;
+      padding: 28px;
+      border: 1px solid rgba(131, 70, 223, 0.12);
+      box-shadow: var(--shadow-soft);
+    }
+  </style>
 </head>
 <body>
-    <div class="dashboard-wrapper">
-        <div class="dashboard-container">
-            <header class="navbar" style="margin-bottom: 40px;">
-                <div class="nav-left">
-                    <div class="logo-wrap">
-                        <div class="logo-badge career-logo">
-                            <div class="logo-circle"></div>
-                            <div class="logo-arrow arrow-1"></div>
-                            <div class="logo-arrow arrow-2"></div>
-                            <div class="logo-arrow arrow-3"></div>
-                        </div>
-                        <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
-                    </div>
-                </div>
-                <nav class="nav-links">
-                    <a href="/welcome">Dashboard</a>
-                    <a href="/assessment" class="nav-take-test-link">Take Test</a>
-                    <a href="/career-match">Career Match</a>
-                    <a href="/analytics">Analytics</a>
-                </nav>
-                <div class="nav-actions"><a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a></div>
-            </header>
-            <section class="dashboard-section">
-                <h2 class="section-header">Analytics</h2>
-                <div class="analytics-row">
-                    <div class="chart-card-box">
-                        <canvas id="careerChart"></canvas>
-                    </div>
-                    <div class="chart-card-box">
-                        <canvas id="skillChart"></canvas>
-                    </div>
-                </div>
-            </section>
+  <div class="dashboard-wrapper page-shell">
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="dashboard-container" style="max-width: 1280px; margin: 0 auto; position: relative; z-index: 1;">
+
+      <!-- Navbar -->
+      <header class="navbar" style="margin-bottom: 36px;">
+        <div class="nav-left">
+          <a href="/welcome" class="logo-wrap" style="text-decoration: none;">
+            <div class="logo-badge career-logo"><div class="logo-circle"></div><div class="logo-arrow arrow-1"></div><div class="logo-arrow arrow-2"></div><div class="logo-arrow arrow-3"></div></div>
+            <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
+          </a>
         </div>
+        <nav class="nav-links">
+          <a href="/welcome">Dashboard</a>
+          <a href="/assessment" class="nav-take-test-link">Take Test</a>
+          <a href="/career-paths">Career Paths</a>
+          <a href="/resources">Resources</a>
+          <a href="/history">History</a>
+          <a href="/profile">Profile</a>
+        </nav>
+        <div class="nav-actions">
+          <a href="/welcome" class="nav-btn secondary-btn" style="text-decoration:none;">← Dashboard</a>
+        </div>
+      </header>
+
+      <!-- Analytics Hero Banner -->
+      <section class="analytics-hero">
+        <div>
+          <h1 class="section-header" style="font-size: 2.2rem; margin-bottom: 8px;">Career Analytics Dashboard</h1>
+          <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 680px; line-height: 1.6;">
+            In-depth evaluation of your career preparedness, skill progression breakdown, and industry benchmark metrics.
+          </p>
+        </div>
+
+        <div class="readiness-ring-wrap">
+          <div>
+            <div class="readiness-val">84<span style="font-size:1.5rem;">%</span></div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #059669; margin-top: 4px;">High Job Readiness</div>
+          </div>
+          <div style="border-left: 1px solid rgba(131, 70, 223, 0.2); padding-left: 20px;">
+            <div style="font-size: 0.85rem; color: var(--text-soft); font-weight: 600;">Overall Status</div>
+            <div style="font-weight: 800; color: var(--text-dark); font-size: 1.1rem;">Full-Stack Engineer</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 Key Readiness Metrics Grid -->
+      <section class="metrics-row-grid">
+        <div class="metric-card-box">
+          <i class="fas fa-clipboard-check metric-card-icon"></i>
+          <div class="metric-card-val">88%</div>
+          <div class="metric-card-lbl">Assessment Score</div>
+        </div>
+        <div class="metric-card-box">
+          <i class="fas fa-chart-line metric-card-icon" style="color: #0284c7;"></i>
+          <div class="metric-card-val">78%</div>
+          <div class="metric-card-lbl">Skills Mastery</div>
+        </div>
+        <div class="metric-card-box">
+          <i class="fas fa-route metric-card-icon" style="color: #d97706;"></i>
+          <div class="metric-card-val">72%</div>
+          <div class="metric-card-lbl">Roadmap Progress</div>
+        </div>
+        <div class="metric-card-box">
+          <i class="fas fa-certificate metric-card-icon" style="color: #059669;"></i>
+          <div class="metric-card-val">65%</div>
+          <div class="metric-card-lbl">Certifications</div>
+        </div>
+        <div class="metric-card-box">
+          <i class="fas fa-file-alt metric-card-icon" style="color: #8346df;"></i>
+          <div class="metric-card-val">85%</div>
+          <div class="metric-card-lbl">Resume Score</div>
+        </div>
+        <div class="metric-card-box">
+          <i class="fas fa-user-check metric-card-icon" style="color: #ec4899;"></i>
+          <div class="metric-card-val">80%</div>
+          <div class="metric-card-lbl">Interview Preparedness</div>
+        </div>
+      </section>
+
+      <!-- Charts Section -->
+      <section class="charts-grid">
+        <div class="chart-box-card">
+          <h3 style="color: var(--text-dark); font-size: 1.2rem; margin-bottom: 16px; font-weight: 700;">
+            <i class="fas fa-chart-bar" style="color: var(--lilac-600); margin-right: 8px;"></i>Skill Proficiency Breakdown
+          </h3>
+          <div style="height: 300px; position: relative;">
+            <canvas id="skillBarChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-box-card">
+          <h3 style="color: var(--text-dark); font-size: 1.2rem; margin-bottom: 16px; font-weight: 700;">
+            <i class="fas fa-chart-pie" style="color: var(--lilac-600); margin-right: 8px;"></i>Career Match Weight Distribution
+          </h3>
+          <div style="height: 300px; position: relative;">
+            <canvas id="careerPieChart"></canvas>
+          </div>
+        </div>
+      </section>
+
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('careerChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['Software', 'Data', 'Design', 'Marketing'],
-                datasets: [{ data: [30, 25, 20, 15], backgroundColor: ['#9d5cff', '#6531b3', '#bd8cff', '#e7d7ff'] }]
-            }
-        });
-        const ctx2 = document.getElementById('skillChart').getContext('2d');
-        new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: ['Python', 'SQL', 'Java', 'Design'],
-                datasets: [{ label: 'Proficiency', data: [85, 70, 65, 60], backgroundColor: '#9d5cff' }]
-            },
-            options: { scales: { y: { beginAtZero: true } } }
-        });
-    </script>
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Skill Bar Chart
+      const ctxBar = document.getElementById('skillBarChart').getContext('2d');
+      new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels: ['Python', 'Problem Solving', 'SQL', 'Data Analysis', 'Web Dev', 'Leadership'],
+          datasets: [{
+            label: 'Proficiency Level (%)',
+            data: [85, 92, 75, 80, 70, 65],
+            backgroundColor: 'rgba(157, 92, 255, 0.75)',
+            borderColor: '#6531b3',
+            borderWidth: 2,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, max: 100 }
+          }
+        }
+      });
+
+      // 2. Career Pie Chart
+      const ctxPie = document.getElementById('careerPieChart').getContext('2d');
+      new Chart(ctxPie, {
+        type: 'pie',
+        data: {
+          labels: ['Software Engineering', 'Data Analytics', 'Cloud & DevOps', 'Product Management'],
+          datasets: [{
+            data: [40, 25, 20, 15],
+            backgroundColor: ['#6531b3', '#9d5cff', '#0284c7', '#d97706']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    });
+  </script>
 </body>
 </html>

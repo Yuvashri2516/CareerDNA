@@ -3,19 +3,186 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resume Builder - Career DNA</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
+  <meta name="description" content="Build, customize, and download your AI-optimized professional resume with Career DNA.">
+  <title>Resume Builder — Career DNA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/features.css">
+  <style>
+    .rb-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .rb-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    .rb-form-panel {
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: 24px;
+      padding: 30px;
+      border: 1px solid rgba(131, 70, 223, 0.12);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(16px);
+    }
+    .rb-preview-panel {
+      position: sticky;
+      top: 20px;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 36px;
+      border: 1px solid rgba(131, 70, 223, 0.15);
+      box-shadow: 0 20px 50px rgba(83, 41, 138, 0.15);
+      color: #1f2937;
+      min-height: 720px;
+    }
+    .form-section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 20px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .input-group {
+      margin-bottom: 14px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(131, 70, 223, 0.2);
+      background: rgba(255, 255, 255, 0.9);
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      border-color: var(--lilac-600);
+      box-shadow: 0 0 0 3px rgba(157, 92, 255, 0.15);
+    }
+    .dynamic-item-card {
+      background: rgba(247, 242, 255, 0.7);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(131, 70, 223, 0.1);
+      position: relative;
+    }
+    .remove-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      color: #ef4444;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    
+    /* Resume Document Print Styles */
+    .resume-doc-header {
+      border-bottom: 2px solid var(--lilac-600);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+    .resume-doc-name {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--lilac-900);
+      line-height: 1.2;
+    }
+    .resume-doc-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--lilac-600);
+      margin-top: 2px;
+    }
+    .resume-doc-contact {
+      font-size: 0.82rem;
+      color: #6b7280;
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .resume-doc-sec {
+      margin-bottom: 16px;
+    }
+    .resume-doc-sec-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--lilac-800);
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+    }
+    .resume-doc-item {
+      margin-bottom: 8px;
+    }
+    .resume-doc-item-head {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #111827;
+    }
+    .resume-doc-item-sub {
+      font-size: 0.85rem;
+      color: #4b5563;
+      font-style: italic;
+    }
+    .resume-doc-item-desc {
+      font-size: 0.85rem;
+      color: #374151;
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      .rb-preview-panel, .rb-preview-panel * { visibility: visible; }
+      .rb-preview-panel {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="dashboard-wrapper">
-    <div class="dashboard-container">
-      <header class="navbar" style="margin-bottom: 40px;">
+  <div class="dashboard-wrapper page-shell">
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="dashboard-container" style="max-width: 1360px; margin: 0 auto; position: relative; z-index: 1;">
+
+      <!-- Navbar -->
+      <header class="navbar" style="margin-bottom: 30px;">
         <div class="nav-left">
-          <div class="logo-wrap">
+          <a href="/welcome" class="logo-wrap" style="text-decoration: none;">
             <div class="logo-badge career-logo"><div class="logo-circle"></div><div class="logo-arrow arrow-1"></div><div class="logo-arrow arrow-2"></div><div class="logo-arrow arrow-3"></div></div>
             <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
-          </div>
+          </a>
         </div>
         <nav class="nav-links">
           <a href="/welcome">Dashboard</a>
@@ -25,16 +192,333 @@
           <a href="/history">History</a>
           <a href="/profile">Profile</a>
         </nav>
-        <div class="nav-actions"><a href="/logout" class="nav-btn secondary-btn" style="text-decoration:none;display:inline-block;">Logout</a></div>
-      </header>
-      <section class="dashboard-section">
-        <h2 class="section-header">Resume Builder</h2>
-        <p style="color: var(--text-soft); font-size: 1rem; line-height: 1.6;">Create a polished AI‑optimized resume. (Feature coming soon.)</p>
-        <div class="glass-card" style="padding:30px;">
-          <p style="color: var(--text-soft);">Interactive resume builder will be added here.</p>
+        <div class="nav-actions">
+          <a href="/welcome" class="nav-btn secondary-btn" style="text-decoration:none;">← Dashboard</a>
         </div>
-      </section>
+      </header>
+
+      <!-- Main Header & Action Toolbar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+        <div>
+          <h1 class="section-header" style="font-size: 2.2rem; margin-bottom: 4px;">Interactive Resume Builder</h1>
+          <p style="color: var(--text-soft); font-size: 1rem;">Create an ATS-friendly, professionally structured resume in real time.</p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="nav-btn secondary-btn" onclick="toggleMobilePreview()" id="togglePreviewBtn" style="display: none;">
+            <i class="fas fa-eye" style="margin-right: 6px;"></i>Toggle Preview
+          </button>
+          <button class="nav-btn primary-btn" onclick="window.print()">
+            <i class="fas fa-download" style="margin-right: 6px;"></i>Download Resume PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Resume Builder 2-Column Split -->
+      <div class="rb-container">
+
+        <!-- Left Form Edit Panel -->
+        <div class="rb-form-panel">
+          
+          <!-- Personal Info -->
+          <div class="form-section-title"><i class="fas fa-user" style="color: var(--lilac-600);"></i>Personal Information</div>
+          <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="rFullName" class="form-input" value="Alex Morgan" oninput="updateResumePreview()">
+          </div>
+          <div class="input-group">
+            <label>Professional Title</label>
+            <input type="text" id="rTitle" class="form-input" value="Software Engineer" oninput="updateResumePreview()">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="input-group">
+              <label>Email</label>
+              <input type="email" id="rEmail" class="form-input" value="alex.morgan@example.com" oninput="updateResumePreview()">
+            </div>
+            <div class="input-group">
+              <label>Phone</label>
+              <input type="text" id="rPhone" class="form-input" value="+1 (555) 234-5678" oninput="updateResumePreview()">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="input-group">
+              <label>Location</label>
+              <input type="text" id="rLocation" class="form-input" value="San Francisco, CA" oninput="updateResumePreview()">
+            </div>
+            <div class="input-group">
+              <label>LinkedIn / Portfolio</label>
+              <input type="text" id="rLinkedin" class="form-input" value="linkedin.com/in/alexmorgan" oninput="updateResumePreview()">
+            </div>
+          </div>
+
+          <!-- Professional Summary -->
+          <div class="form-section-title"><i class="fas fa-file-alt" style="color: var(--lilac-600);"></i>Professional Summary</div>
+          <div class="input-group">
+            <textarea id="rSummary" class="form-input" rows="3" oninput="updateResumePreview()">Results-driven Software Engineer with 3+ years of experience designing scalable RESTful APIs, database architectures, and reactive frontend interfaces. Skilled in Python, SQL, JavaScript, and cloud deployments.</textarea>
+          </div>
+
+          <!-- Experience Section -->
+          <div class="form-section-title">
+            <i class="fas fa-briefcase" style="color: var(--lilac-600);"></i>Work Experience
+          </div>
+          <div id="expContainer"></div>
+          <button class="nav-btn secondary-btn" style="width: 100%; font-size: 0.88rem; margin-bottom: 16px;" onclick="addExpItem()">
+            <i class="fas fa-plus" style="margin-right: 6px;"></i>Add Experience
+          </button>
+
+          <!-- Education Section -->
+          <div class="form-section-title">
+            <i class="fas fa-graduation-cap" style="color: var(--lilac-600);"></i>Education
+          </div>
+          <div id="eduContainer"></div>
+          <button class="nav-btn secondary-btn" style="width: 100%; font-size: 0.88rem; margin-bottom: 16px;" onclick="addEduItem()">
+            <i class="fas fa-plus" style="margin-right: 6px;"></i>Add Education
+          </button>
+
+          <!-- Projects Section -->
+          <div class="form-section-title">
+            <i class="fas fa-folder-open" style="color: var(--lilac-600);"></i>Key Projects
+          </div>
+          <div id="projContainer"></div>
+          <button class="nav-btn secondary-btn" style="width: 100%; font-size: 0.88rem; margin-bottom: 16px;" onclick="addProjItem()">
+            <i class="fas fa-plus" style="margin-right: 6px;"></i>Add Project
+          </button>
+
+          <!-- Skills Section -->
+          <div class="form-section-title"><i class="fas fa-tools" style="color: var(--lilac-600);"></i>Skills & Technologies</div>
+          <div class="input-group">
+            <label>Technical Skills (comma separated)</label>
+            <input type="text" id="rSkillsTech" class="form-input" value="Python, SQL, PostgreSQL, Flask, FastAPI, JavaScript, Docker, Git" oninput="updateResumePreview()">
+          </div>
+          <div class="input-group">
+            <label>Soft Skills & Methodologies</label>
+            <input type="text" id="rSkillsSoft" class="form-input" value="Agile Scrum, Problem Solving, Cross-Functional Leadership, Technical Documentation" oninput="updateResumePreview()">
+          </div>
+
+          <!-- Certifications & Achievements -->
+          <div class="form-section-title"><i class="fas fa-certificate" style="color: var(--lilac-600);"></i>Certifications & Achievements</div>
+          <div class="input-group">
+            <textarea id="rCerts" class="form-input" rows="2" oninput="updateResumePreview()">AWS Certified Solutions Architect (Associate) • Google Data Analytics Professional Certificate</textarea>
+          </div>
+
+        </div>
+
+        <!-- Right Live Document Preview Panel -->
+        <div class="rb-preview-panel" id="resumePreviewPanel">
+          <div class="resume-doc-header">
+            <div class="resume-doc-name" id="pvName">Alex Morgan</div>
+            <div class="resume-doc-title" id="pvTitle">Software Engineer</div>
+            <div class="resume-doc-contact">
+              <span id="pvEmail"><i class="fas fa-envelope"></i> alex.morgan@example.com</span>
+              <span id="pvPhone"><i class="fas fa-phone"></i> +1 (555) 234-5678</span>
+              <span id="pvLoc"><i class="fas fa-map-marker-alt"></i> San Francisco, CA</span>
+              <span id="pvLink"><i class="fab fa-linkedin"></i> linkedin.com/in/alexmorgan</span>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="resume-doc-sec">
+            <div class="resume-doc-sec-title">Professional Summary</div>
+            <div class="resume-doc-item-desc" id="pvSummary"></div>
+          </div>
+
+          <!-- Experience -->
+          <div class="resume-doc-sec">
+            <div class="resume-doc-sec-title">Work Experience</div>
+            <div id="pvExpList"></div>
+          </div>
+
+          <!-- Education -->
+          <div class="resume-doc-sec">
+            <div class="resume-doc-sec-title">Education</div>
+            <div id="pvEduList"></div>
+          </div>
+
+          <!-- Projects -->
+          <div class="resume-doc-sec">
+            <div class="resume-doc-sec-title">Key Projects</div>
+            <div id="pvProjList"></div>
+          </div>
+
+          <!-- Skills -->
+          <div class="resume-doc-sec">
+            <div class="resume-doc-sec-title">Skills & Competencies</div>
+            <div class="resume-doc-item-desc"><strong>Technical:</strong> <span id="pvSkillsTech"></span></div>
+            <div class="resume-doc-item-desc" style="margin-top:3px;"><strong>Soft Skills:</strong> <span id="pvSkillsSoft"></span></div>
+          </div>
+
+          <!-- Certifications -->
+          <div class="resume-doc-sec">
+            <div class="resume-doc-sec-title">Certifications & Achievements</div>
+            <div class="resume-doc-item-desc" id="pvCerts"></div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
+
+  <script>
+    let expData = [
+      { role: 'Software Engineer', company: 'TechCorp Labs', dates: '2023 – Present', desc: 'Designed high-throughput REST APIs using Python & FastAPI. Reduced database query latency by 35% through indexing and caching.' },
+      { role: 'Associate Developer Intern', company: 'DataScale Inc', dates: '2022 – 2023', desc: 'Assisted in building full-stack analytics dashboards and writing automated integration test suites.' }
+    ];
+
+    let eduData = [
+      { degree: 'B.S. in Computer Science', school: 'University of Technology', year: '2023' }
+    ];
+
+    let projData = [
+      { name: 'Career DNA Platform', tech: 'Python, Flask, SQLite, Vite JS', desc: 'Developed a personalized career assessment engine that matches user profiles with salary trends and roadmaps.' }
+    ];
+
+    function renderExpInputs() {
+      const container = document.getElementById('expContainer');
+      container.innerHTML = '';
+      expData.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'dynamic-item-card';
+        div.innerHTML = `
+          <button class="remove-btn" onclick="removeExp(${idx})"><i class="fas fa-trash"></i></button>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+            <input type="text" class="form-input" placeholder="Job Title" value="${item.role}" oninput="expData[${idx}].role=this.value; updateResumePreview();">
+            <input type="text" class="form-input" placeholder="Company" value="${item.company}" oninput="expData[${idx}].company=this.value; updateResumePreview();">
+          </div>
+          <input type="text" class="form-input" placeholder="Dates (e.g. 2022 - Present)" value="${item.dates}" style="margin-bottom: 8px;" oninput="expData[${idx}].dates=this.value; updateResumePreview();">
+          <textarea class="form-input" rows="2" placeholder="Responsibilities & Key Impact" oninput="expData[${idx}].desc=this.value; updateResumePreview();">${item.desc}</textarea>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderEduInputs() {
+      const container = document.getElementById('eduContainer');
+      container.innerHTML = '';
+      eduData.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'dynamic-item-card';
+        div.innerHTML = `
+          <button class="remove-btn" onclick="removeEdu(${idx})"><i class="fas fa-trash"></i></button>
+          <input type="text" class="form-input" placeholder="Degree / Program" value="${item.degree}" style="margin-bottom: 8px;" oninput="eduData[${idx}].degree=this.value; updateResumePreview();">
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+            <input type="text" class="form-input" placeholder="University / School" value="${item.school}" oninput="eduData[${idx}].school=this.value; updateResumePreview();">
+            <input type="text" class="form-input" placeholder="Year" value="${item.year}" oninput="eduData[${idx}].year=this.value; updateResumePreview();">
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderProjInputs() {
+      const container = document.getElementById('projContainer');
+      container.innerHTML = '';
+      projData.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'dynamic-item-card';
+        div.innerHTML = `
+          <button class="remove-btn" onclick="removeProj(${idx})"><i class="fas fa-trash"></i></button>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+            <input type="text" class="form-input" placeholder="Project Name" value="${item.name}" oninput="projData[${idx}].name=this.value; updateResumePreview();">
+            <input type="text" class="form-input" placeholder="Tech Stack" value="${item.tech}" oninput="projData[${idx}].tech=this.value; updateResumePreview();">
+          </div>
+          <textarea class="form-input" rows="2" placeholder="Project description & achievements" oninput="projData[${idx}].desc=this.value; updateResumePreview();">${item.desc}</textarea>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addExpItem() {
+      expData.push({ role: 'Software Engineer', company: 'Company Name', dates: '2023 - Present', desc: 'Key responsibility and measurable results.' });
+      renderExpInputs();
+      updateResumePreview();
+    }
+
+    function removeExp(idx) {
+      expData.splice(idx, 1);
+      renderExpInputs();
+      updateResumePreview();
+    }
+
+    function addEduItem() {
+      eduData.push({ degree: 'Degree Name', school: 'University Name', year: '2024' });
+      renderEduInputs();
+      updateResumePreview();
+    }
+
+    function removeEdu(idx) {
+      eduData.splice(idx, 1);
+      renderEduInputs();
+      updateResumePreview();
+    }
+
+    function addProjItem() {
+      projData.push({ name: 'Project Name', tech: 'Tech Stack', desc: 'Project overview and impact.' });
+      renderProjInputs();
+      updateResumePreview();
+    }
+
+    function removeProj(idx) {
+      projData.splice(idx, 1);
+      renderProjInputs();
+      updateResumePreview();
+    }
+
+    function updateResumePreview() {
+      document.getElementById('pvName').innerText = document.getElementById('rFullName').value || 'Your Name';
+      document.getElementById('pvTitle').innerText = document.getElementById('rTitle').value || 'Professional Title';
+      document.getElementById('pvEmail').innerHTML = `<i class="fas fa-envelope"></i> ${document.getElementById('rEmail').value}`;
+      document.getElementById('pvPhone').innerHTML = `<i class="fas fa-phone"></i> ${document.getElementById('rPhone').value}`;
+      document.getElementById('pvLoc').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${document.getElementById('rLocation').value}`;
+      document.getElementById('pvLink').innerHTML = `<i class="fab fa-linkedin"></i> ${document.getElementById('rLinkedin').value}`;
+      document.getElementById('pvSummary').innerText = document.getElementById('rSummary').value;
+      document.getElementById('pvSkillsTech').innerText = document.getElementById('rSkillsTech').value;
+      document.getElementById('pvSkillsSoft').innerText = document.getElementById('rSkillsSoft').value;
+      document.getElementById('pvCerts').innerText = document.getElementById('rCerts').value;
+
+      // Render Exp
+      const pvExp = document.getElementById('pvExpList');
+      pvExp.innerHTML = '';
+      expData.forEach(item => {
+        pvExp.innerHTML += `
+          <div class="resume-doc-item">
+            <div class="resume-doc-item-head"><span>${item.role}</span><span>${item.dates}</span></div>
+            <div class="resume-doc-item-sub">${item.company}</div>
+            <div class="resume-doc-item-desc">${item.desc}</div>
+          </div>
+        `;
+      });
+
+      // Render Edu
+      const pvEdu = document.getElementById('pvEduList');
+      pvEdu.innerHTML = '';
+      eduData.forEach(item => {
+        pvEdu.innerHTML += `
+          <div class="resume-doc-item">
+            <div class="resume-doc-item-head"><span>${item.degree}</span><span>${item.year}</span></div>
+            <div class="resume-doc-item-sub">${item.school}</div>
+          </div>
+        `;
+      });
+
+      // Render Proj
+      const pvProj = document.getElementById('pvProjList');
+      pvProj.innerHTML = '';
+      projData.forEach(item => {
+        pvProj.innerHTML += `
+          <div class="resume-doc-item">
+            <div class="resume-doc-item-head"><span>${item.name}</span><span style="font-size:0.8rem; font-weight:normal; color:#6b7280;">${item.tech}</span></div>
+            <div class="resume-doc-item-desc">${item.desc}</div>
+          </div>
+        `;
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderExpInputs();
+      renderEduInputs();
+      renderProjInputs();
+      updateResumePreview();
+    });
+  </script>
 </body>
 </html>

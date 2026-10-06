@@ -692,54 +692,65 @@ def career_match():
     return render_template('career_match.html')
 
 @app.route('/skills')
+@app.route('/skills/')
+@app.route('/skill-tracker')
+@app.route('/skill-tracker/')
 def skills():
     if 'user' not in session:
         return redirect('/login')
     return render_template('skills.html')
 
 @app.route('/roadmap')
+@app.route('/roadmap/')
 def roadmap():
     if 'user' not in session:
         return redirect('/login')
     return render_template('roadmap.html')
 
 @app.route('/resume-builder')
+@app.route('/resume-builder/')
 def resume_builder():
     if 'user' not in session:
         return redirect('/login')
     return render_template('resume_builder.html')
 
 @app.route('/interview')
+@app.route('/interview/')
 def interview():
     if 'user' not in session:
         return redirect('/login')
     return render_template('interview.html')
 
 @app.route('/certifications')
+@app.route('/certifications/')
 def certifications():
     if 'user' not in session:
         return redirect('/login')
     return render_template('certifications.html')
 
 @app.route('/internships')
+@app.route('/internships/')
 def internships():
     if 'user' not in session:
         return redirect('/login')
     return render_template('internships.html')
 
 @app.route('/analytics')
+@app.route('/analytics/')
 def analytics():
     if 'user' not in session:
         return redirect('/login')
     return render_template('analytics.html')
 
 @app.route('/ai-assistant')
+@app.route('/ai-assistant/')
 def ai_assistant():
     if 'user' not in session:
         return redirect('/login')
     return render_template('ai_assistant.html')
 
 @app.route('/achievements')
+@app.route('/achievements/')
 def achievements():
     if 'user' not in session:
         return redirect('/login')
