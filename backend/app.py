@@ -7,6 +7,9 @@ from flask_cors import CORS
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from werkzeug.security import generate_password_hash, check_password_hash
+import career_engine
+import career_service
+
 
 app = Flask(
     __name__,
@@ -157,8 +160,69 @@ def init_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS user_profiles (
+            user_name TEXT PRIMARY KEY,
+            full_name TEXT DEFAULT '',
+            education_level TEXT DEFAULT '',
+            degree TEXT DEFAULT '',
+            grad_year INTEGER DEFAULT 0,
+            tech_skills TEXT DEFAULT '[]',
+            soft_skills TEXT DEFAULT '[]',
+            interests TEXT DEFAULT '[]',
+            work_style TEXT DEFAULT '{}',
+            goals TEXT DEFAULT '{}',
+            experience TEXT DEFAULT '[]',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS assessment_dimensions (
+            user_name TEXT PRIMARY KEY,
+            analytical_thinking INTEGER DEFAULT 60,
+            creativity INTEGER DEFAULT 60,
+            communication INTEGER DEFAULT 60,
+            leadership INTEGER DEFAULT 60,
+            problem_solving INTEGER DEFAULT 60,
+            technical_interest INTEGER DEFAULT 60,
+            social_interest INTEGER DEFAULT 60,
+            business_interest INTEGER DEFAULT 60,
+            research_interest INTEGER DEFAULT 60,
+            design_interest INTEGER DEFAULT 60,
+            risk_tolerance INTEGER DEFAULT 60,
+            work_style_score INTEGER DEFAULT 60,
+            learning_preference INTEGER DEFAULT 60,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS roadmap_progress (
+            user_name TEXT PRIMARY KEY,
+            career_id TEXT,
+            completed_stages TEXT DEFAULT '[]',
+            current_stage INTEGER DEFAULT 1,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
     conn.commit()
     conn.close()
+
+def get_auth_user():
+    """Extract authenticated user name from session or request headers."""
+    user = session.get('user')
+    if user:
+        return user
+    auth_header = request.headers.get('Authorization')
+    if auth_header and auth_header.startswith('Bearer '):
+        return auth_header.split(' ')[1]
+    req_user = request.headers.get('X-User-Name') or request.args.get('user_name')
+    if req_user:
+        return req_user
+    return None
+
 
 # -----------------------------
 # SAVE RESULT
@@ -599,6 +663,12 @@ def api_chat():
     data = request.get_json() or {}
     message = data.get("message", "").lower()
     
+    user_name = get_auth_user()
+    if user_name:
+        p_reply = career_service.get_personalized_chat_response(user_name, message)
+        if p_reply:
+            return jsonify({"reply": p_reply})
+
     # Intelligent response based on keywords
     if any(k in message for k in ["roadmap", "path", "learn", "timeline"]):
         reply = "Here is a recommended learning roadmap:<br>1. **Beginner**: Master basic languages (Python, JavaScript, SQL) and command line.<br>2. **Intermediate**: Work on data structures, build 2-3 personal portfolio projects, use GitHub.<br>3. **Advanced**: Specialize in frameworks (Django, React, PyTorch), deploy apps to cloud platforms, and obtain professional certifications. Which career path are you interested in specifically?"
@@ -880,5 +950,355 @@ def api_contact():
     return jsonify({'success': True, 'message': 'Message received. We will get back to you soon.'}), 200
 
 
+# ── API ENDPOINTS FOR REAL-TIME CAREER INTELLIGENCE SYSTEM ──────────────────
+
+@app.route('/api/profile', methods=['GET', 'PUT', 'POST', 'OPTIONS'])
+def api_profile():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user()
+    if not user_name:
+        return jsonify({'success': False, 'message': 'Authentication required.'}), 401
+
+    if request.method in ['PUT', 'POST']:
+        data = request.get_json(silent=True) or {}
+        ok, msg = career_service.save_user_profile(user_name, data)
+        if not ok:
+            return jsonify({'success': False, 'message': msg}), 400
+
+    profile = career_service.get_user_profile(user_name)
+    completion = career_engine.calculate_profile_completion(profile)
+
+    return jsonify({
+        'success': True,
+        'profile': profile,
+        'completion': completion
+    }), 200
+
+@app.route('/api/assessment/dimensions', methods=['GET', 'POST', 'OPTIONS'])
+@app.route('/api/assessment/results', methods=['GET', 'POST', 'OPTIONS'])
+def api_assessment_results():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user()
+    if not user_name:
+        return jsonify({'success': False, 'message': 'Authentication required.'}), 401
+
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+        dims = data.get('dimensions', data)
+        career_service.save_assessment_dimensions(user_name, dims)
+
+    dims = career_service.get_assessment_dimensions(user_name)
+    return jsonify({
+        'success': True,
+        'user_name': user_name,
+        'dimensions': dims
+    }), 200
+
+@app.route('/api/career-recommendations', methods=['GET', 'OPTIONS'])
+def api_career_recommendations():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user() or 'Guest'
+    recs = career_service.get_user_recommendations(user_name)
+    return jsonify({
+        'success': True,
+        'user_name': user_name,
+        'ideal_match': recs.get('ideal_match'),
+        'top_careers': recs.get('top_careers', []),
+        'total_evaluated': recs.get('total_careers_evaluated', 0)
+    }), 200
+
+@app.route('/api/career/<career_id>', methods=['GET', 'OPTIONS'])
+def api_career_detail(career_id):
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user() or 'Guest'
+    careers = career_engine.get_careers_data()
+    target = None
+    for c in careers:
+        if c.get('id') == career_id or career_engine.slugify(c.get('name', '')) == career_id:
+            target = c
+            break
+
+    if not target:
+        return jsonify({'success': False, 'message': 'Career not found.'}), 404
+
+    profile = career_service.get_user_profile(user_name)
+    dims = career_service.get_assessment_dimensions(user_name)
+    match_data = career_engine.match_user_to_career(profile, dims, target)
+
+    return jsonify({
+        'success': True,
+        'career': target,
+        'match_analysis': match_data
+    }), 200
+
+@app.route('/api/career/<career_id>/skills', methods=['GET', 'OPTIONS'])
+def api_career_skills(career_id):
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user() or 'Guest'
+    analysis = career_service.get_skill_gap_analysis(user_name, career_id)
+    return jsonify({
+        'success': True,
+        'skill_analysis': analysis
+    }), 200
+
+@app.route('/api/career/<career_id>/roadmap', methods=['GET', 'OPTIONS'])
+def api_career_roadmap(career_id):
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user() or 'Guest'
+    roadmap_data = career_service.get_user_roadmap(user_name, career_id)
+    return jsonify({
+        'success': True,
+        'roadmap': roadmap_data
+    }), 200
+
+@app.route('/api/roadmap-progress', methods=['POST', 'OPTIONS'])
+def api_roadmap_progress():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user()
+    if not user_name:
+        return jsonify({'success': False, 'message': 'Authentication required.'}), 401
+
+    data = request.get_json(silent=True) or {}
+    career_id = data.get('career_id', '')
+    completed_stages = data.get('completed_stages', [])
+    current_stage = data.get('current_stage', 1)
+
+    db_path_val = career_service.get_db_path()
+    try:
+        conn = sqlite3.connect(db_path_val)
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_name FROM roadmap_progress WHERE user_name = ?", (user_name,))
+        if cursor.fetchone():
+            cursor.execute("""
+                UPDATE roadmap_progress SET career_id=?, completed_stages=?, current_stage=?, updated_at=CURRENT_TIMESTAMP
+                WHERE user_name=?
+            """, (career_id, json.dumps(completed_stages), current_stage, user_name))
+        else:
+            cursor.execute("""
+                INSERT INTO roadmap_progress (user_name, career_id, completed_stages, current_stage)
+                VALUES (?, ?, ?, ?)
+            """, (user_name, career_id, json.dumps(completed_stages), current_stage))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"[API] roadmap-progress error: {e}")
+
+    roadmap_data = career_service.get_user_roadmap(user_name, career_id)
+    return jsonify({
+        'success': True,
+        'roadmap': roadmap_data
+    }), 200
+
+@app.route('/api/skill-progress', methods=['POST', 'OPTIONS'])
+def api_skill_progress():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user()
+    if not user_name:
+        return jsonify({'success': False, 'message': 'Authentication required.'}), 401
+
+    data = request.get_json(silent=True) or {}
+    skill_name = (data.get('skill_name') or data.get('skill') or '').strip()
+    level = data.get('level', 'Advanced')
+
+    if not skill_name:
+        return jsonify({'success': False, 'message': 'Skill name is required.'}), 400
+
+    res = career_service.add_user_skill(user_name, skill_name, level)
+    return jsonify(res), 200
+
+@app.route('/api/career/<career_id>/market', methods=['GET', 'OPTIONS'])
+def api_career_market(career_id):
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    careers = career_engine.get_careers_data()
+    target = None
+    for c in careers:
+        if c.get('id') == career_id or career_engine.slugify(c.get('name', '')) == career_id:
+            target = c
+            break
+
+    if not target and careers:
+        target = careers[0]
+
+    # Check if external market provider key exists
+    market_key = os.environ.get('MARKET_DATA_API_KEY')
+    is_live = bool(market_key)
+
+    market_info = {
+        'career_id': target.get('id', career_id) if target else career_id,
+        'career_name': target.get('name', '') if target else career_id,
+        'is_live': is_live,
+        'source': 'LIVE_MARKET_PROVIDER' if is_live else 'INTERNAL_KNOWLEDGE_BASE',
+        'status_label': 'Live Market Feed' if is_live else 'Market data (Curated Baseline)',
+        'salary_range': target.get('salary', '$95,000 - $140,000') if target else '$95,000',
+        'projected_growth': target.get('demand', 'High demand (20%+ growth)') if target else 'High growth',
+        'top_hiring_companies': target.get('companies', ['Google', 'Microsoft', 'Amazon', 'Meta']) if target else [],
+        'required_tech_stack': target.get('tech_stack', []) if target else []
+    }
+
+    return jsonify({
+        'success': True,
+        'market_data': market_info
+    }), 200
+
+@app.route('/api/internships', methods=['GET', 'OPTIONS'])
+def api_internships():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user() or 'Guest'
+    recs = career_service.get_user_recommendations(user_name)
+    ideal = recs.get('ideal_match', {})
+    career_name = ideal.get('career_name', 'Software Development')
+
+    opportunities = [
+        {
+            "id": "opp-1",
+            "title": f"Junior {career_name} Intern",
+            "company": "TechNova Solutions",
+            "location": "Remote / Hybrid",
+            "work_type": "Internship",
+            "stipend": "$3,500 / month",
+            "skills": ideal.get('explanations', ['Python', 'SQL'])[:2],
+            "posted_date": "Recently posted",
+            "apply_url": "https://careers.google.com"
+        },
+        {
+            "id": "opp-2",
+            "title": f"Associate {career_name} Trainee",
+            "company": "Global Data Systems",
+            "location": "On-site / San Francisco, CA",
+            "work_type": "Full-time Entry Level",
+            "stipend": "$85,000 / year",
+            "skills": ["Problem Solving", "Git"],
+            "posted_date": "2 days ago",
+            "apply_url": "https://careers.microsoft.com"
+        },
+        {
+            "id": "opp-3",
+            "title": "AI & Analytics Research Apprentice",
+            "company": "Apex AI Labs",
+            "location": "Remote",
+            "work_type": "Apprenticeship",
+            "stipend": "$4,000 / month",
+            "skills": ["Machine Learning", "Python"],
+            "posted_date": "1 day ago",
+            "apply_url": "https://openai.com/careers"
+        }
+    ]
+
+    return jsonify({
+        'success': True,
+        'is_live': False,
+        'source': 'INTERNAL_KNOWLEDGE_BASE',
+        'status_label': 'Curated Baseline Opportunities',
+        'target_career': career_name,
+        'opportunities': opportunities
+    }), 200
+
+@app.route('/api/readiness', methods=['GET', 'OPTIONS'])
+def api_readiness():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user() or 'Guest'
+    profile = career_service.get_user_profile(user_name)
+    dims = career_service.get_assessment_dimensions(user_name)
+    readiness = career_engine.calculate_career_readiness(profile, dims)
+
+    return jsonify({
+        'success': True,
+        'user_name': user_name,
+        'readiness': readiness
+    }), 200
+
+@app.route('/api/career/compare', methods=['GET', 'OPTIONS'])
+def api_career_compare():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user() or 'Guest'
+    ids_param = request.args.get('ids', 'software-engineer,data-scientist,ai-engineer')
+    requested_ids = [i.strip() for i in ids_param.split(',') if i.strip()]
+
+    profile = career_service.get_user_profile(user_name)
+    dims = career_service.get_assessment_dimensions(user_name)
+    careers = career_engine.get_careers_data()
+
+    comparison_list = []
+    for cid in requested_ids:
+        target = None
+        for c in careers:
+            if c.get('id') == cid or career_engine.slugify(c.get('name', '')) == cid:
+                target = c
+                break
+        if target:
+            match_res = career_engine.match_user_to_career(profile, dims, target)
+            skill_gap = career_service.get_skill_gap_analysis(user_name, target.get('id'))
+            comparison_list.append({
+                'career': target,
+                'match': match_res,
+                'skill_gap': skill_gap
+            })
+
+    return jsonify({
+        'success': True,
+        'comparison': comparison_list
+    }), 200
+
+@app.route('/api/dashboard-summary', methods=['GET', 'OPTIONS'])
+def api_dashboard_summary():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user() or 'Guest'
+    profile = career_service.get_user_profile(user_name)
+    dims = career_service.get_assessment_dimensions(user_name)
+    
+    completion = career_engine.calculate_profile_completion(profile)
+    recs = career_service.get_user_recommendations(user_name)
+    readiness = career_engine.calculate_career_readiness(profile, dims)
+
+    ideal = recs.get('ideal_match', {})
+    career_id = ideal.get('career_id', 'software-engineer')
+    roadmap = career_service.get_user_roadmap(user_name, career_id)
+
+    top_skills = [s['name'] if isinstance(s, dict) else s for s in profile.get('tech_skills', [])[:3]]
+    if not top_skills:
+        top_skills = ["Python", "Problem Solving", "Communication"]
+
+    return jsonify({
+        'success': True,
+        'user_name': user_name,
+        'profile_completion': completion.get('completion_percentage', 50),
+        'ideal_career': ideal.get('career_name', 'Software Engineer'),
+        'ideal_match_score': ideal.get('overall_match', 85),
+        'career_readiness_score': readiness.get('overall_readiness', 75),
+        'top_user_skills': top_skills,
+        'skills_to_develop': [g.replace('⚠ ', '') for g in ideal.get('skill_gaps', [])[:3]],
+        'current_roadmap_stage': roadmap.get('current_stage', 1),
+        'total_roadmap_stages': roadmap.get('total_stages', 5),
+        'recommended_next_action': f"Complete {ideal.get('skill_gaps', ['Machine Learning'])[0].replace('⚠ ', '')} fundamentals"
+    }), 200
+
+
 if __name__ == "__main__":
     app.run(debug=True)
+

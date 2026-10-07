@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="stylesheet" href="/static/css/features.css">
+  <script src="/config.js"></script>
   <style>
     .skill-hero {
       background: rgba(255, 255, 255, 0.85);
@@ -421,6 +422,25 @@
       document.getElementById('skillModal').style.display = 'none';
     }
 
+    function syncSkillToBackend(name, pct) {
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/skill-progress';
+      const level = pct >= 80 ? 'Advanced' : (pct >= 50 ? 'Intermediate' : 'Beginner');
+
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skill_name: name, level: level })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.new_match_score) {
+          console.log(`[Realtime Intelligence] Match for ${data.ideal_career} recalculated: ${data.new_match_score}%`);
+        }
+      })
+      .catch(err => console.warn('Skill progress sync notice:', err));
+    }
+
     function saveSkillFromModal() {
       const name = document.getElementById('modalSkillName').value.trim();
       const category = document.getElementById('modalSkillCategory').value;
@@ -443,6 +463,7 @@
 
       closeModal();
       renderSkills();
+      syncSkillToBackend(name, pct);
     }
 
     function addRecommendedSkill(name, pct, category) {
@@ -458,6 +479,7 @@
         icon: 'fa-solid fa-rocket'
       });
       renderSkills();
+      syncSkillToBackend(name, pct);
     }
 
     window.addEventListener('DOMContentLoaded', renderSkills);
