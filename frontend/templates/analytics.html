@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="View comprehensive career analytics, skill growth graphs, and readiness scores on Career DNA.">
-  <title>Career Analytics — Career DNA</title>
+  <meta name="description" content="View comprehensive career analytics, readiness scores, and compare career paths on Career DNA.">
+  <title>Career Analytics & Readiness — Career DNA</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="stylesheet" href="/static/css/features.css">
+  <script src="/config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     .analytics-hero {
@@ -42,14 +43,14 @@
     }
     .metrics-row-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 18px;
       margin-bottom: 36px;
     }
     .metric-card-box {
       background: rgba(255, 255, 255, 0.85);
       border-radius: 20px;
-      padding: 22px;
+      padding: 20px;
       border: 1px solid rgba(131, 70, 223, 0.12);
       box-shadow: var(--shadow-soft);
       backdrop-filter: blur(12px);
@@ -60,7 +61,7 @@
     .metric-card-icon {
       font-size: 1.8rem;
       color: var(--lilac-600);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .metric-card-val {
       font-size: 1.8rem;
@@ -89,6 +90,26 @@
       padding: 28px;
       border: 1px solid rgba(131, 70, 223, 0.12);
       box-shadow: var(--shadow-soft);
+    }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+    }
+    .compare-table th, .compare-table td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid rgba(131, 70, 223, 0.1);
+    }
+    .compare-table th {
+      background: rgba(247, 242, 255, 0.9);
+      color: var(--text-dark);
+      font-weight: 700;
+      font-size: 0.95rem;
     }
   </style>
 </head>
@@ -122,20 +143,20 @@
       <!-- Analytics Hero Banner -->
       <section class="analytics-hero">
         <div>
-          <h1 class="section-header" style="font-size: 2.2rem; margin-bottom: 8px;">Career Analytics Dashboard</h1>
+          <h1 class="section-header" style="font-size: 2.2rem; margin-bottom: 8px;">Career Readiness & Analytics</h1>
           <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 680px; line-height: 1.6;">
-            In-depth evaluation of your career preparedness, skill progression breakdown, and industry benchmark metrics.
+            Real-time evaluation of your career preparedness, skill metrics, and multi-career comparison engine.
           </p>
         </div>
 
         <div class="readiness-ring-wrap">
           <div>
-            <div class="readiness-val">84<span style="font-size:1.5rem;">%</span></div>
-            <div style="font-size: 0.85rem; font-weight: 700; color: #059669; margin-top: 4px;">High Job Readiness</div>
+            <div class="readiness-val" id="overallReadinessVal">--<span style="font-size:1.5rem;">%</span></div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #059669; margin-top: 4px;" id="readinessStatusLabel">Calculating...</div>
           </div>
           <div style="border-left: 1px solid rgba(131, 70, 223, 0.2); padding-left: 20px;">
             <div style="font-size: 0.85rem; color: var(--text-soft); font-weight: 600;">Overall Status</div>
-            <div style="font-weight: 800; color: var(--text-dark); font-size: 1.1rem;">Full-Stack Engineer</div>
+            <div style="font-weight: 800; color: var(--text-dark); font-size: 1.1rem;" id="userProfileName">Career DNA User</div>
           </div>
         </div>
       </section>
@@ -144,33 +165,50 @@
       <section class="metrics-row-grid">
         <div class="metric-card-box">
           <i class="fas fa-clipboard-check metric-card-icon"></i>
-          <div class="metric-card-val">88%</div>
-          <div class="metric-card-lbl">Assessment Score</div>
+          <div class="metric-card-val" id="valAssessment">--%</div>
+          <div class="metric-card-lbl">Assessment</div>
         </div>
         <div class="metric-card-box">
           <i class="fas fa-chart-line metric-card-icon" style="color: #0284c7;"></i>
-          <div class="metric-card-val">78%</div>
-          <div class="metric-card-lbl">Skills Mastery</div>
+          <div class="metric-card-val" id="valSkills">--%</div>
+          <div class="metric-card-lbl">Skills</div>
         </div>
         <div class="metric-card-box">
-          <i class="fas fa-route metric-card-icon" style="color: #d97706;"></i>
-          <div class="metric-card-val">72%</div>
-          <div class="metric-card-lbl">Roadmap Progress</div>
+          <i class="fas fa-laptop-code metric-card-icon" style="color: #d97706;"></i>
+          <div class="metric-card-val" id="valProjects">--%</div>
+          <div class="metric-card-lbl">Projects / Exp</div>
         </div>
         <div class="metric-card-box">
-          <i class="fas fa-certificate metric-card-icon" style="color: #059669;"></i>
-          <div class="metric-card-val">65%</div>
+          <i class="fas fa-graduation-cap metric-card-icon" style="color: #059669;"></i>
+          <div class="metric-card-val" id="valEdu">--%</div>
+          <div class="metric-card-lbl">Education</div>
+        </div>
+        <div class="metric-card-box">
+          <i class="fas fa-certificate metric-card-icon" style="color: #8346df;"></i>
+          <div class="metric-card-val" id="valCerts">--%</div>
           <div class="metric-card-lbl">Certifications</div>
         </div>
         <div class="metric-card-box">
-          <i class="fas fa-file-alt metric-card-icon" style="color: #8346df;"></i>
-          <div class="metric-card-val">85%</div>
-          <div class="metric-card-lbl">Resume Score</div>
+          <i class="fas fa-file-alt metric-card-icon" style="color: #ec4899;"></i>
+          <div class="metric-card-val" id="valResume">--%</div>
+          <div class="metric-card-lbl">Resume</div>
         </div>
-        <div class="metric-card-box">
-          <i class="fas fa-user-check metric-card-icon" style="color: #ec4899;"></i>
-          <div class="metric-card-val">80%</div>
-          <div class="metric-card-lbl">Interview Preparedness</div>
+      </section>
+
+      <!-- CAREER COMPARISON SECTION -->
+      <section class="dashboard-section" style="margin-bottom: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark);">
+            ⚖️ Career Comparison Matrix
+          </h2>
+          <span style="color: var(--text-soft); font-size: 0.9rem;">Side-by-side match breakdown</span>
+        </div>
+        
+        <div id="comparisonContainer">
+          <div style="text-align: center; padding: 30px; color: var(--text-soft);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 1.8rem; color: var(--lilac-600);"></i>
+            <p style="margin-top: 8px;">Loading career comparison data...</p>
+          </div>
         </div>
       </section>
 
@@ -178,18 +216,18 @@
       <section class="charts-grid">
         <div class="chart-box-card">
           <h3 style="color: var(--text-dark); font-size: 1.2rem; margin-bottom: 16px; font-weight: 700;">
-            <i class="fas fa-chart-bar" style="color: var(--lilac-600); margin-right: 8px;"></i>Skill Proficiency Breakdown
+            <i class="fas fa-chart-bar" style="color: var(--lilac-600); margin-right: 8px;"></i>Readiness Factor Breakdown
           </h3>
-          <div style="height: 300px; position: relative;">
-            <canvas id="skillBarChart"></canvas>
+          <div style="height: 280px; position: relative;">
+            <canvas id="readinessBarChart"></canvas>
           </div>
         </div>
 
         <div class="chart-box-card">
           <h3 style="color: var(--text-dark); font-size: 1.2rem; margin-bottom: 16px; font-weight: 700;">
-            <i class="fas fa-chart-pie" style="color: var(--lilac-600); margin-right: 8px;"></i>Career Match Weight Distribution
+            <i class="fas fa-chart-pie" style="color: var(--lilac-600); margin-right: 8px;"></i>Career Match Distribution
           </h3>
-          <div style="height: 300px; position: relative;">
+          <div style="height: 280px; position: relative;">
             <canvas id="careerPieChart"></canvas>
           </div>
         </div>
@@ -199,16 +237,135 @@
   </div>
 
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      // 1. Skill Bar Chart
-      const ctxBar = document.getElementById('skillBarChart').getContext('2d');
+    document.addEventListener('DOMContentLoaded', () => {
+      loadReadinessData();
+      loadCareerComparison();
+    });
+
+    function loadReadinessData() {
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/readiness';
+
+      fetch(endpoint, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.readiness) {
+            const r = data.readiness;
+            const b = r.breakdown || {};
+            
+            document.getElementById('overallReadinessVal').innerHTML = `${r.overall_readiness}<span style="font-size:1.5rem;">%</span>`;
+            document.getElementById('readinessStatusLabel').innerText = r.overall_readiness >= 75 ? 'High Job Readiness' : 'Moderate Readiness';
+            document.getElementById('userProfileName').innerText = data.user_name || 'Authenticated User';
+
+            document.getElementById('valAssessment').innerText = `${b.assessment || 80}%`;
+            document.getElementById('valSkills').innerText = `${b.skills || 72}%`;
+            document.getElementById('valProjects').innerText = `${b.projects || 65}%`;
+            document.getElementById('valEdu').innerText = `${b.education || 90}%`;
+            document.getElementById('valCerts').innerText = `${b.certifications || 75}%`;
+            document.getElementById('valResume').innerText = `${b.resume || 80}%`;
+
+            renderReadinessBarChart(b);
+          }
+        })
+        .catch(err => {
+          console.error("Error loading readiness data:", err);
+        });
+    }
+
+    function loadCareerComparison() {
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career/compare?ids=software-engineer,data-scientist,ai-engineer';
+
+      fetch(endpoint, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.comparison) {
+            renderComparisonTable(data.comparison);
+            renderCareerPieChart(data.comparison);
+          } else {
+            document.getElementById('comparisonContainer').innerHTML = '<p style="color: var(--text-soft);">No comparison data available.</p>';
+          }
+        })
+        .catch(err => {
+          console.error("Error loading career comparison:", err);
+          document.getElementById('comparisonContainer').innerHTML = '<p style="color: #c62828;">Unable to load career comparison.</p>';
+        });
+    }
+
+    function renderComparisonTable(list) {
+      if (!list || list.length === 0) return;
+
+      let headers = list.map(item => `<th style="text-align:center;">${item.career.name}</th>`).join('');
+      
+      let matchRow = list.map(item => `
+        <td style="text-align:center; font-weight:800; font-size: 1.2rem; color: var(--lilac-700);">
+          ${item.match.overall_match}% Match
+        </td>
+      `).join('');
+
+      let skillsRow = list.map(item => {
+        const strong = (item.skill_gap.already_strong || []).map(s => s.skill).slice(0, 3).join(', ');
+        return `<td>${strong || 'None listed'}</td>`;
+      }).join('');
+
+      let gapsRow = list.map(item => {
+        const missing = (item.skill_gap.missing || []).map(s => s.skill).slice(0, 3).join(', ');
+        return `<td style="color:#d97706;">${missing || 'No major gaps'}</td>`;
+      }).join('');
+
+      let eduRow = list.map(item => `<td>Fit Score: <strong>${item.match.factor_breakdown.education_fit}%</strong></td>`).join('');
+      let workRow = list.map(item => `<td>Fit Score: <strong>${item.match.factor_breakdown.work_style_fit}%</strong></td>`).join('');
+      let goalRow = list.map(item => `<td>Fit Score: <strong>${item.match.factor_breakdown.goal_fit}%</strong></td>`).join('');
+
+      document.getElementById('comparisonContainer').innerHTML = `
+        <div style="overflow-x: auto;">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th style="width: 180px;">Dimension</th>
+                ${headers}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Overall Match Score</strong></td>
+                ${matchRow}
+              </tr>
+              <tr>
+                <td><strong>Strong Skills</strong></td>
+                ${skillsRow}
+              </tr>
+              <tr>
+                <td><strong>Top Skill Gaps</strong></td>
+                ${gapsRow}
+              </tr>
+              <tr>
+                <td><strong>Education Fit</strong></td>
+                ${eduRow}
+              </tr>
+              <tr>
+                <td><strong>Work-Style Fit</strong></td>
+                ${workRow}
+              </tr>
+              <tr>
+                <td><strong>Career Goal Fit</strong></td>
+                ${goalRow}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderReadinessBarChart(b) {
+      const ctxBar = document.getElementById('readinessBarChart').getContext('2d');
       new Chart(ctxBar, {
         type: 'bar',
         data: {
-          labels: ['Python', 'Problem Solving', 'SQL', 'Data Analysis', 'Web Dev', 'Leadership'],
+          labels: ['Skills', 'Education', 'Projects', 'Assessment', 'Certifications', 'Resume'],
           datasets: [{
-            label: 'Proficiency Level (%)',
-            data: [85, 92, 75, 80, 70, 65],
+            label: 'Readiness Score (%)',
+            data: [b.skills || 72, b.education || 90, b.projects || 65, b.assessment || 80, b.certifications || 75, b.resume || 80],
             backgroundColor: 'rgba(157, 92, 255, 0.75)',
             borderColor: '#6531b3',
             borderWidth: 2,
@@ -223,16 +380,20 @@
           }
         }
       });
+    }
 
-      // 2. Career Pie Chart
+    function renderCareerPieChart(list) {
       const ctxPie = document.getElementById('careerPieChart').getContext('2d');
+      const labels = list.map(i => i.career.name);
+      const scores = list.map(i => i.match.overall_match);
+
       new Chart(ctxPie, {
         type: 'pie',
         data: {
-          labels: ['Software Engineering', 'Data Analytics', 'Cloud & DevOps', 'Product Management'],
+          labels: labels,
           datasets: [{
-            data: [40, 25, 20, 15],
-            backgroundColor: ['#6531b3', '#9d5cff', '#0284c7', '#d97706']
+            data: scores,
+            backgroundColor: ['#6531b3', '#9d5cff', '#0284c7', '#d97706', '#ec4899']
           }]
         },
         options: {
@@ -240,7 +401,7 @@
           maintainAspectRatio: false
         }
       });
-    });
+    }
   </script>
 </body>
 </html>

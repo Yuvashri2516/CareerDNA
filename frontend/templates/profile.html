@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profile Settings - Career DNA</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="/static/css/features.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="/config.js"></script>
 
 <style>
 .profile-page {
@@ -63,10 +66,6 @@
     font-weight: 600;
 }
 
-.avatar-selector {
-    margin-bottom: 20px;
-}
-
 .avatar-selector p {
     font-size: 0.85rem;
     font-weight: 600;
@@ -93,6 +92,27 @@
     box-shadow: 0 14px 28px rgba(131, 70, 223, 0.3);
 }
 
+.profile-settings-form label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    margin: 14px 0 6px 0;
+}
+
+.profile-settings-form input,
+.profile-settings-form select,
+.profile-settings-form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(131, 70, 223, 0.2);
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
 @media (max-width: 768px) {
     .metrics-row {
         grid-template-columns: 1fr;
@@ -106,25 +126,18 @@
 
     <header class="navbar">
         <div class="nav-left">
-            <div class="menu-icon">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-
-            <div class="logo-wrap">
+            <a href="/welcome" class="logo-wrap" style="text-decoration: none;">
                 <div class="logo-badge career-logo">
                     <div class="logo-circle"></div>
                     <div class="logo-arrow arrow-1"></div>
                     <div class="logo-arrow arrow-2"></div>
                     <div class="logo-arrow arrow-3"></div>
                 </div>
-
                 <div class="logo-text">
                     <span class="logo-main">Career</span>
                     <span class="logo-accent">DNA</span>
                 </div>
-            </div>
+            </a>
         </div>
 
         <nav class="nav-links">
@@ -144,126 +157,97 @@
     <div class="profile-wrap">
         
         <div class="profile-header">
-            <h1>Your Profile Settings</h1>
-            <p>Customize your personal dashboard appearance, update your details, and inspect earned credentials.</p>
+            <h1>Your Profile & Career Intelligence Settings</h1>
+            <p>Update your education, skills, interests, and goals to recalculate real-time career recommendations.</p>
         </div>
 
         <div class="metrics-row">
             <div class="metric-card">
-                <h3>{{ results_count }}</h3>
+                <h3 id="statAssessments">1</h3>
                 <p>Assessments Completed</p>
             </div>
             <div class="metric-card">
-                <h3 style="font-size: 1.3rem; margin-top: 10px; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    {{ latest_career }}
+                <h3 id="statTopCareer" style="font-size: 1.3rem; margin-top: 10px; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    Data Scientist
                 </h3>
                 <p>Top Career Match</p>
             </div>
             <div class="metric-card">
-                <h3>{{ 75 if results_count > 0 else 0 }}%</h3>
+                <h3 id="statCompleteness">85%</h3>
                 <p>Profile Completeness</p>
             </div>
         </div>
 
-        <div class="profile-grid">
+        <div id="saveAlert" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid #059669; color: #059669; border-radius: 16px; padding: 14px 20px; margin-bottom: 24px; font-weight: 600; text-align: center;">
+            ✓ Profile saved! Career matches and readiness metrics recalibrated.
+        </div>
+
+        <div class="profile-grid" style="display: grid; grid-template-columns: 320px 1fr; gap: 28px;">
             
-            <!-- LEFT PANEL: PHOTO & BADGES -->
-            <div class="profile-card">
-                
-                <div class="profile-avatar-wrap">
-                    <img id="currentAvatar" class="profile-avatar" src="{{ user.photo_url }}" alt="Profile Avatar">
+            <!-- LEFT PANEL: USER INFO & AVATAR -->
+            <div class="profile-card" style="background: white; border-radius: 24px; padding: 28px; text-align: center; border: 1px solid rgba(131,70,223,0.12);">
+                <div class="profile-avatar-wrap" style="margin-bottom: 16px;">
+                    <img id="currentAvatar" class="profile-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Felix&backgroundColor=b6e3f4" alt="Profile Avatar" style="width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--lilac-600);">
                 </div>
                 
-                <h3 style="font-size: 1.4rem; color: var(--text-dark); margin-bottom: 4px;">{{ user.username }}</h3>
-                <p style="font-size: 0.85rem; color: var(--text-soft); margin-bottom: 24px;">Member since 2026</p>
+                <h3 id="profileUsername" style="font-size: 1.4rem; color: var(--text-dark); margin-bottom: 4px;">User</h3>
+                <p style="font-size: 0.85rem; color: var(--text-soft); margin-bottom: 24px;">Career DNA Intelligence Profile</p>
                 
-                <div class="avatar-selector">
-                    <p>Select Avatar Image</p>
-                    <div class="avatar-select-grid">
-                        <div class="avatar-option {% if user.photo_url == '/static/images/avatar1.png' %}selected{% endif %}" onclick="selectAvatar('/static/images/avatar1.png', this)">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Felix&backgroundColor=b6e3f4" alt="Avatar 1">
+                <div style="border-top: 1px solid rgba(131, 70, 223, 0.1); padding-top: 20px; text-align: left;">
+                    <h4 style="font-size: 0.95rem; color: var(--text-dark); margin-bottom: 12px; font-weight: 700;">🏅 Verified Credentials</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="background: #faf7ff; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
+                            <span>🎯</span> Assessment Complete
                         </div>
-                        <div class="avatar-option {% if user.photo_url == '/static/images/avatar2.png' %}selected{% endif %}" onclick="selectAvatar('/static/images/avatar2.png', this)">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aneka&backgroundColor=c0aede" alt="Avatar 2">
-                        </div>
-                        <div class="avatar-option {% if user.photo_url == '/static/images/avatar3.png' %}selected{% endif %}" onclick="selectAvatar('/static/images/avatar3.png', this)">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Buddy&backgroundColor=ffdf70" alt="Avatar 3">
-                        </div>
-                        <div class="avatar-option {% if user.photo_url == '/static/images/avatar4.png' %}selected{% endif %}" onclick="selectAvatar('/static/images/avatar4.png', this)">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Ginger&backgroundColor=ffd5dc" alt="Avatar 4">
+                        <div style="background: #faf7ff; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
+                            <span>⚡</span> Real-time Match Active
                         </div>
                     </div>
                 </div>
-
-                <div style="border-top: 1px solid rgba(131, 70, 223, 0.1); padding-top: 20px; margin-top: 20px; text-align: left;">
-                    <h4 style="font-size: 0.95rem; color: var(--text-dark); margin-bottom: 12px; font-weight: 700;">🏅 Earned Achievements</h4>
-                    <div class="profile-badge-grid">
-                        {% if not badges %}
-                            <p style="font-size: 0.85rem; color: var(--text-soft); text-align: center; width: 100%;">No achievements earned yet. Take the assessment to unlock!</p>
-                        {% endif %}
-                        {% for badge in badges %}
-                            <div class="profile-badge-card">
-                                {% if badge == "Completed Assessment" %}
-                                    <span class="badge-icon">🎯</span>
-                                    <span class="badge-title">First Step Done</span>
-                                {% elif badge == "Top Learner" %}
-                                    <span class="badge-icon">👑</span>
-                                    <span class="badge-title">Career Master</span>
-                                {% elif badge == "Problem Solver" %}
-                                    <span class="badge-icon">🔬</span>
-                                    <span class="badge-title">Logic Specialist</span>
-                                {% elif badge == "Quick Learner" %}
-                                    <span class="badge-icon">⚡</span>
-                                    <span class="badge-title">Active DNA</span>
-                                {% elif badge == "AI Explorer" %}
-                                    <span class="badge-icon">🤖</span>
-                                    <span class="badge-title">Future Explorer</span>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
             </div>
 
-            <!-- RIGHT PANEL: SETTINGS FORM -->
-            <div class="profile-card" style="text-align: left;">
-                <h3 style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 24px;">Account Settings</h3>
+            <!-- RIGHT PANEL: EDITABLE PROFILE FORM -->
+            <div class="profile-card" style="background: white; border-radius: 24px; padding: 32px; border: 1px solid rgba(131,70,223,0.12); text-align: left;">
+                <h3 style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 20px; font-weight: 700;">Edit Profile Dimensions</h3>
                 
-                <form class="profile-settings-form" action="/profile" method="POST">
+                <form id="profileForm" class="profile-settings-form" onsubmit="saveProfile(event)">
                     
-                    <!-- Hidden photo URL input -->
-                    <input type="hidden" name="photo_url" id="avatarInput" value="{{ user.photo_url }}">
-
-                    <label for="username">Username (Non-editable)</label>
-                    <input type="text" id="username" value="{{ user.username }}" readonly style="background: #f1ecff; color: var(--text-soft);">
-
-                    <label for="email">Email Address</label>
-                    <input type="email" name="email" id="email" value="{{ user.email }}" placeholder="Enter your email address" required>
-
-                    <label for="bio">Professional Bio</label>
-                    <textarea name="bio" id="bio" rows="4" placeholder="Briefly describe your career goals, background, or learning progress...">{{ user.bio }}</textarea>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div>
-                            <label for="theme">Dashboard Theme Color</label>
-                            <select name="theme" id="theme">
-                                <option value="purple" {% if user.theme == 'purple' %}selected{% endif %}>Classic Lavender (Purple)</option>
-                                <option value="blue" {% if user.theme == 'blue' %}selected{% endif %}>Ocean Wave (Blue)</option>
-                                <option value="dark" {% if user.theme == 'dark' %}selected{% endif %}>Carbon Space (Dark)</option>
+                            <label for="education_level">Education Level</label>
+                            <select id="education_level" name="education_level">
+                                <option value="Bachelor's Degree">Bachelor's Degree</option>
+                                <option value="Master's Degree">Master's Degree</option>
+                                <option value="PhD">PhD / Doctorate</option>
+                                <option value="High School">High School / Self-Taught</option>
                             </select>
                         </div>
                         <div>
-                            <label for="visibility">Profile Visibility</label>
-                            <select name="profile_visibility" id="visibility">
-                                <option value="public" {% if user.profile_visibility == 'public' %}selected{% endif %}>Public (Show Recommendations)</option>
-                                <option value="private" {% if user.profile_visibility == 'private' %}selected{% endif %}>Private (Keep Private)</option>
+                            <label for="work_style_pref">Work-Style Preference</label>
+                            <select id="work_style_pref" name="work_style_pref">
+                                <option value="Remote & Independent">Remote & Independent</option>
+                                <option value="Hybrid & Collaborative">Hybrid & Collaborative</option>
+                                <option value="In-Office Team">In-Office Team Leader</option>
                             </select>
                         </div>
                     </div>
 
-                    <div style="margin-top: 10px;">
-                        <button type="submit" class="settings-btn-save">Save Settings & Changes</button>
+                    <label for="tech_skills">Technical & Core Skills (Comma-separated)</label>
+                    <input type="text" id="tech_skills" name="tech_skills" placeholder="e.g. Python, SQL, Machine Learning, Data Analysis">
+
+                    <label for="interests">Career Field Interests (Comma-separated)</label>
+                    <input type="text" id="interests" name="interests" placeholder="e.g. Data Science, Artificial Intelligence, Software Engineering">
+
+                    <label for="career_goals">Primary Career Goal</label>
+                    <input type="text" id="career_goals" name="career_goals" placeholder="e.g. Senior Data Scientist / ML Engineer">
+
+                    <label for="bio">Professional Bio & Experience Summary</label>
+                    <textarea id="bio" name="bio" rows="3" placeholder="Briefly describe your background, projects, or aspirations..."></textarea>
+
+                    <div style="margin-top: 24px;">
+                        <button type="submit" class="settings-btn-save">
+                            <i class="fas fa-save" style="margin-right: 8px;"></i>Save Profile & Recalculate Career Engine
+                        </button>
                     </div>
 
                 </form>
@@ -275,19 +259,95 @@
 </div>
 
 <script>
-    function selectAvatar(url, optionElement) {
-        // Update input
-        document.getElementById("avatarInput").value = url;
-        
-        // Update current avatar image view (using Dicebear links dynamically matching the seed/colors)
-        const imgSrc = optionElement.querySelector("img").src;
-        document.getElementById("currentAvatar").src = imgSrc;
-        
-        // Update selected option class
-        document.querySelectorAll(".avatar-option").forEach(opt => {
-            opt.classList.remove("selected");
+    document.addEventListener("DOMContentLoaded", function() {
+        loadProfileData();
+    });
+
+    function loadProfileData() {
+        const apiBase = window.CAREER_DNA_API_BASE || '';
+        const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/profile';
+
+        fetch(endpoint, { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && data.profile) {
+                    const p = data.profile;
+                    document.getElementById('profileUsername').innerText = p.username || 'User';
+                    document.getElementById('education_level').value = p.education_level || "Bachelor's Degree";
+                    document.getElementById('work_style_pref').value = p.work_style_pref || "Hybrid & Collaborative";
+                    
+                    let skillsArr = p.tech_skills || [];
+                    if (typeof skillsArr === 'string') {
+                        try { skillsArr = JSON.parse(skillsArr); } catch(e) { skillsArr = []; }
+                    }
+                    const skillNames = skillsArr.map(s => typeof s === 'object' ? s.name : s).join(', ');
+                    document.getElementById('tech_skills').value = skillNames || 'Python, SQL, Data Analysis';
+
+                    let interestsArr = p.interests || [];
+                    if (typeof interestsArr === 'string') {
+                        try { interestsArr = JSON.parse(interestsArr); } catch(e) { interestsArr = []; }
+                    }
+                    document.getElementById('interests').value = Array.isArray(interestsArr) ? interestsArr.join(', ') : (interestsArr || 'Data Science');
+                    
+                    document.getElementById('career_goals').value = p.career_goals || 'Data Scientist';
+                    document.getElementById('bio').value = p.bio || '';
+                    document.getElementById('statCompleteness').innerText = `${data.completion || 85}%`;
+                }
+            })
+            .catch(err => {
+                console.error("Error loading profile:", err);
+            });
+
+        // Also fetch top career recommendation
+        const recEndpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career-recommendations';
+        fetch(recEndpoint, { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && data.ideal_match) {
+                    document.getElementById('statTopCareer').innerText = data.ideal_match.career_name;
+                }
+            });
+    }
+
+    function saveProfile(event) {
+        event.preventDefault();
+        const apiBase = window.CAREER_DNA_API_BASE || '';
+        const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/profile';
+
+        const skillsRaw = document.getElementById('tech_skills').value.split(',').map(s => s.trim()).filter(s => s);
+        const techSkills = skillsRaw.map(s => ({ name: s, level: 'Intermediate' }));
+
+        const interestsRaw = document.getElementById('interests').value.split(',').map(s => s.trim()).filter(s => s);
+
+        const payload = {
+            education_level: document.getElementById('education_level').value,
+            work_style_pref: document.getElementById('work_style_pref').value,
+            tech_skills: techSkills,
+            interests: interestsRaw,
+            career_goals: document.getElementById('career_goals').value.trim(),
+            bio: document.getElementById('bio').value.trim()
+        };
+
+        fetch(endpoint, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success) {
+                document.getElementById('saveAlert').style.display = 'block';
+                document.getElementById('statCompleteness').innerText = `${data.completion || 90}%`;
+                setTimeout(() => {
+                    document.getElementById('saveAlert').style.display = 'none';
+                }, 4000);
+            }
+        })
+        .catch(err => {
+            console.error("Error saving profile:", err);
+            alert("Unable to save profile changes. Please try again.");
         });
-        optionElement.classList.add("selected");
     }
 </script>
 </body>

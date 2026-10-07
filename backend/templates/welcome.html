@@ -379,8 +379,50 @@
                 </div>
             </div>
         </section>
-<!-- Feature Hub with compact previews -->
-<section class="dashboard-section">
+
+        <!-- REAL-TIME CAREER INTELLIGENCE SUMMARY BAR -->
+        <section class="dashboard-section" id="intelligenceSummarySection" style="margin-bottom: 30px;">
+            <h2 class="section-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <span>✨ Real-Time Career Intelligence</span>
+                <span id="dashCompletionPill" class="badge-item badge-purple" style="font-size: 0.85rem; font-weight: 600;">Profile Completion: Loading...</span>
+            </h2>
+            <div class="grid-3-col" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="glass-card" style="padding: 24px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--lilac-700); text-transform: uppercase;">Best Career Match</span>
+                    <h3 id="dashBestCareer" style="font-size: 1.5rem; color: var(--text-dark); margin: 8px 0 4px 0;">Loading...</h3>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="dashBestScore" class="badge-item badge-purple" style="font-size: 0.9rem; font-weight: 800;">--% Match</span>
+                        <span style="font-size: 0.82rem; color: var(--text-soft);">Deterministic Match</span>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="padding: 24px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--lilac-700); text-transform: uppercase;">Career Readiness</span>
+                    <h3 id="dashReadinessScore" style="font-size: 1.5rem; color: var(--text-dark); margin: 8px 0 4px 0;">--%</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-soft); margin: 0;">Preparation breakdown</p>
+                </div>
+
+                <div class="glass-card" style="padding: 24px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--lilac-700); text-transform: uppercase;">Roadmap Progress</span>
+                    <h3 id="dashRoadmapStage" style="font-size: 1.3rem; color: var(--text-dark); margin: 8px 0 4px 0;">Stage 1 of 5</h3>
+                    <p id="dashNextAction" style="font-size: 0.85rem; color: var(--text-soft); margin: 0; font-weight: 500;">Loading action...</p>
+                </div>
+            </div>
+
+            <div class="glass-card" style="margin-top: 20px; padding: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+                <div>
+                    <h4 style="font-size: 0.95rem; color: var(--text-dark); margin-bottom: 6px;">💡 Top Skills & Current Gaps</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-soft); margin: 0;">
+                        <strong>Your Skills:</strong> <span id="dashTopSkills">Loading...</span> | 
+                        <strong>Develop Next:</strong> <span id="dashSkillsToDevelop" style="color: #d97706; font-weight: 600;">Loading...</span>
+                    </p>
+                </div>
+                <a href="/skills" class="nav-btn primary-btn" style="text-decoration: none;">Update Skill Progress</a>
+            </div>
+        </section>
+
+        <!-- Feature Hub with compact previews -->
+        <section class="dashboard-section">
     <h2 class="section-header">Features</h2>
     <div class="grid-3-col">
         <div class="glass-card">
@@ -1203,7 +1245,44 @@
                 }
             }
         });
+
+        // ── Real-Time Dashboard Summary API Call ──
+        const apiBase = window.CAREER_DNA_API_BASE || '';
+        const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/dashboard-summary';
+
+        fetch(endpoint, { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success) {
+                    if (document.getElementById('dashCompletionPill')) {
+                        document.getElementById('dashCompletionPill').textContent = 'Profile Completion: ' + data.profile_completion + '%';
+                    }
+                    if (document.getElementById('dashBestCareer')) {
+                        document.getElementById('dashBestCareer').textContent = data.ideal_career;
+                    }
+                    if (document.getElementById('dashBestScore')) {
+                        document.getElementById('dashBestScore').textContent = data.ideal_match_score + '% Match';
+                    }
+                    if (document.getElementById('dashReadinessScore')) {
+                        document.getElementById('dashReadinessScore').textContent = data.career_readiness_score + '%';
+                    }
+                    if (document.getElementById('dashTopSkills')) {
+                        document.getElementById('dashTopSkills').textContent = data.top_user_skills.join(', ');
+                    }
+                    if (document.getElementById('dashSkillsToDevelop')) {
+                        document.getElementById('dashSkillsToDevelop').textContent = data.skills_to_develop.join(', ');
+                    }
+                    if (document.getElementById('dashRoadmapStage')) {
+                        document.getElementById('dashRoadmapStage').textContent = 'Stage ' + data.current_roadmap_stage + ' of ' + data.total_roadmap_stages;
+                    }
+                    if (document.getElementById('dashNextAction')) {
+                        document.getElementById('dashNextAction').textContent = data.recommended_next_action;
+                    }
+                }
+            })
+            .catch(err => console.warn('Dashboard summary load error:', err));
     });
 </script>
+<script src="/config.js"></script>
 </body>
 </html>

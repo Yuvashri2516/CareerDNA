@@ -51,20 +51,20 @@
       margin-bottom: 20px;
     }
     .section-title-wrap h3 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--text-dark);
       font-weight: 700;
     }
     .skill-card-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 24px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 36px;
     }
     .skill-card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       border-radius: 20px;
-      padding: 24px;
+      padding: 22px;
       border: 1px solid rgba(131, 70, 223, 0.12);
       box-shadow: var(--shadow-soft);
       backdrop-filter: blur(12px);
@@ -85,7 +85,7 @@
     }
     .skill-name {
       font-weight: 700;
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       color: var(--text-dark);
       display: flex;
       align-items: center;
@@ -99,17 +99,17 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .badge-advanced {
-      background: rgba(131, 70, 223, 0.15);
-      color: var(--lilac-700);
+    .badge-strong {
+      background: rgba(46, 125, 50, 0.15);
+      color: #2e7d32;
     }
-    .badge-intermediate {
-      background: rgba(79, 172, 254, 0.15);
-      color: #0284c7;
-    }
-    .badge-beginner {
-      background: rgba(245, 158, 11, 0.15);
+    .badge-developing {
+      background: rgba(217, 119, 6, 0.15);
       color: #d97706;
+    }
+    .badge-missing {
+      background: rgba(220, 38, 38, 0.15);
+      color: #dc2626;
     }
     .progress-bar-bg {
       height: 10px;
@@ -121,8 +121,16 @@
     .progress-bar-fill {
       height: 100%;
       border-radius: 99px;
-      background: linear-gradient(90deg, var(--lilac-500), var(--lilac-700));
       transition: width 0.6s ease;
+    }
+    .fill-strong {
+      background: linear-gradient(90deg, #4caf50, #2e7d32);
+    }
+    .fill-developing {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+    .fill-missing {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
     }
     .skill-footer {
       display: flex;
@@ -135,19 +143,12 @@
       font-weight: 600;
       color: var(--text-main);
     }
-    .rec-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-    .rec-card {
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 18px;
-      padding: 20px;
-      border: 1px dashed rgba(131, 70, 223, 0.3);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+    .top3-box {
+      background: linear-gradient(135deg, rgba(247, 242, 255, 0.95), rgba(235, 220, 255, 0.8));
+      border: 1px solid rgba(131, 70, 223, 0.2);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 36px;
     }
   </style>
 </head>
@@ -160,19 +161,21 @@
       <!-- Navbar -->
       <header class="navbar" style="margin-bottom: 36px;">
         <div class="nav-left">
-          <a href="/" class="logo-wrap" style="text-decoration: none;">
+          <a href="/welcome" class="logo-wrap" style="text-decoration: none;">
             <div class="logo-badge career-logo"><div class="logo-circle"></div><div class="logo-arrow arrow-1"></div><div class="logo-arrow arrow-2"></div><div class="logo-arrow arrow-3"></div></div>
             <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
           </a>
         </div>
         <nav class="nav-links">
-          <a href="/">Home</a>
+          <a href="/welcome">Dashboard</a>
+          <a href="/assessment" class="nav-take-test-link">Take Test</a>
           <a href="/career-paths">Career Paths</a>
           <a href="/resources">Resources</a>
-          <a href="/contact">Contact</a>
+          <a href="/history">History</a>
+          <a href="/profile">Profile</a>
         </nav>
         <div class="nav-actions">
-          <a href="/login" class="nav-btn secondary-btn" style="text-decoration:none;">Log In</a>
+          <a href="/welcome" class="nav-btn secondary-btn" style="text-decoration:none;">← Dashboard</a>
         </div>
       </header>
 
@@ -181,240 +184,255 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
           <div>
             <h1 class="section-header" style="font-size: 2.2rem; margin-bottom: 8px;">Skill Tracker</h1>
-            <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 720px; line-height: 1.6;">
-              Monitor your technical and soft skill progression, update your proficiency levels, and discover recommended skills to accelerate your career growth.
+            <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 720px; line-height: 1.6;" id="targetCareerSubtitle">
+              Loading your personalized career skill analysis...
             </p>
           </div>
-          <button id="addSkillBtn" class="nav-btn primary-btn" onclick="openAddSkillModal()">
-            <i class="fas fa-plus" style="margin-right: 8px;"></i>Add Custom Skill
+          <button class="nav-btn primary-btn" onclick="openAddSkillModal()">
+            <i class="fas fa-plus" style="margin-right: 8px;"></i>Update Skill Level
           </button>
         </div>
 
         <div class="hero-metrics">
           <div class="metric-card">
-            <div class="metric-value" id="overallMasteryPct">78%</div>
-            <div class="metric-label">Overall Skill Mastery</div>
+            <div class="metric-value" style="color: #2e7d32;" id="strongCount">0</div>
+            <div class="metric-label">Already Strong</div>
           </div>
           <div class="metric-card">
-            <div class="metric-value" id="totalSkillsCount">10</div>
-            <div class="metric-label">Skills Tracked</div>
+            <div class="metric-value" style="color: #d97706;" id="developingCount">0</div>
+            <div class="metric-label">Developing</div>
           </div>
           <div class="metric-card">
-            <div class="metric-value" style="color: #0284c7;" id="advancedSkillsCount">4</div>
-            <div class="metric-label">Advanced Level</div>
+            <div class="metric-value" style="color: #dc2626;" id="missingCount">0</div>
+            <div class="metric-label">Missing Gaps</div>
           </div>
           <div class="metric-card">
-            <div class="metric-value" style="color: #d97706;" id="interSkillsCount">5</div>
-            <div class="metric-label">Intermediate Level</div>
+            <div class="metric-value" id="overallSkillReadiness">0%</div>
+            <div class="metric-label">Target Skill Fit</div>
           </div>
         </div>
       </section>
 
-      <!-- Technical Skills Section -->
-      <section class="dashboard-section" style="margin-bottom: 36px;">
-        <div class="section-title-wrap">
-          <h3><i class="fas fa-code" style="color: var(--lilac-600); margin-right: 10px;"></i>Technical Skills</h3>
-          <span style="color: var(--text-soft); font-size: 0.9rem;">Core engineering & analytical tools</span>
-        </div>
-        <div class="skill-card-grid" id="techSkillsGrid">
-          <!-- Populated dynamically -->
-        </div>
-      </section>
+      <!-- TOP 3 SKILLS TO LEARN NEXT -->
+      <div id="top3Container" class="top3-box" style="display: none;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-bullseye" style="color: var(--lilac-700);"></i> TOP 3 SKILLS TO LEARN NEXT
+        </h3>
+        <div id="top3List" style="display: flex; flex-wrap: wrap; gap: 12px;"></div>
+      </div>
 
-      <!-- Soft Skills Section -->
-      <section class="dashboard-section" style="margin-bottom: 36px;">
-        <div class="section-title-wrap">
-          <h3><i class="fas fa-users" style="color: var(--lilac-600); margin-right: 10px;"></i>Soft Skills</h3>
-          <span style="color: var(--text-soft); font-size: 0.9rem;">Leadership & interpersonal strengths</span>
+      <!-- Main Skill Content Container -->
+      <div id="skillsMainContainer">
+        <div style="text-align: center; padding: 40px; color: var(--text-soft);">
+          <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--lilac-600); margin-bottom: 12px;"></i>
+          <p>Loading your personalized skill analysis...</p>
         </div>
-        <div class="skill-card-grid" id="softSkillsGrid">
-          <!-- Populated dynamically -->
-        </div>
-      </section>
-
-      <!-- Recommended Skills to Improve Section -->
-      <section class="dashboard-section" style="margin-bottom: 40px;">
-        <div class="section-title-wrap">
-          <h3><i class="fas fa-lightbulb" style="color: #d97706; margin-right: 10px;"></i>Recommended Skills to Improve</h3>
-          <span style="color: var(--text-soft); font-size: 0.9rem;">High impact for career advancement</span>
-        </div>
-        <div class="rec-grid">
-          <div class="rec-card">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h4 style="font-weight: 700; color: var(--text-dark);">Cloud Architecture (AWS / Azure)</h4>
-                <span class="skill-badge badge-beginner">High Demand</span>
-              </div>
-              <p style="color: var(--text-soft); font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px;">
-                Essential for scaling enterprise web applications and DevOps pipelines. Boosts career match score by +22%.
-              </p>
-            </div>
-            <button class="nav-btn secondary-btn" style="width: 100%; text-align: center; font-size: 0.9rem;" onclick="addRecommendedSkill('Cloud Architecture', 40, 'Technical')">
-              <i class="fas fa-plus-circle" style="margin-right: 6px;"></i>Add to Tracker
-            </button>
-          </div>
-
-          <div class="rec-card">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h4 style="font-weight: 700; color: var(--text-dark);">System Design & Architecture</h4>
-                <span class="skill-badge badge-beginner">Senior Level</span>
-              </div>
-              <p style="color: var(--text-soft); font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px;">
-                Learn load balancing, caching, database sharding, and microservices for senior technical interviews.
-              </p>
-            </div>
-            <button class="nav-btn secondary-btn" style="width: 100%; text-align: center; font-size: 0.9rem;" onclick="addRecommendedSkill('System Design', 35, 'Technical')">
-              <i class="fas fa-plus-circle" style="margin-right: 6px;"></i>Add to Tracker
-            </button>
-          </div>
-
-          <div class="rec-card">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h4 style="font-weight: 700; color: var(--text-dark);">Generative AI & LLM Prompting</h4>
-                <span class="skill-badge badge-beginner">Trending</span>
-              </div>
-              <p style="color: var(--text-soft); font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px;">
-                Integrate modern LLM APIs, prompt engineering, and fine-tuning into software workflows.
-              </p>
-            </div>
-            <button class="nav-btn secondary-btn" style="width: 100%; text-align: center; font-size: 0.9rem;" onclick="addRecommendedSkill('Generative AI', 45, 'Technical')">
-              <i class="fas fa-plus-circle" style="margin-right: 6px;"></i>Add to Tracker
-            </button>
-          </div>
-        </div>
-      </section>
+      </div>
 
     </div>
   </div>
 
-  <!-- Modal for updating or adding skill -->
+  <!-- Modal for updating skill -->
   <div id="skillModal" style="display: none; position: fixed; inset: 0; background: rgba(36,19,63,0.5); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; padding: 20px;">
     <div class="glass-card" style="max-width: 440px; width: 100%; background: #ffffff; padding: 28px; border-radius: 24px;">
-      <h3 id="modalTitle" style="color: var(--text-dark); margin-bottom: 16px;">Update Skill Progress</h3>
+      <h3 style="color: var(--text-dark); margin-bottom: 16px;">Update Skill Level</h3>
       <div style="margin-bottom: 16px;">
         <label style="display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; color: var(--text-dark);">Skill Name</label>
-        <input type="text" id="modalSkillName" class="search-input" style="border-radius: 12px; padding: 10px 14px;" placeholder="e.g. Python">
-      </div>
-      <div style="margin-bottom: 16px;">
-        <label style="display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; color: var(--text-dark);">Category</label>
-        <select id="modalSkillCategory" class="search-input" style="border-radius: 12px; padding: 10px 14px;">
-          <option value="Technical">Technical Skill</option>
-          <option value="Soft">Soft Skill</option>
-        </select>
+        <input type="text" id="modalSkillName" class="search-input" style="border-radius: 12px; padding: 10px 14px;" placeholder="e.g. Machine Learning">
       </div>
       <div style="margin-bottom: 24px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-          <label style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark);">Proficiency Level</label>
-          <span id="modalPctVal" style="font-weight: 700; color: var(--lilac-700);">75%</span>
-        </div>
-        <input type="range" id="modalPctSlider" min="0" max="100" value="75" style="width: 100%; accent-color: var(--lilac-600);" oninput="document.getElementById('modalPctVal').innerText = this.value + '%'">
+        <label style="display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; color: var(--text-dark);">Proficiency Level</label>
+        <select id="modalSkillLevel" class="search-input" style="border-radius: 12px; padding: 10px 14px;">
+          <option value="Advanced">Advanced (80% - 100%)</option>
+          <option value="Intermediate">Intermediate (50% - 79%)</option>
+          <option value="Beginner">Beginner / Developing (1% - 49%)</option>
+        </select>
       </div>
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
         <button class="nav-btn secondary-btn" onclick="closeModal()">Cancel</button>
-        <button class="nav-btn primary-btn" onclick="saveSkillFromModal()">Save Skill</button>
+        <button class="nav-btn primary-btn" onclick="saveSkillProgress()">Save & Recalculate</button>
       </div>
     </div>
   </div>
 
   <script>
-    const defaultSkills = [
-      { name: 'Python', pct: 85, category: 'Technical', icon: 'fa-brands fa-python' },
-      { name: 'SQL & Databases', pct: 75, category: 'Technical', icon: 'fa-solid fa-database' },
-      { name: 'Data Analysis', pct: 80, category: 'Technical', icon: 'fa-solid fa-chart-pie' },
-      { name: 'Machine Learning', pct: 60, category: 'Technical', icon: 'fa-solid fa-brain' },
-      { name: 'Web Development', pct: 70, category: 'Technical', icon: 'fa-solid fa-globe' },
-      { name: 'Communication', pct: 88, category: 'Soft', icon: 'fa-solid fa-comments' },
-      { name: 'Problem Solving', pct: 92, category: 'Soft', icon: 'fa-solid fa-puzzle-piece' },
-      { name: 'Teamwork', pct: 85, category: 'Soft', icon: 'fa-solid fa-people-group' },
-      { name: 'Leadership', pct: 65, category: 'Soft', icon: 'fa-solid fa-user-tie' },
-      { name: 'Time Management', pct: 75, category: 'Soft', icon: 'fa-solid fa-clock' }
-    ];
+    let activeCareerId = null;
 
-    let currentSkills = JSON.parse(localStorage.getItem('careerDNA_skills')) || defaultSkills;
-    let editingIndex = -1;
+    document.addEventListener("DOMContentLoaded", function() {
+      initSkillTracker();
+    });
 
-    function getLevelLabel(pct) {
-      if (pct >= 80) return { label: 'Advanced', class: 'badge-advanced' };
-      if (pct >= 50) return { label: 'Intermediate', class: 'badge-intermediate' };
-      return { label: 'Beginner', class: 'badge-beginner' };
+    function initSkillTracker() {
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const recEndpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career-recommendations';
+
+      fetch(recEndpoint, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.ideal_match) {
+            activeCareerId = data.ideal_match.career_id;
+            const careerName = data.ideal_match.career_name;
+            document.getElementById('targetCareerSubtitle').innerText = `Real-time skill gap analysis for your target role: ${careerName}.`;
+            loadCareerSkills(activeCareerId);
+          } else {
+            showEmptyState();
+          }
+        })
+        .catch(err => {
+          console.error("Error loading career recommendations:", err);
+          showEmptyState();
+        });
     }
 
-    function renderSkills() {
-      const techGrid = document.getElementById('techSkillsGrid');
-      const softGrid = document.getElementById('softSkillsGrid');
-      techGrid.innerHTML = '';
-      softGrid.innerHTML = '';
+    function showEmptyState() {
+      document.getElementById('targetCareerSubtitle').innerText = 'Complete your career assessment to generate your personalized skill analysis.';
+      document.getElementById('skillsMainContainer').innerHTML = `
+        <div class="glass-card" style="text-align: center; padding: 48px; border-radius: 24px; background: rgba(255,255,255,0.9);">
+          <i class="fas fa-brain" style="font-size: 3rem; color: var(--lilac-600); margin-bottom: 16px;"></i>
+          <h3 style="color: var(--text-dark); font-size: 1.5rem; margin-bottom: 8px;">No Skill Analysis Yet</h3>
+          <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 500px; margin: 0 auto 24px auto;">
+            Complete your career assessment to generate your personalized skill analysis.
+          </p>
+          <a href="/assessment" class="nav-btn primary-btn" style="text-decoration:none; display: inline-block;">Take Career Assessment</a>
+        </div>
+      `;
+    }
 
-      let totalPct = 0;
-      let advCount = 0;
-      let interCount = 0;
+    function loadCareerSkills(careerId) {
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career/' + careerId + '/skills';
 
-      currentSkills.forEach((skill, index) => {
-        totalPct += skill.pct;
-        const level = getLevelLabel(skill.pct);
-        if (level.label === 'Advanced') advCount++;
-        else if (level.label === 'Intermediate') interCount++;
+      fetch(endpoint, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.skill_analysis) {
+            renderSkillAnalysis(data.skill_analysis);
+          } else {
+            showEmptyState();
+          }
+        })
+        .catch(err => {
+          console.error("Error loading career skills:", err);
+          document.getElementById('skillsMainContainer').innerHTML = `
+            <div style="text-align: center; padding: 30px; color: #c62828;">
+              <p>Unable to load your skill analysis. Please try again.</p>
+              <button onclick="loadCareerSkills('${careerId}')" class="nav-btn secondary-btn" style="margin-top: 10px;">Retry</button>
+            </div>
+          `;
+        });
+    }
 
-        const card = document.createElement('div');
-        card.className = 'skill-card';
-        card.innerHTML = `
+    function renderSkillAnalysis(sa) {
+      const strong = sa.already_strong || [];
+      const dev = sa.developing || [];
+      const missing = sa.missing || [];
+      const top3 = sa.top_3_to_learn_next || [];
+
+      // Update metrics
+      document.getElementById('strongCount').innerText = strong.length;
+      document.getElementById('developingCount').innerText = dev.length;
+      document.getElementById('missingCount').innerText = missing.length;
+      
+      const total = strong.length + dev.length + missing.length;
+      const fitPct = total > 0 ? Math.round(((strong.length * 100) + (dev.length * 50)) / total) : 0;
+      document.getElementById('overallSkillReadiness').innerText = `${fitPct}%`;
+
+      // Render Top 3
+      if (top3.length > 0) {
+        document.getElementById('top3Container').style.display = 'block';
+        document.getElementById('top3List').innerHTML = top3.map(sk => `
+          <div style="background: white; border-radius: 12px; padding: 8px 16px; border: 1px solid rgba(131,70,223,0.2); font-weight: 700; color: var(--lilac-700); display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-arrow-circle-right"></i> ${sk}
+            <button onclick="quickUpdateSkill('${sk}', 'Intermediate')" style="background: none; border: none; color: var(--lilac-600); cursor: pointer; font-size: 0.8rem; margin-left: 8px; text-decoration: underline;">Mark Learning</button>
+          </div>
+        `).join('');
+      } else {
+        document.getElementById('top3Container').style.display = 'none';
+      }
+
+      let html = '';
+
+      // 1. ALREADY STRONG
+      html += `
+        <section style="margin-bottom: 36px;">
+          <div class="section-title-wrap">
+            <h3><i class="fas fa-check-circle" style="color: #2e7d32; margin-right: 10px;"></i>Already Strong (${strong.length})</h3>
+            <span style="color: var(--text-soft); font-size: 0.9rem;">75% - 100% Proficiency</span>
+          </div>
+          <div class="skill-card-grid">
+            ${strong.length > 0 ? strong.map(s => renderSkillCard(s, 'strong')).join('') : '<div style="color: var(--text-soft); grid-column: 1/-1;">No skills in this tier yet.</div>'}
+          </div>
+        </section>
+      `;
+
+      // 2. DEVELOPING
+      html += `
+        <section style="margin-bottom: 36px;">
+          <div class="section-title-wrap">
+            <h3><i class="fas fa-hourglass-half" style="color: #d97706; margin-right: 10px;"></i>Developing (${dev.length})</h3>
+            <span style="color: var(--text-soft); font-size: 0.9rem;">40% - 74% Proficiency</span>
+          </div>
+          <div class="skill-card-grid">
+            ${dev.length > 0 ? dev.map(s => renderSkillCard(s, 'developing')).join('') : '<div style="color: var(--text-soft); grid-column: 1/-1;">No skills currently developing.</div>'}
+          </div>
+        </section>
+      `;
+
+      // 3. MISSING
+      html += `
+        <section style="margin-bottom: 36px;">
+          <div class="section-title-wrap">
+            <h3><i class="fas fa-exclamation-triangle" style="color: #dc2626; margin-right: 10px;"></i>Missing Skills (${missing.length})</h3>
+            <span style="color: var(--text-soft); font-size: 0.9rem;">Required for target role</span>
+          </div>
+          <div class="skill-card-grid">
+            ${missing.length > 0 ? missing.map(s => renderSkillCard(s, 'missing')).join('') : '<div style="color: var(--text-soft); grid-column: 1/-1;">Great job! You have no missing core skills.</div>'}
+          </div>
+        </section>
+      `;
+
+      document.getElementById('skillsMainContainer').innerHTML = html;
+    }
+
+    function renderSkillCard(item, tier) {
+      const name = item.skill;
+      const pct = item.proficiency || (tier === 'strong' ? 90 : (tier === 'developing' ? 50 : 0));
+      const badgeClass = tier === 'strong' ? 'badge-strong' : (tier === 'developing' ? 'badge-developing' : 'badge-missing');
+      const fillClass = tier === 'strong' ? 'fill-strong' : (tier === 'developing' ? 'fill-developing' : 'fill-missing');
+      const label = tier === 'strong' ? 'Strong' : (tier === 'developing' ? 'Developing' : 'Missing');
+
+      return `
+        <div class="skill-card">
           <div>
             <div class="skill-header">
               <div class="skill-name">
-                <i class="${skill.icon || 'fa-solid fa-check-double'}" style="color: var(--lilac-600);"></i>
-                ${skill.name}
+                <i class="fas fa-code" style="color: var(--lilac-600);"></i>
+                ${name}
               </div>
-              <span class="skill-badge ${level.class}">${level.label}</span>
+              <span class="skill-badge ${badgeClass}">${label}</span>
             </div>
             <div class="progress-bar-bg">
-              <div class="progress-bar-fill" style="width: ${skill.pct}%"></div>
+              <div class="progress-bar-fill ${fillClass}" style="width: ${pct}%"></div>
             </div>
           </div>
           <div class="skill-footer">
-            <span class="skill-pct">${skill.pct}% Proficiency</span>
-            <button class="nav-btn secondary-btn" style="padding: 6px 14px; font-size: 0.85rem;" onclick="openEditModal(${index})">
+            <span class="skill-pct">${pct}%</span>
+            <button class="nav-btn secondary-btn" style="padding: 6px 14px; font-size: 0.85rem;" onclick="promptUpdateSkill('${name}')">
               <i class="fas fa-sliders-h" style="margin-right: 4px;"></i>Update
             </button>
           </div>
-        `;
-
-        if (skill.category === 'Technical') {
-          techGrid.appendChild(card);
-        } else {
-          softGrid.appendChild(card);
-        }
-      });
-
-      // Update metrics
-      const avgPct = Math.round(totalPct / (currentSkills.length || 1));
-      document.getElementById('overallMasteryPct').innerText = `${avgPct}%`;
-      document.getElementById('totalSkillsCount').innerText = currentSkills.length;
-      document.getElementById('advancedSkillsCount').innerText = advCount;
-      document.getElementById('interSkillsCount').innerText = interCount;
-
-      localStorage.setItem('careerDNA_skills', JSON.stringify(currentSkills));
+        </div>
+      `;
     }
 
     function openAddSkillModal() {
-      editingIndex = -1;
-      document.getElementById('modalTitle').innerText = 'Add Custom Skill';
       document.getElementById('modalSkillName').value = '';
-      document.getElementById('modalSkillCategory').value = 'Technical';
-      document.getElementById('modalPctSlider').value = 50;
-      document.getElementById('modalPctVal').innerText = '50%';
+      document.getElementById('modalSkillLevel').value = 'Advanced';
       document.getElementById('skillModal').style.display = 'flex';
     }
 
-    function openEditModal(index) {
-      editingIndex = index;
-      const skill = currentSkills[index];
-      document.getElementById('modalTitle').innerText = `Update: ${skill.name}`;
-      document.getElementById('modalSkillName').value = skill.name;
-      document.getElementById('modalSkillCategory').value = skill.category;
-      document.getElementById('modalPctSlider').value = skill.pct;
-      document.getElementById('modalPctVal').innerText = `${skill.pct}%`;
+    function promptUpdateSkill(skillName) {
+      document.getElementById('modalSkillName').value = skillName;
       document.getElementById('skillModal').style.display = 'flex';
     }
 
@@ -422,67 +440,37 @@
       document.getElementById('skillModal').style.display = 'none';
     }
 
-    function syncSkillToBackend(name, pct) {
+    function saveSkillProgress() {
+      const name = document.getElementById('modalSkillName').value.trim();
+      const level = document.getElementById('modalSkillLevel').value;
+      if (!name) return alert('Please specify a skill name.');
+
+      quickUpdateSkill(name, level);
+      closeModal();
+    }
+
+    function quickUpdateSkill(skillName, level) {
       const apiBase = window.CAREER_DNA_API_BASE || '';
       const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/skill-progress';
-      const level = pct >= 80 ? 'Advanced' : (pct >= 50 ? 'Intermediate' : 'Beginner');
 
       fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ skill_name: name, level: level })
+        credentials: 'include',
+        body: JSON.stringify({ skill_name: skillName, level: level })
       })
       .then(res => res.json())
       .then(data => {
-        if (data && data.new_match_score) {
-          console.log(`[Realtime Intelligence] Match for ${data.ideal_career} recalculated: ${data.new_match_score}%`);
+        if (activeCareerId) {
+          loadCareerSkills(activeCareerId);
+        } else {
+          initSkillTracker();
         }
       })
-      .catch(err => console.warn('Skill progress sync notice:', err));
-    }
-
-    function saveSkillFromModal() {
-      const name = document.getElementById('modalSkillName').value.trim();
-      const category = document.getElementById('modalSkillCategory').value;
-      const pct = parseInt(document.getElementById('modalPctSlider').value);
-
-      if (!name) return alert('Please enter a skill name.');
-
-      if (editingIndex >= 0) {
-        currentSkills[editingIndex].name = name;
-        currentSkills[editingIndex].category = category;
-        currentSkills[editingIndex].pct = pct;
-      } else {
-        currentSkills.push({
-          name: name,
-          pct: pct,
-          category: category,
-          icon: category === 'Technical' ? 'fa-solid fa-code' : 'fa-solid fa-star'
-        });
-      }
-
-      closeModal();
-      renderSkills();
-      syncSkillToBackend(name, pct);
-    }
-
-    function addRecommendedSkill(name, pct, category) {
-      const exists = currentSkills.find(s => s.name.toLowerCase() === name.toLowerCase());
-      if (exists) {
-        alert(`${name} is already in your skill tracker!`);
-        return;
-      }
-      currentSkills.push({
-        name: name,
-        pct: pct,
-        category: category,
-        icon: 'fa-solid fa-rocket'
+      .catch(err => {
+        console.error("Error updating skill progress:", err);
       });
-      renderSkills();
-      syncSkillToBackend(name, pct);
     }
-
-    window.addEventListener('DOMContentLoaded', renderSkills);
   </script>
 </body>
 </html>

@@ -3,25 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Career Match - Career DNA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
+    <title>Career Match — Career DNA</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/features.css">
+    <script src="/config.js"></script>
+    <style>
+        .ideal-hero-card {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid rgba(131, 70, 223, 0.18);
+            box-shadow: var(--shadow-card, 0 16px 40px rgba(95,51,156,0.12));
+            backdrop-filter: blur(16px);
+            margin-bottom: 36px;
+        }
+        .factor-bar-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.88rem;
+        }
+        .factor-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(131,70,223,0.1);
+            border-radius: 99px;
+            margin: 0 12px;
+            overflow: hidden;
+        }
+        .factor-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--lilac-600), var(--lilac-700));
+            border-radius: 99px;
+            transition: width 0.5s ease;
+        }
+        .career-rank-item {
+            background: rgba(255,255,255,0.85);
+            border-radius: 20px;
+            padding: 22px;
+            border: 1px solid rgba(131,70,223,0.12);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .career-rank-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(95,51,156,0.15);
+        }
+        .detail-modal-bg {
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(45, 21, 82, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .detail-modal-content {
+            background: white; border-radius: 24px;
+            max-width: 650px; width: 100%; max-height: 90vh;
+            overflow-y: auto; padding: 30px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+    </style>
 </head>
 <body>
-    <header class="navbar" style="margin-bottom: 40px;">
+    <header class="navbar" style="margin-bottom: 30px;">
         <div class="nav-left">
-            <div class="logo-wrap">
-                <div class="logo-badge career-logo">
-                    <div class="logo-circle"></div>
-                    <div class="logo-arrow arrow-1"></div>
-                    <div class="logo-arrow arrow-2"></div>
-                    <div class="logo-arrow arrow-3"></div>
-                </div>
-                <div class="logo-text">
-                    <span class="logo-main">Career</span><span class="logo-accent">DNA</span>
-                </div>
-            </div>
+            <a href="/welcome" class="logo-wrap" style="text-decoration: none;">
+                <div class="logo-badge career-logo"><div class="logo-circle"></div><div class="logo-arrow arrow-1"></div><div class="logo-arrow arrow-2"></div><div class="logo-arrow arrow-3"></div></div>
+                <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
+            </a>
         </div>
         <nav class="nav-links">
             <a href="/welcome">Dashboard</a>
@@ -32,34 +90,219 @@
             <a href="/profile">Profile</a>
         </nav>
         <div class="nav-actions">
-            <a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none; display: inline-block;">Logout</a>
+            <a href="/logout" class="nav-btn secondary-btn" style="text-decoration: none;">Logout</a>
         </div>
     </header>
-    <div class="dashboard-wrapper">
-        <div class="dashboard-container">
-            <section class="dashboard-section">
-                <h2 class="section-header">Career Match</h2>
-                <p style="color: var(--text-soft); font-size: 1rem; line-height: 1.6;">
-                    Based on your assessment results, here are personalized career recommendations with match percentages, expected salaries, and quick links to explore each path.
+
+    <div class="dashboard-wrapper page-shell">
+        <div class="bg-blob blob-1"></div>
+        <div class="bg-blob blob-2"></div>
+        <div class="dashboard-container" style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 1;">
+            
+            <div class="assistant-hero" style="text-align: center; margin-bottom: 32px;">
+                <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--text-dark, #2d1552); margin-bottom: 8px;">
+                    Personalized Career Match
+                </h1>
+                <p style="font-size: 1.05rem; color: var(--text-soft, #6b5b95); max-width: 640px; margin: 0 auto;">
+                    Real-time multi-factor matching engine integrating your personality, interests, skills, education, and career goals.
                 </p>
-                <div class="grid-4-col" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">
-                    <div class="glass-card" style="display: flex; flex-direction: column;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span class="badge-item badge-purple" style="font-weight: bold;">95% Match</span>
-                            <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ High Demand</span>
-                        </div>
-                        <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">Software Engineer</h3>
-                        <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; flex: 1;">
-                            Build applications and large‑scale systems using modern programming languages and cloud services.
-                        </p>
-                        <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">$115,000/yr</span>
-                            <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
-                        </div>
-                    </div>
+            </div>
+
+            <!-- 1. IDEAL HERO MATCH CARD -->
+            <div id="idealMatchContainer" class="ideal-hero-card">
+                <div style="text-align: center; padding: 40px; color: var(--text-soft);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--lilac-600); margin-bottom: 12px;"></i>
+                    <p>Calculating your personalized career recommendations...</p>
+                </div>
+            </div>
+
+            <!-- 2. TOP 5 CAREER RECOMMENDATIONS -->
+            <section style="margin-top: 40px;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-bottom: 20px;">
+                    🏆 Your Top Career Recommendations
+                </h2>
+                <div id="topCareersGrid" class="grid-3-col" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+                    <!-- Rendered dynamically -->
                 </div>
             </section>
+
         </div>
     </div>
+
+    <!-- CAREER DETAIL MODAL -->
+    <div id="detailModal" class="detail-modal-bg">
+        <div class="detail-modal-content">
+            <button onclick="closeModal()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #888;">×</button>
+            <div id="modalBody">Loading career details...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadCareerRecommendations();
+        });
+
+        function loadCareerRecommendations() {
+            const apiBase = window.CAREER_DNA_API_BASE || '';
+            const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career-recommendations';
+
+            fetch(endpoint, { credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success && data.ideal_match) {
+                        renderIdealMatch(data.ideal_match);
+                        renderTopCareers(data.top_careers);
+                    } else {
+                        document.getElementById('idealMatchContainer').innerHTML = `
+                            <div style="text-align: center; padding: 30px;">
+                                <h3 style="color: var(--text-dark);">Complete Your Career Profile</h3>
+                                <p style="color: var(--text-soft); margin: 12px 0 20px 0;">Complete your profile and assessment to unlock your personalized career match.</p>
+                                <a href="/assessment" class="nav-btn primary-btn" style="text-decoration:none;">Take Career Assessment</a>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(err => {
+                    console.error("Error loading career recommendations:", err);
+                    document.getElementById('idealMatchContainer').innerHTML = `
+                        <div style="text-align: center; padding: 30px; color: #c62828;">
+                            <p>Unable to load your career recommendations right now. Please try again.</p>
+                            <button onclick="loadCareerRecommendations()" class="nav-btn secondary-btn" style="margin-top: 10px;">Retry</button>
+                        </div>
+                    `;
+                });
+        }
+
+        function renderIdealMatch(ideal) {
+            const fb = ideal.factor_breakdown || {};
+            const explanations = (ideal.explanations || []).map(e => `<li style="margin-bottom: 6px; font-weight: 500;">${e}</li>`).join('');
+            const gaps = (ideal.skill_gaps || []).map(g => `<span class="badge-item" style="background: rgba(217, 119, 6, 0.15); color: #d97706; margin-right: 6px; margin-bottom: 6px; display: inline-block;">${g}</span>`).join('');
+
+            document.getElementById('idealMatchContainer').innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px; margin-bottom: 24px;">
+                    <div>
+                        <span class="hero-chip" style="margin-bottom: 10px;"><span class="chip-dot"></span> YOUR IDEAL CAREER MATCH</span>
+                        <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--text-dark); margin: 4px 0;">${ideal.career_name}</h2>
+                        <p style="color: var(--text-soft); font-size: 0.95rem;">Average Salary: <strong>${ideal.salary}</strong> | Demand: <strong>${ideal.demand}</strong></p>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 3rem; font-weight: 800; color: var(--lilac-700); line-height: 1;">${ideal.overall_match}%</span>
+                        <div style="font-weight: 700; color: var(--text-soft); font-size: 0.85rem;">Overall Match Score</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">
+                    <div>
+                        <h4 style="font-size: 1.05rem; color: var(--text-dark); margin-bottom: 12px; font-weight: 700;">Why this career matches you:</h4>
+                        <ul style="padding-left: 20px; color: var(--text-main); font-size: 0.95rem; line-height: 1.6;">
+                            ${explanations}
+                        </ul>
+
+                        <h4 style="font-size: 1.05rem; color: var(--text-dark); margin: 20px 0 10px 0; font-weight: 700;">Top Skill Gaps to Bridge:</h4>
+                        <div>${gaps || '<span style="color: var(--text-soft);">No critical gaps identified!</span>'}</div>
+                    </div>
+
+                    <div style="background: rgba(247, 242, 255, 0.8); padding: 20px; border-radius: 18px; border: 1px solid rgba(131,70,223,0.12);">
+                        <h4 style="font-size: 0.95rem; color: var(--text-dark); margin-bottom: 14px; font-weight: 700;">Matching Factor Breakdown:</h4>
+                        
+                        <div class="factor-bar-row"><span>Personality Fit</span><div class="factor-track"><div class="factor-fill" style="width: ${fb.personality_fit || 75}%;"></div></div><span>${fb.personality_fit || 75}%</span></div>
+                        <div class="factor-bar-row"><span>Interest Fit</span><div class="factor-track"><div class="factor-fill" style="width: ${fb.interest_fit || 80}%;"></div></div><span>${fb.interest_fit || 80}%</span></div>
+                        <div class="factor-bar-row"><span>Skill Fit</span><div class="factor-track"><div class="factor-fill" style="width: ${fb.skill_fit || 70}%;"></div></div><span>${fb.skill_fit || 70}%</span></div>
+                        <div class="factor-bar-row"><span>Education Fit</span><div class="factor-track"><div class="factor-fill" style="width: ${fb.education_fit || 90}%;"></div></div><span>${fb.education_fit || 90}%</span></div>
+                        <div class="factor-bar-row"><span>Work-Style Fit</span><div class="factor-track"><div class="factor-fill" style="width: ${fb.work_style_fit || 85}%;"></div></div><span>${fb.work_style_fit || 85}%</span></div>
+                        <div class="factor-bar-row"><span>Goal Fit</span><div class="factor-track"><div class="factor-fill" style="width: ${fb.goal_fit || 95}%;"></div></div><span>${fb.goal_fit || 95}%</span></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; text-align: right;">
+                    <button class="nav-btn primary-btn" onclick="openCareerDetail('${ideal.career_id}')">Explore ${ideal.career_name} Details →</button>
+                </div>
+            `;
+        }
+
+        function renderTopCareers(careers) {
+            const grid = document.getElementById('topCareersGrid');
+            grid.innerHTML = '';
+
+            (careers || []).forEach((c, idx) => {
+                const item = document.createElement('div');
+                item.className = 'career-rank-item';
+                item.innerHTML = `
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 0.85rem; font-weight: 800; color: var(--lilac-700);">Rank #${idx + 1}</span>
+                            <span class="badge-item badge-purple" style="font-weight: 800;">${c.overall_match}% Match</span>
+                        </div>
+                        <h3 style="font-size: 1.25rem; color: var(--text-dark); margin-bottom: 8px; font-weight: 700;">${c.career_name}</h3>
+                        <p style="font-size: 0.88rem; color: var(--text-soft); margin-bottom: 14px; line-height: 1.5;">${c.explanations[0] || 'Matches your career profile preferences.'}</p>
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(131,70,223,0.1); padding-top: 14px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark);">${c.salary}</span>
+                        <button onclick="openCareerDetail('${c.career_id}')" style="background: none; border: none; color: var(--lilac-600); font-weight: 700; cursor: pointer; font-size: 0.88rem;">Explore Details ↗</button>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        function openCareerDetail(careerId) {
+            const modal = document.getElementById('detailModal');
+            const modalBody = document.getElementById('modalBody');
+            modal.style.display = 'flex';
+            modalBody.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--lilac-600);"></i><p style="margin-top: 10px;">Fetching career intelligence details...</p></div>';
+
+            const apiBase = window.CAREER_DNA_API_BASE || '';
+            const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career/' + careerId;
+
+            fetch(endpoint, { credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success) {
+                        const c = data.career;
+                        const ma = data.match_analysis;
+                        const fb = ma.factor_breakdown || {};
+                        const skills = (c.skills || []).map(s => `<span class="badge-item" style="background: rgba(131, 70, 223, 0.1); color: var(--lilac-700); margin: 3px;">${s}</span>`).join('');
+                        const gaps = (ma.skill_gaps || []).map(g => `<span class="badge-item" style="background: rgba(217, 119, 6, 0.15); color: #d97706; margin: 3px;">${g}</span>`).join('');
+
+                        modalBody.innerHTML = `
+                            <span class="badge-item badge-purple" style="margin-bottom: 8px;">${ma.overall_match}% Overall Match Score</span>
+                            <h2 style="font-size: 1.8rem; color: var(--text-dark); margin: 6px 0 12px 0;">${c.name}</h2>
+                            <p style="color: var(--text-soft); line-height: 1.6; margin-bottom: 20px;">${c.description}</p>
+
+                            <div style="background: #faf7ff; padding: 18px; border-radius: 16px; border: 1px solid rgba(131,70,223,0.12); margin-bottom: 20px;">
+                                <h4 style="font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">Match Factor Breakdown</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.88rem;">
+                                    <div>Personality Fit: <strong>${fb.personality_fit}%</strong></div>
+                                    <div>Interest Fit: <strong>${fb.interest_fit}%</strong></div>
+                                    <div>Skill Fit: <strong>${fb.skill_fit}%</strong></div>
+                                    <div>Education Fit: <strong>${fb.education_fit}%</strong></div>
+                                    <div>Work Style Fit: <strong>${fb.work_style_fit}%</strong></div>
+                                    <div>Goal Fit: <strong>${fb.goal_fit}%</strong></div>
+                                </div>
+                            </div>
+
+                            <h4 style="font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">Required & Core Skills</h4>
+                            <div style="margin-bottom: 16px;">${skills}</div>
+
+                            <h4 style="font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">Skill Gaps To Improve Score</h4>
+                            <div style="margin-bottom: 24px;">${gaps || 'No major gaps!'}</div>
+
+                            <div style="display: flex; gap: 12px;">
+                                <a href="/roadmap" class="nav-btn primary-btn" style="text-decoration:none; flex: 1; text-align: center;">View Learning Roadmap</a>
+                                <button onclick="closeModal()" class="nav-btn secondary-btn">Close</button>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(err => {
+                    modalBody.innerHTML = '<p style="color: #c62828;">Unable to load details for this career.</p>';
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

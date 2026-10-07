@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="stylesheet" href="/static/css/features.css">
+  <script src="/config.js"></script>
   <style>
     .roadmap-hero {
       background: rgba(255, 255, 255, 0.85);
@@ -61,13 +62,13 @@
       color: #ffffff;
       border-color: var(--lilac-600);
     }
-    .timeline-node.in-progress {
+    .timeline-node.current {
       background: var(--lilac-100);
       border-color: var(--lilac-600);
       box-shadow: 0 0 0 4px rgba(157, 92, 255, 0.25);
     }
     .step-card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.88);
       border-radius: 20px;
       padding: 28px;
       border: 1px solid rgba(131, 70, 223, 0.12);
@@ -101,54 +102,8 @@
       gap: 6px;
     }
     .status-completed { background: rgba(16, 185, 129, 0.15); color: #059669; }
-    .status-progress { background: rgba(157, 92, 255, 0.18); color: var(--lilac-700); }
+    .status-current { background: rgba(157, 92, 255, 0.18); color: var(--lilac-700); }
     .status-upcoming { background: rgba(107, 114, 128, 0.15); color: #4b5563; }
-
-    .skills-pill-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 14px 0;
-    }
-    .skill-pill {
-      background: var(--lilac-100);
-      color: var(--lilac-800);
-      font-size: 0.82rem;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 99px;
-    }
-    .meta-box-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      margin-top: 18px;
-      padding-top: 18px;
-      border-top: 1px dashed rgba(131, 70, 223, 0.2);
-    }
-    .meta-box {
-      background: rgba(247, 242, 255, 0.7);
-      border-radius: 14px;
-      padding: 14px;
-    }
-    .meta-box h5 {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--lilac-700);
-      margin-bottom: 6px;
-      font-weight: 700;
-    }
-    .resource-link {
-      display: block;
-      color: var(--text-dark);
-      font-size: 0.88rem;
-      text-decoration: none;
-      margin-bottom: 4px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-    .resource-link:hover { color: var(--lilac-600); }
   </style>
 </head>
 <body>
@@ -160,19 +115,21 @@
       <!-- Navbar -->
       <header class="navbar" style="margin-bottom: 36px;">
         <div class="nav-left">
-          <a href="/" class="logo-wrap" style="text-decoration: none;">
+          <a href="/welcome" class="logo-wrap" style="text-decoration: none;">
             <div class="logo-badge career-logo"><div class="logo-circle"></div><div class="logo-arrow arrow-1"></div><div class="logo-arrow arrow-2"></div><div class="logo-arrow arrow-3"></div></div>
             <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
           </a>
         </div>
         <nav class="nav-links">
-          <a href="/">Home</a>
+          <a href="/welcome">Dashboard</a>
+          <a href="/assessment" class="nav-take-test-link">Take Test</a>
           <a href="/career-paths">Career Paths</a>
           <a href="/resources">Resources</a>
-          <a href="/contact">Contact</a>
+          <a href="/history">History</a>
+          <a href="/profile">Profile</a>
         </nav>
         <div class="nav-actions">
-          <a href="/login" class="nav-btn secondary-btn" style="text-decoration:none;">Log In</a>
+          <a href="/welcome" class="nav-btn secondary-btn" style="text-decoration:none;">← Dashboard</a>
         </div>
       </header>
 
@@ -181,186 +138,194 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
           <div>
             <h1 class="section-header" style="font-size: 2.2rem; margin-bottom: 8px;">Personalized Learning Roadmap</h1>
-            <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 760px; line-height: 1.6;">
-              A structured step-by-step career path for <strong style="color: var(--lilac-800);">Full-Stack & Data Software Engineering</strong>. Track your milestones from fundamentals to career readiness.
+            <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 760px; line-height: 1.6;" id="roadmapCareerSubtitle">
+              Loading your career roadmap stages...
             </p>
           </div>
           <div style="text-align: right; min-width: 200px;">
-            <span style="font-size: 0.85rem; color: var(--text-soft); font-weight: 600;">Roadmap Progress</span>
-            <div style="font-size: 2rem; font-weight: 800; color: var(--lilac-700);" id="overallRoadmapPct">40%</div>
+            <span style="font-size: 0.85rem; color: var(--text-soft); font-weight: 600;">Overall Progress</span>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--lilac-700);" id="overallRoadmapPct">0%</div>
           </div>
         </div>
 
         <div style="margin-top: 20px; background: rgba(131, 70, 223, 0.1); height: 12px; border-radius: 99px; overflow: hidden;">
-          <div id="overallProgressFill" style="width: 40%; height: 100%; background: linear-gradient(90deg, var(--lilac-500), var(--lilac-700)); transition: width 0.5s ease;"></div>
+          <div id="overallProgressFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--lilac-500), var(--lilac-700)); transition: width 0.5s ease;"></div>
         </div>
       </section>
 
       <!-- Vertical Roadmap Timeline -->
       <section class="timeline-wrapper" id="roadmapTimeline">
-        <!-- Rendered dynamically -->
+        <div style="text-align: center; padding: 40px; color: var(--text-soft);">
+          <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--lilac-600); margin-bottom: 12px;"></i>
+          <p>Generating your personalized career roadmap...</p>
+        </div>
       </section>
 
     </div>
   </div>
 
   <script>
-    const defaultSteps = [
-      {
-        step: 1,
-        title: 'Step 1 — Foundations',
-        duration: '4 Weeks',
-        status: 'Completed',
-        pct: 100,
-        desc: 'Master core programming fundamentals, control structures, version control with Git, and data structure basics.',
-        skills: ['Python Fundamentals', 'Algorithms & Logic', 'Git & GitHub', 'Terminal CLI'],
-        projects: ['CLI Task & Task Tracker Tool', 'Algorithm Benchmark Suite'],
-        resources: [
-          { name: 'Python Basics (FreeCodeCamp)', url: 'https://www.freecodecamp.org' },
-          { name: 'Git & Version Control Primer', url: 'https://git-scm.com/doc' }
-        ]
-      },
-      {
-        step: 2,
-        title: 'Step 2 — Core Skills',
-        duration: '6 Weeks',
-        status: 'In Progress',
-        pct: 65,
-        desc: 'Build proficiency in backend RESTful APIs, database design, relational modeling, and clean web application structure.',
-        skills: ['SQL & Relational DBs', 'Flask / FastAPI Framework', 'RESTful API Architecture', 'Database Normalization'],
-        projects: ['E-Commerce RESTful Backend Service', 'User Auth & JWT Session System'],
-        resources: [
-          { name: 'PostgreSQL & SQL Tutorial', url: 'https://www.postgresql.org/docs/' },
-          { name: 'REST API Best Practices', url: 'https://restfulapi.net' }
-        ]
-      },
-      {
-        step: 3,
-        title: 'Step 3 — Advanced Skills',
-        duration: '6 Weeks',
-        status: 'Up Next',
-        pct: 0,
-        desc: 'Dive into reactive modern frontend frameworks, containerization with Docker, and CI/CD automated build pipelines.',
-        skills: ['JavaScript (ES6+) & Vite', 'Docker Containerization', 'CI/CD Automated Testing', 'Cloud Deployment'],
-        projects: ['Interactive Dashboard Application', 'Dockerized Microservices Suite'],
-        resources: [
-          { name: 'Full Stack Open Guide', url: 'https://fullstackopen.com/en/' },
-          { name: 'Docker Hands-on Handbook', url: 'https://docs.docker.com' }
-        ]
-      },
-      {
-        step: 4,
-        title: 'Step 4 — Real-World Projects',
-        duration: '5 Weeks',
-        status: 'Up Next',
-        pct: 0,
-        desc: 'Construct portfolio-ready full-stack applications with high code coverage, architectural documentation, and real performance metrics.',
-        skills: ['System Architecture Design', 'Performance Optimization', 'Automated Integration Testing', 'API Security'],
-        projects: ['Real-Time Analytics Engine', 'Open Source Contribution'],
-        resources: [
-          { name: 'GitHub Developer Showcase', url: 'https://github.com' },
-          { name: 'Clean Architecture Principles', url: 'https://refactoring.guru' }
-        ]
-      },
-      {
-        step: 5,
-        title: 'Step 5 — Career Preparation',
-        duration: '3 Weeks',
-        status: 'Up Next',
-        pct: 0,
-        desc: 'Polish your ATS-optimized resume, sharpen behavioral STAR answers, perform mock coding interviews, and submit job applications.',
-        skills: ['Behavioral STAR Method', 'System Design Interviewing', 'ATS Resume Optimization', 'LinkedIn Branding'],
-        projects: ['Interactive Web Portfolio Site', 'Mock Technical Drills'],
-        resources: [
-          { name: 'Tech Resume Blueprint Guide', url: '/resume-builder' },
-          { name: 'Mock Interview Practice Studio', url: '/interview' }
-        ]
-      }
-    ];
+    let activeCareerId = null;
+    let currentStagesData = [];
 
-    let steps = JSON.parse(localStorage.getItem('careerDNA_roadmap')) || defaultSteps;
+    document.addEventListener("DOMContentLoaded", function() {
+      initRoadmap();
+    });
 
-    function renderRoadmap() {
+    function initRoadmap() {
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const recEndpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career-recommendations';
+
+      fetch(recEndpoint, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.ideal_match) {
+            activeCareerId = data.ideal_match.career_id;
+            const careerName = data.ideal_match.career_name;
+            document.getElementById('roadmapCareerSubtitle').innerHTML = `A structured step-by-step career path tailored for <strong style="color: var(--lilac-800);">${careerName}</strong>.`;
+            loadCareerRoadmap(activeCareerId);
+          } else {
+            showEmptyState();
+          }
+        })
+        .catch(err => {
+          console.error("Error loading career recommendations:", err);
+          showEmptyState();
+        });
+    }
+
+    function showEmptyState() {
+      document.getElementById('roadmapCareerSubtitle').innerText = 'Complete your career profile and assessment to view your personalized roadmap.';
+      document.getElementById('roadmapTimeline').innerHTML = `
+        <div class="glass-card" style="text-align: center; padding: 48px; border-radius: 24px; background: rgba(255,255,255,0.9);">
+          <i class="fas fa-route" style="font-size: 3rem; color: var(--lilac-600); margin-bottom: 16px;"></i>
+          <h3 style="color: var(--text-dark); font-size: 1.5rem; margin-bottom: 8px;">No Roadmap Generated Yet</h3>
+          <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 500px; margin: 0 auto 24px auto;">
+            Complete your profile and career assessment to generate your personalized learning roadmap.
+          </p>
+          <a href="/assessment" class="nav-btn primary-btn" style="text-decoration:none; display: inline-block;">Take Career Assessment</a>
+        </div>
+      `;
+    }
+
+    function loadCareerRoadmap(careerId) {
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career/' + careerId + '/roadmap';
+
+      fetch(endpoint, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.roadmap) {
+            renderRoadmap(data.roadmap);
+          } else {
+            showEmptyState();
+          }
+        })
+        .catch(err => {
+          console.error("Error loading roadmap:", err);
+          document.getElementById('roadmapTimeline').innerHTML = `
+            <div style="text-align: center; padding: 30px; color: #c62828;">
+              <p>Unable to load your roadmap right now. Please try again.</p>
+              <button onclick="loadCareerRoadmap('${careerId}')" class="nav-btn secondary-btn" style="margin-top: 10px;">Retry</button>
+            </div>
+          `;
+        });
+    }
+
+    function renderRoadmap(roadmapData) {
       const container = document.getElementById('roadmapTimeline');
       container.innerHTML = '';
 
-      let completedSteps = 0;
+      const stages = roadmapData.stages || [];
+      currentStagesData = stages;
 
-      steps.forEach((s, idx) => {
-        if (s.status === 'Completed') completedSteps++;
+      let completedCount = 0;
+
+      stages.forEach((s) => {
+        if (s.status === 'Completed' || s.completed) completedCount++;
 
         let nodeClass = '';
         let statusTagClass = 'status-upcoming';
         let statusIcon = '<i class="fas fa-clock"></i>';
 
-        if (s.status === 'Completed') {
+        if (s.status === 'Completed' || s.completed) {
           nodeClass = 'completed';
           statusTagClass = 'status-completed';
           statusIcon = '<i class="fas fa-check-circle"></i>';
-        } else if (s.status === 'In Progress') {
-          nodeClass = 'in-progress';
-          statusTagClass = 'status-progress';
+        } else if (s.status === 'Current') {
+          nodeClass = 'current';
+          statusTagClass = 'status-current';
           statusIcon = '<i class="fas fa-spinner fa-spin"></i>';
         }
 
         const stepElem = document.createElement('div');
         stepElem.className = 'timeline-step';
         stepElem.innerHTML = `
-          <div class="timeline-node ${nodeClass}">${s.status === 'Completed' ? '✓' : s.step}</div>
+          <div class="timeline-node ${nodeClass}">${(s.status === 'Completed' || s.completed) ? '✓' : s.stage_number}</div>
           <div class="step-card">
             <div class="step-header">
               <div>
                 <span class="status-tag ${statusTagClass}">${statusIcon} ${s.status}</span>
-                <span style="font-size: 0.85rem; color: var(--text-soft); font-weight: 600; margin-left: 10px;">Est. Duration: ${s.duration}</span>
-                <h3 class="step-title" style="margin-top: 6px;">${s.title}</h3>
+                <h3 class="step-title" style="margin-top: 8px;">${s.title}</h3>
               </div>
-              <button class="nav-btn secondary-btn" style="padding: 6px 14px; font-size: 0.85rem;" onclick="cycleStepStatus(${idx})">
-                Update Status
+              <button class="nav-btn secondary-btn" style="padding: 6px 14px; font-size: 0.85rem;" onclick="toggleStageProgress(${s.stage_number})">
+                ${s.status === 'Completed' ? 'Mark Current' : (s.status === 'Current' ? 'Mark Completed' : 'Start Stage')}
               </button>
             </div>
 
-            <p style="color: var(--text-soft); font-size: 0.95rem; line-height: 1.6;">${s.desc}</p>
-
-            <div class="skills-pill-wrap">
-              ${s.skills.map(sk => `<span class="skill-pill"><i class="fas fa-check" style="font-size:0.75rem; margin-right:4px;"></i>${sk}</span>`).join('')}
-            </div>
-
-            <div class="meta-box-grid">
-              <div class="meta-box">
-                <h5><i class="fas fa-laptop-code" style="margin-right: 6px;"></i>Suggested Projects</h5>
-                ${s.projects.map(p => `<div style="font-size: 0.88rem; color: var(--text-dark); margin-bottom: 4px; font-weight: 500;">• ${p}</div>`).join('')}
-              </div>
-
-              <div class="meta-box">
-                <h5><i class="fas fa-book-open" style="margin-right: 6px;"></i>Learning Resources</h5>
-                ${s.resources.map(r => `<a href="${r.url}" target="_blank" class="resource-link"><i class="fas fa-external-link-alt" style="font-size:0.75rem; margin-right:4px;"></i>${r.name}</a>`).join('')}
-              </div>
-            </div>
+            <p style="color: var(--text-soft); font-size: 0.95rem; line-height: 1.6; margin-top: 8px;">
+              ${s.description || 'Focus on building key skills and projects for this stage.'}
+            </p>
           </div>
         `;
         container.appendChild(stepElem);
       });
 
-      const totalPct = Math.round((completedSteps / steps.length) * 100);
+      const totalPct = stages.length > 0 ? Math.round((completedCount / stages.length) * 100) : 0;
       document.getElementById('overallRoadmapPct').innerText = `${totalPct}%`;
       document.getElementById('overallProgressFill').style.width = `${totalPct}%`;
-
-      localStorage.setItem('careerDNA_roadmap', JSON.stringify(steps));
     }
 
-    function cycleStepStatus(index) {
-      const order = ['Up Next', 'In Progress', 'Completed'];
-      const curIdx = order.indexOf(steps[index].status);
-      const nextStatus = order[(curIdx + 1) % order.length];
-      steps[index].status = nextStatus;
-      if (nextStatus === 'Completed') steps[index].pct = 100;
-      else if (nextStatus === 'In Progress') steps[index].pct = 50;
-      else steps[index].pct = 0;
+    function toggleStageProgress(stageNum) {
+      if (!activeCareerId) return;
 
-      renderRoadmap();
+      let completedStages = [];
+      let nextCurrentStage = stageNum;
+
+      currentStagesData.forEach(s => {
+        if (s.stage_number < stageNum) {
+          completedStages.push(s.stage_number);
+        }
+      });
+
+      // If user clicks on current stage button to mark completed:
+      const targetStage = currentStagesData.find(s => s.stage_number === stageNum);
+      if (targetStage && targetStage.status === 'Current') {
+        completedStages.push(stageNum);
+        nextCurrentStage = stageNum + 1;
+      }
+
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/roadmap-progress';
+
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          career_id: activeCareerId,
+          completed_stages: completedStages,
+          current_stage: nextCurrentStage
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        loadCareerRoadmap(activeCareerId);
+      })
+      .catch(err => {
+        console.error("Error updating roadmap progress:", err);
+      });
     }
-
-    window.addEventListener('DOMContentLoaded', renderRoadmap);
   </script>
 </body>
 </html>
