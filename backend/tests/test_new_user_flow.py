@@ -14,6 +14,18 @@ class TestNewUserFlow(unittest.TestCase):
         app.app.config['TESTING'] = True
         self.client = app.app.test_client()
         self.test_username = "test_new_user_xyz"
+        # Cleanup any existing test user record
+        import sqlite3
+        db_path = career_service.get_db_path()
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            for tbl in ['users', 'user_profiles', 'assessment_dimensions', 'roadmap_progress', 'skill_progress', 'user_projects', 'user_certifications', 'results']:
+                try: cursor.execute(f"DELETE FROM {tbl} WHERE user_name = ?", (self.test_username,))
+                except: pass
+            conn.commit()
+            conn.close()
+        except: pass
 
     def test_new_user_zero_initial_state_and_progression(self):
         # 1. Register new user

@@ -188,7 +188,7 @@
               Loading your personalized career skill analysis...
             </p>
           </div>
-          <button class="nav-btn primary-btn" onclick="openAddSkillModal()">
+          <button id="heroAddSkillBtn" class="nav-btn primary-btn" style="position: relative; z-index: 10;">
             <i class="fas fa-plus" style="margin-right: 8px;"></i>Update Skill Level
           </button>
         </div>
@@ -260,6 +260,11 @@
 
     document.addEventListener("DOMContentLoaded", function() {
       initSkillTracker();
+      
+      const heroBtn = document.getElementById('heroAddSkillBtn');
+      if (heroBtn) {
+        heroBtn.addEventListener('click', openAddSkillModal);
+      }
     });
 
     function initSkillTracker() {

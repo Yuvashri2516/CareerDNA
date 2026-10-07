@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="stylesheet" href="/static/css/features.css">
+  <script src="/config.js"></script>
   <style>
     .achieve-hero {
       background: rgba(255, 255, 255, 0.88);
@@ -82,7 +83,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
+      font-size: 2.2rem;
       margin-bottom: 16px;
       box-shadow: 0 8px 24px rgba(131, 70, 223, 0.2);
     }
@@ -108,11 +109,11 @@
       margin-bottom: 16px;
     }
     .badge-status-pill {
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 99px;
       margin-top: auto;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 99px;
     }
     .status-unlocked-pill {
       background: rgba(16, 185, 129, 0.15);
@@ -121,19 +122,6 @@
     .status-locked-pill {
       background: rgba(107, 114, 128, 0.15);
       color: #6b7280;
-    }
-    .badge-progress-bg {
-      width: 100%;
-      height: 6px;
-      background: rgba(131,70,223,0.1);
-      border-radius: 99px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-    .badge-progress-fill {
-      height: 100%;
-      background: var(--lilac-600);
-      border-radius: 99px;
     }
   </style>
 </head>
@@ -146,19 +134,21 @@
       <!-- Navbar -->
       <header class="navbar" style="margin-bottom: 36px;">
         <div class="nav-left">
-          <a href="/" class="logo-wrap" style="text-decoration: none;">
+          <a href="/welcome" class="logo-wrap" style="text-decoration: none;">
             <div class="logo-badge career-logo"><div class="logo-circle"></div><div class="logo-arrow arrow-1"></div><div class="logo-arrow arrow-2"></div><div class="logo-arrow arrow-3"></div></div>
             <div class="logo-text"><span class="logo-main">Career</span><span class="logo-accent">DNA</span></div>
           </a>
         </div>
         <nav class="nav-links">
-          <a href="/">Home</a>
+          <a href="/welcome">Dashboard</a>
+          <a href="/assessment" class="nav-take-test-link">Take Test</a>
           <a href="/career-paths">Career Paths</a>
           <a href="/resources">Resources</a>
-          <a href="/contact">Contact</a>
+          <a href="/history">History</a>
+          <a href="/profile">Profile</a>
         </nav>
         <div class="nav-actions">
-          <a href="/login" class="nav-btn secondary-btn" style="text-decoration:none;">Log In</a>
+          <a href="/welcome" class="nav-btn secondary-btn" style="text-decoration:none;">← Dashboard</a>
         </div>
       </header>
 
@@ -167,22 +157,18 @@
         <div>
           <h1 class="section-header" style="font-size: 2.2rem; margin-bottom: 8px;">My Achievements & Badges</h1>
           <p style="color: var(--text-soft); font-size: 1.05rem; max-width: 660px; line-height: 1.6;">
-            Celebrate your career development milestones, unlock achievement badges, and track your total XP points.
+            Earn badges dynamically by completing career assessments, updating skills, starting learning roadmaps, and building your profile.
           </p>
         </div>
 
         <div class="badge-summary-row">
           <div class="summary-badge-box">
-            <div class="summary-badge-val">6 / 12</div>
+            <div class="summary-badge-val" id="unlockedBadgeRatio">0 / 5</div>
             <div class="summary-badge-lbl">Badges Unlocked</div>
           </div>
           <div class="summary-badge-box">
-            <div class="summary-badge-val">1,450</div>
+            <div class="summary-badge-val" id="totalXPVal">0 XP</div>
             <div class="summary-badge-lbl">Career XP</div>
-          </div>
-          <div class="summary-badge-box">
-            <div class="summary-badge-val" style="color: #059669;">7 Days</div>
-            <div class="summary-badge-lbl">Active Streak</div>
           </div>
         </div>
       </section>
@@ -190,113 +176,75 @@
       <!-- Badges Grid -->
       <section class="dashboard-section" style="margin-bottom: 40px;">
         <div class="badge-grid" id="badgeGrid">
-          
-          <!-- Badge 1: Assessment Completed -->
-          <div class="badge-card badge-unlocked">
-            <div class="badge-icon-wrap"><i class="fas fa-compass"></i></div>
-            <div class="badge-title">Career Explorer</div>
-            <div class="badge-desc">Earned for completing your baseline Career DNA assessment.</div>
-            <span class="badge-status-pill status-unlocked-pill"><i class="fas fa-check-circle"></i> Unlocked</span>
+          <div style="text-align: center; padding: 40px; grid-column: 1/-1; color: var(--text-soft);">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--lilac-600); margin-bottom: 12px;"></i>
+            <p>Loading your achievements...</p>
           </div>
-
-          <!-- Badge 2: Skills Unlocked -->
-          <div class="badge-card badge-unlocked">
-            <div class="badge-icon-wrap"><i class="fas fa-code"></i></div>
-            <div class="badge-title">Skill Pioneer</div>
-            <div class="badge-desc">Earned for tracking and maintaining 5+ technical & soft skills.</div>
-            <span class="badge-status-pill status-unlocked-pill"><i class="fas fa-check-circle"></i> Unlocked</span>
-          </div>
-
-          <!-- Badge 3: Learning Roadmap -->
-          <div class="badge-card badge-unlocked">
-            <div class="badge-icon-wrap"><i class="fas fa-route"></i></div>
-            <div class="badge-title">Roadmap Runner</div>
-            <div class="badge-desc">Completed Stage 1 Foundations on your personal learning roadmap.</div>
-            <span class="badge-status-pill status-unlocked-pill"><i class="fas fa-check-circle"></i> Unlocked</span>
-          </div>
-
-          <!-- Badge 4: Resume Master -->
-          <div class="badge-card badge-unlocked">
-            <div class="badge-icon-wrap"><i class="fas fa-file-invoice"></i></div>
-            <div class="badge-title">Resume Master</div>
-            <div class="badge-desc">Built and customized a professional ATS-friendly resume.</div>
-            <span class="badge-status-pill status-unlocked-pill"><i class="fas fa-check-circle"></i> Unlocked</span>
-          </div>
-
-          <!-- Badge 5: Interview Ace -->
-          <div class="badge-card badge-unlocked">
-            <div class="badge-icon-wrap"><i class="fas fa-comments"></i></div>
-            <div class="badge-title">Interview Prep Ace</div>
-            <div class="badge-desc">Practiced STAR responses in the AI Mock Interview Studio.</div>
-            <span class="badge-status-pill status-unlocked-pill"><i class="fas fa-check-circle"></i> Unlocked</span>
-          </div>
-
-          <!-- Badge 6: Certification Explorer -->
-          <div class="badge-card badge-unlocked">
-            <div class="badge-icon-wrap"><i class="fas fa-award"></i></div>
-            <div class="badge-title">Certified Pro</div>
-            <div class="badge-desc">Selected target industry certifications for career growth.</div>
-            <span class="badge-status-pill status-unlocked-pill"><i class="fas fa-check-circle"></i> Unlocked</span>
-          </div>
-
-          <!-- Badge 7: Code Warrior (Locked) -->
-          <div class="badge-card badge-locked">
-            <div class="badge-icon-wrap"><i class="fas fa-laptop-code"></i></div>
-            <div class="badge-title">Code Warrior</div>
-            <div class="badge-desc">Complete 10 algorithmic drills on LeetCode / GeeksForGeeks.</div>
-            <div class="badge-progress-bg"><div class="badge-progress-fill" style="width: 80%;"></div></div>
-            <span class="badge-status-pill status-locked-pill" style="margin-top: 10px;"><i class="fas fa-lock"></i> 80% Progress</span>
-          </div>
-
-          <!-- Badge 8: System Architect (Locked) -->
-          <div class="badge-card badge-locked">
-            <div class="badge-icon-wrap"><i class="fas fa-network-wired"></i></div>
-            <div class="badge-title">System Architect</div>
-            <div class="badge-desc">Complete Stage 3 Advanced Skills on your learning roadmap.</div>
-            <div class="badge-progress-bg"><div class="badge-progress-fill" style="width: 50%;"></div></div>
-            <span class="badge-status-pill status-locked-pill" style="margin-top: 10px;"><i class="fas fa-lock"></i> 50% Progress</span>
-          </div>
-
-          <!-- Badge 9: Mock Champ (Locked) -->
-          <div class="badge-card badge-locked">
-            <div class="badge-icon-wrap"><i class="fas fa-trophy"></i></div>
-            <div class="badge-title">Mock Interview Champ</div>
-            <div class="badge-desc">Score 90%+ on an AI STAR behavioral mock answer.</div>
-            <div class="badge-progress-bg"><div class="badge-progress-fill" style="width: 40%;"></div></div>
-            <span class="badge-status-pill status-locked-pill" style="margin-top: 10px;"><i class="fas fa-lock"></i> 40% Progress</span>
-          </div>
-
-          <!-- Badge 10: Internship Contender (Locked) -->
-          <div class="badge-card badge-locked">
-            <div class="badge-icon-wrap"><i class="fas fa-briefcase"></i></div>
-            <div class="badge-title">Internship Contender</div>
-            <div class="badge-desc">Submit 3 internship applications through the discovery portal.</div>
-            <div class="badge-progress-bg"><div class="badge-progress-fill" style="width: 60%;"></div></div>
-            <span class="badge-status-pill status-locked-pill" style="margin-top: 10px;"><i class="fas fa-lock"></i> 60% Progress</span>
-          </div>
-
-          <!-- Badge 11: Polyglot Dev (Locked) -->
-          <div class="badge-card badge-locked">
-            <div class="badge-icon-wrap"><i class="fas fa-layer-group"></i></div>
-            <div class="badge-title">Full-Stack Polyglot</div>
-            <div class="badge-desc">Achieve Advanced proficiency level across 3 distinct tech stacks.</div>
-            <div class="badge-progress-bg"><div class="badge-progress-fill" style="width: 70%;"></div></div>
-            <span class="badge-status-pill status-locked-pill" style="margin-top: 10px;"><i class="fas fa-lock"></i> 70% Progress</span>
-          </div>
-
-          <!-- Badge 12: Career Champion (Locked) -->
-          <div class="badge-card badge-locked">
-            <div class="badge-icon-wrap"><i class="fas fa-crown"></i></div>
-            <div class="badge-title">Career Champion</div>
-            <div class="badge-desc">Reach a 90%+ total career readiness score on analytics.</div>
-            <div class="badge-progress-bg"><div class="badge-progress-fill" style="width: 84%;"></div></div>
-            <span class="badge-status-pill status-locked-pill" style="margin-top: 10px;"><i class="fas fa-lock"></i> 84% Progress</span>
-          </div>
-
         </div>
       </section>
 
     </div>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      loadAchievements();
+    });
+
+    function loadAchievements() {
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/achievements';
+
+      fetch(endpoint, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.badges) {
+            renderBadges(data);
+          } else {
+            showEmptyState();
+          }
+        })
+        .catch(err => {
+          console.error("Error loading achievements:", err);
+          showEmptyState();
+        });
+    }
+
+    function renderBadges(data) {
+      const badges = data.badges || [];
+      const unlockedCount = data.unlocked_count || 0;
+      const total = data.total_badges || badges.length;
+
+      document.getElementById('unlockedBadgeRatio').innerText = `${unlockedCount} / ${total}`;
+      document.getElementById('totalXPVal').innerText = `${unlockedCount * 250} XP`;
+
+      const grid = document.getElementById('badgeGrid');
+      grid.innerHTML = '';
+
+      badges.forEach(b => {
+        const card = document.createElement('div');
+        card.className = `badge-card ${b.unlocked ? 'badge-unlocked' : 'badge-locked'}`;
+        card.innerHTML = `
+          <div class="badge-icon-wrap"><span>${b.icon || '🏆'}</span></div>
+          <div class="badge-title">${b.title}</div>
+          <div class="badge-desc">${b.desc}</div>
+          <span class="badge-status-pill ${b.unlocked ? 'status-unlocked-pill' : 'status-locked-pill'}">
+            ${b.unlocked ? '<i class="fas fa-check-circle"></i> Unlocked' : '<i class="fas fa-lock"></i> Locked'}
+          </span>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function showEmptyState() {
+      document.getElementById('unlockedBadgeRatio').innerText = `0 / 5`;
+      document.getElementById('totalXPVal').innerText = `0 XP`;
+      document.getElementById('badgeGrid').innerHTML = `
+        <div style="text-align: center; padding: 40px; grid-column: 1/-1; color: var(--text-soft);">
+          <p>No achievements unlocked yet. Take your career assessment or update your profile to earn your first badge!</p>
+        </div>
+      `;
+    }
+  </script>
 </body>
 </html>

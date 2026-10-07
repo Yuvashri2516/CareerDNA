@@ -291,7 +291,15 @@
                     
                     document.getElementById('career_goals').value = p.career_goals || 'Data Scientist';
                     document.getElementById('bio').value = p.bio || '';
-                    document.getElementById('statCompleteness').innerText = `${data.completion || 85}%`;
+                    let pct = 0;
+                    if (data && data.completion) {
+                        if (typeof data.completion.completion_percentage === 'number') {
+                            pct = data.completion.completion_percentage;
+                        } else if (typeof data.completion === 'number') {
+                            pct = data.completion;
+                        }
+                    }
+                    document.getElementById('statCompleteness').innerText = `${pct}%`;
                 }
             })
             .catch(err => {
@@ -338,7 +346,15 @@
         .then(data => {
             if (data && data.success) {
                 document.getElementById('saveAlert').style.display = 'block';
-                document.getElementById('statCompleteness').innerText = `${data.completion || 90}%`;
+                let pct = 0;
+                if (data && data.completion) {
+                    if (typeof data.completion.completion_percentage === 'number') {
+                        pct = data.completion.completion_percentage;
+                    } else if (typeof data.completion === 'number') {
+                        pct = data.completion;
+                    }
+                }
+                document.getElementById('statCompleteness').innerText = `${pct}%`;
                 setTimeout(() => {
                     document.getElementById('saveAlert').style.display = 'none';
                 }, 4000);

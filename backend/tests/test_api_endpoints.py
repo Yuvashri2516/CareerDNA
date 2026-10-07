@@ -82,10 +82,43 @@ class TestAPIEndpoints(unittest.TestCase):
         self.assertIn('profile_completion', data)
 
     def test_chat_personalized_endpoint(self):
-        res = self.client.post('/api/chat', json={'message': 'Which career is right for me?'})
-        self.assertEqual(res.status_code, 200)
-        data = res.get_json()
-        self.assertIn('reply', data)
+        import career_service
+        career_service.add_user_skill('test_user', 'Python', 'Advanced')
+        career_service.add_user_skill('test_user', 'SQL', 'Intermediate')
+        career_service.save_assessment_dimensions('test_user', {'tech_focus': 80})
+
+        questions = [
+            ("explain about skill tracker", "helps you monitor your current skills"),
+            ("what is skill tracker", "identify the skills you need to improve"),
+            ("what skills am I missing?", "Missing Gaps (Priority)"),
+            ("how can I improve Python?", "project-based approach"),
+            ("what is my top career?", "is currently your strongest match at"),
+            ("why is software engineer my top match?", "because your profile aligns strongly"),
+            ("explain learning roadmap", "step-by-step personalized guide"),
+            ("what is resume builder?", "clean, ATS-friendly resume layout")
+        ]
+        
+        responses = []
+        for q, expected_snippet in questions:
+            res = self.client.post('/api/chat?user_name=test_user', json={'message': q})
+            self.assertEqual(res.status_code, 200)
+            data = res.get_json()
+            reply = data.get('reply', '')
+            self.assertTrue(len(reply) > 0)
+            self.assertIn(expected_snippet.lower(), reply.lower(), f"Failed on '{q}', got: {reply}")
+            responses.append(reply)
+
+    def test_chat_new_user_no_assessment(self):
+        new_user = 'brand_new_user_12345'
+        res1 = self.client.post(f'/api/chat?user_name={new_user}', json={'message': 'What career is best for me?'})
+        self.assertEqual(res1.status_code, 200)
+        data1 = res1.get_json()
+        self.assertIn("don't have enough information", data1.get('reply', ''))
+
+        res2 = self.client.post(f'/api/chat?user_name={new_user}', json={'message': 'What skills am I missing?'})
+        self.assertEqual(res2.status_code, 200)
+        data2 = res2.get_json()
+        self.assertIn("isn't available yet", data2.get('reply', ''))
 
 if __name__ == '__main__':
     unittest.main()

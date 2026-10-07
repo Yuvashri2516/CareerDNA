@@ -180,19 +180,19 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS assessment_dimensions (
             user_name TEXT PRIMARY KEY,
-            analytical_thinking INTEGER DEFAULT 60,
-            creativity INTEGER DEFAULT 60,
-            communication INTEGER DEFAULT 60,
-            leadership INTEGER DEFAULT 60,
-            problem_solving INTEGER DEFAULT 60,
-            technical_interest INTEGER DEFAULT 60,
-            social_interest INTEGER DEFAULT 60,
-            business_interest INTEGER DEFAULT 60,
-            research_interest INTEGER DEFAULT 60,
-            design_interest INTEGER DEFAULT 60,
-            risk_tolerance INTEGER DEFAULT 60,
-            work_style_score INTEGER DEFAULT 60,
-            learning_preference INTEGER DEFAULT 60,
+            analytical_thinking INTEGER DEFAULT 0,
+            creativity INTEGER DEFAULT 0,
+            communication INTEGER DEFAULT 0,
+            leadership INTEGER DEFAULT 0,
+            problem_solving INTEGER DEFAULT 0,
+            technical_interest INTEGER DEFAULT 0,
+            social_interest INTEGER DEFAULT 0,
+            business_interest INTEGER DEFAULT 0,
+            research_interest INTEGER DEFAULT 0,
+            design_interest INTEGER DEFAULT 0,
+            risk_tolerance INTEGER DEFAULT 0,
+            work_style_score INTEGER DEFAULT 0,
+            learning_preference INTEGER DEFAULT 0,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -202,7 +202,16 @@ def init_db():
             user_name TEXT PRIMARY KEY,
             career_id TEXT,
             completed_stages TEXT DEFAULT '[]',
-            current_stage INTEGER DEFAULT 1,
+            current_stage INTEGER DEFAULT 0,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS resume_progress (
+            user_name TEXT PRIMARY KEY,
+            score INTEGER DEFAULT 0,
+            sections TEXT DEFAULT '{}',
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -238,6 +247,65 @@ def save_result(user_name, best, best_score, second, second_score):
 
     conn.commit()
     conn.close()
+
+# -----------------------------
+# RESUME PROGRESS ENDPOINTS
+# -----------------------------
+@app.route('/api/resume-progress', methods=['GET', 'PUT'])
+def handle_resume_progress():
+    user = get_auth_user()
+    if not user:
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+        
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    
+    if request.method == 'GET':
+        cur.execute("SELECT score, sections FROM resume_progress WHERE user_name = ?", (user,))
+        row = cur.fetchone()
+        conn.close()
+        
+        if row:
+            score = row[0]
+            try:
+                sections = json.loads(row[1])
+            except:
+                sections = {}
+        else:
+            score = 0
+            sections = {}
+            
+        return jsonify({
+            "success": True,
+            "score": score,
+            "sections": sections
+        })
+        
+    elif request.method == 'PUT':
+        data = request.json or {}
+        score = data.get('score', 0)
+        sections = data.get('sections', {})
+        completed_sections = data.get('completed_sections', 0)
+        total_sections = data.get('total_sections', 0)
+        
+        cur.execute("""
+            INSERT INTO resume_progress (user_name, score, sections) 
+            VALUES (?, ?, ?) 
+            ON CONFLICT(user_name) DO UPDATE SET 
+            score=excluded.score, 
+            sections=excluded.sections,
+            updated_at=CURRENT_TIMESTAMP
+        """, (user, score, json.dumps(sections)))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            "success": True,
+            "score": score,
+            "completed_sections": completed_sections,
+            "total_sections": total_sections,
+            "sections": sections
+        })
 
 # -----------------------------
 # AUTH ROUTES
@@ -436,14 +504,17 @@ def history():
     if 'user' not in session:
         return redirect('/login')
 
+    user_name = session['user']
+    
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT id, user_name, best_career, best_score, second_career, second_score, created_at
         FROM results
+        WHERE user_name = ?
         ORDER BY id DESC
-    """)
+    """, (user_name,))
     rows = cursor.fetchall()
     conn.close()
 
@@ -455,19 +526,22 @@ def dashboard():
     if 'user' not in session:
         return redirect('/login')
 
+    user_name = session['user']
+    
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT COUNT(*) FROM results")
+    cursor.execute("SELECT COUNT(*) FROM results WHERE user_name = ?", (user_name,))
     total = cursor.fetchone()[0]
 
     cursor.execute("""
         SELECT best_career, COUNT(*)
         FROM results
+        WHERE user_name = ?
         GROUP BY best_career
         ORDER BY COUNT(*) DESC
         LIMIT 1
-    """)
+    """, (user_name,))
     top = cursor.fetchone()
 
     if top:
@@ -478,9 +552,10 @@ def dashboard():
     cursor.execute("""
         SELECT user_name, best_career, best_score
         FROM results
+        WHERE user_name = ?
         ORDER BY id DESC
         LIMIT 5
-    """)
+    """, (user_name,))
     recent = cursor.fetchall()
 
     conn.close()
@@ -542,6 +617,15 @@ def download_pdf():
         as_attachment=True,
         download_name="career_dna_report.pdf",
         mimetype="application/pdf"
+    )
+
+@app.route('/Career_DNA_Professional_Resume_Template.docx')
+def download_resume_template():
+    return send_file(
+        os.path.join(app.static_folder, 'Career_DNA_Professional_Resume_Template.docx'),
+        as_attachment=True,
+        download_name="Career_DNA_Professional_Resume_Template.docx",
+        mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
 
 # -----------------------------
@@ -661,34 +745,27 @@ def profile():
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
     data = request.get_json() or {}
-    message = data.get("message", "").lower()
+    message = data.get("message", "").strip()
     
     user_name = get_auth_user()
+    if 'chat_history' not in session:
+        session['chat_history'] = []
+    
+    history = session['chat_history']
+    
     if user_name:
-        p_reply = career_service.get_personalized_chat_response(user_name, message)
-        if p_reply:
-            return jsonify({"reply": p_reply})
-
-    # Intelligent response based on keywords
-    if any(k in message for k in ["roadmap", "path", "learn", "timeline"]):
-        reply = "Here is a recommended learning roadmap:<br>1. **Beginner**: Master basic languages (Python, JavaScript, SQL) and command line.<br>2. **Intermediate**: Work on data structures, build 2-3 personal portfolio projects, use GitHub.<br>3. **Advanced**: Specialize in frameworks (Django, React, PyTorch), deploy apps to cloud platforms, and obtain professional certifications. Which career path are you interested in specifically?"
-    elif any(k in message for k in ["resume", "cv", "portfolio"]):
-        reply = "Here is key advice to build a winning resume:<br>- Keep it to one page, clean formatting, and use a PDF format.<br>- Focus on accomplishments rather than tasks; use the Action + Task + Result structure (e.g. 'Optimized database queries, reducing loading times by 40%').<br>- List direct GitHub links to 2-3 projects.<br>- Group technical skills clearly by category (Languages, Databases, Tools)."
-    elif any(k in message for k in ["interview", "mock", "prepare"]):
-        reply = "For interview success, apply these tactics:<br>- Use the **STAR Method** (Situation, Task, Action, Result) for behavioral questions.<br>- Practice live coding out loud so interviewers can follow your logical steps.<br>- Research the company's tech stack and latest business releases.<br>- Ask insightful questions at the end about their development sprint cycles and engineering challenges."
-    elif any(k in message for k in ["software engineer", "software developer", "programmer", "coding"]):
-        reply = "Software Engineers design and build application systems. Key skills: Python, Java, JavaScript, System Design, DSA, and Git. Average Salary: $105,000/yr. Future Demand: 25% growth. Recommended Certifications: AWS Certified Developer, Meta Front-End/Back-End Developer."
-    elif any(k in message for k in ["ai", "machine learning", "ml", "data scientist"]):
-        reply = "AI & ML Engineers develop algorithms that learn from patterns in data. Key skills: Python, Linear Algebra, PyTorch/TensorFlow, Statistics, and SQL. Average Salary: $135,000/yr. Future Demand: Extremely high (35%+ growth). Recommended Certifications: Google Cloud Professional ML Engineer, TensorFlow Developer Certificate."
-    elif any(k in message for k in ["cyber", "security", "cybersecurity", "hack"]):
-        reply = "Cybersecurity Analysts protect networks and infrastructure from attacks. Key skills: Networking, Linux, Wireshark, Metasploit, Risk Assessment. Average Salary: $98,000/yr. Future Demand: 33% growth. Recommended Certifications: CompTIA Security+, Certified Ethical Hacker (CEH), CISSP."
-    elif any(k in message for k in ["cloud", "aws", "azure"]):
-        reply = "Cloud Engineers design and support cloud infrastructure. Key skills: AWS, Azure, Linux, Terraform, Docker, Kubernetes. Average Salary: $118,000/yr. Future Demand: 27% growth. Recommended Certifications: AWS Solutions Architect, Google Professional Cloud Architect."
-    elif any(k in message for k in ["ui", "ux", "design", "figma"]):
-        reply = "UI/UX Designers craft user journeys and interface designs. Key skills: Figma, Prototyping, Wireframing, UX Research, Color Theory. Average Salary: $88,000/yr. Future Demand: High. Recommended Certifications: Google UX Design Certificate, Interaction Design Foundation certifications."
+        reply = career_service.get_personalized_chat_response(user_name, message, history)
     else:
-        reply = "Hello! I am your AI Career Assistant. I can help you with:<br>1. Custom roadmaps for any career.<br>2. Professional resume building advice.<br>3. Interview preparation strategy & mock questions.<br>4. Informing you about average salaries, top companies, and demand statistics. What would you like to explore first?"
-        
+        # Default behavior if not logged in
+        reply = "Hello! I am your AI Career Assistant. Please log in to get personalized career advice."
+
+    # update history
+    history.append({"role": "user", "content": message})
+    history.append({"role": "assistant", "content": reply})
+    if len(history) > 20: # keep last 10 pairs
+        history = history[-20:]
+    session['chat_history'] = history
+    
     return jsonify({"reply": reply})
 
 
@@ -825,6 +902,16 @@ def achievements():
     if 'user' not in session:
         return redirect('/login')
     return render_template('achievements.html')
+
+@app.route('/hr-question-bank')
+@app.route('/hr-question-bank/')
+def hr_question_bank():
+    return render_template('hr_question_bank.html')
+
+@app.route('/system-design-guide')
+@app.route('/system-design-guide/')
+def system_design_guide():
+    return render_template('system_design_guide.html')
 
 # ── Initialise the database at module load time ───────────────────────────
 # When Gunicorn starts the app it imports this module directly; the
@@ -1347,6 +1434,93 @@ def api_achievements():
         'badges': badges
     }), 200
 
+@app.route('/api/career-analytics', methods=['GET', 'OPTIONS'])
+def api_career_analytics():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user()
+    if not user_name:
+        return jsonify({'success': False, 'message': 'Auth required'}), 401
+
+    profile = career_service.get_user_profile(user_name)
+    dims = career_service.get_assessment_dimensions(user_name)
+    
+    coding_score = 0
+    sql_score = 0
+    design_score = 0
+    
+    tech_skills = profile.get('tech_skills', [])
+    if isinstance(tech_skills, str):
+        try: tech_skills = json.loads(tech_skills)
+        except: tech_skills = []
+        
+    for s in tech_skills:
+        skill_name = (s.get('name', '') if isinstance(s, dict) else str(s)).lower()
+        lvl = (s.get('level', 'Intermediate') if isinstance(s, dict) else 'Intermediate').lower()
+        val = 90 if lvl == 'advanced' else (70 if lvl == 'intermediate' else 40)
+        
+        if 'python' in skill_name or 'java' in skill_name or 'c++' in skill_name or 'coding' in skill_name or 'javascript' in skill_name:
+            coding_score = max(coding_score, val)
+        if 'sql' in skill_name or 'database' in skill_name:
+            sql_score = max(sql_score, val)
+        if 'design' in skill_name or 'ui' in skill_name or 'ux' in skill_name or 'figma' in skill_name:
+            design_score = max(design_score, val)
+
+    if dims:
+        comm_score = min(100, dims.get('communication', 0))
+        lead_score = min(100, dims.get('leadership', 0))
+        prob_score = min(100, dims.get('problem_solving', 0) + (dims.get('analytical_thinking', 0)/2))
+        coding_score = min(100, coding_score + (dims.get('technical_interest', 0) * 0.5))
+        design_score = min(100, design_score + (dims.get('design_interest', 0) * 0.5))
+    else:
+        comm_score = 0
+        lead_score = 0
+        prob_score = 0
+
+    soft_skills = profile.get('soft_skills', [])
+    if isinstance(soft_skills, str):
+        try: soft_skills = json.loads(soft_skills)
+        except: soft_skills = []
+    
+    for s in soft_skills:
+        s_lower = str(s).lower()
+        if 'communication' in s_lower: comm_score = max(comm_score, 70)
+        if 'leadership' in s_lower: lead_score = max(lead_score, 70)
+        if 'problem solving' in s_lower: prob_score = max(prob_score, 70)
+
+    capabilities = {
+        "Coding": int(coding_score),
+        "Design": int(design_score),
+        "SQL": int(sql_score),
+        "Communication": int(comm_score),
+        "Leadership": int(lead_score),
+        "Problem Solving": int(prob_score)
+    }
+
+    conn = sqlite3.connect(career_service.get_db_path())
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT best_score FROM results
+        WHERE user_name = ?
+        ORDER BY created_at ASC
+    """, (user_name,))
+    rows = cursor.fetchall()
+    conn.close()
+
+    history = []
+    for idx, row in enumerate(rows):
+        history.append({
+            "stage": f"Stage {idx + 1}",
+            "score": row[0]
+        })
+
+    return jsonify({
+        "success": True,
+        "skills_capability": capabilities,
+        "assessment_history": history
+    }), 200
+
 @app.route('/api/dashboard-summary', methods=['GET', 'OPTIONS'])
 def api_dashboard_summary():
     if request.method == 'OPTIONS':
@@ -1389,6 +1563,7 @@ def api_dashboard_summary():
         'has_assessment': bool(dims),
         'has_career_match': has_match,
         'ideal_career': ideal.get('career_name', 'Not calculated') if has_match else 'Not calculated',
+        'ideal_career_id': ideal.get('career_id', 'software-engineer') if has_match else 'software-engineer',
         'ideal_match_score': ideal.get('overall_match', 0) if has_match else 0,
         'career_readiness_score': readiness.get('overall_readiness', 0),
         'top_user_skills': top_skills,

@@ -257,12 +257,12 @@
             document.getElementById('readinessStatusLabel').innerText = r.overall_readiness >= 75 ? 'High Job Readiness' : 'Moderate Readiness';
             document.getElementById('userProfileName').innerText = data.user_name || 'Authenticated User';
 
-            document.getElementById('valAssessment').innerText = `${b.assessment || 80}%`;
-            document.getElementById('valSkills').innerText = `${b.skills || 72}%`;
-            document.getElementById('valProjects').innerText = `${b.projects || 65}%`;
-            document.getElementById('valEdu').innerText = `${b.education || 90}%`;
-            document.getElementById('valCerts').innerText = `${b.certifications || 75}%`;
-            document.getElementById('valResume').innerText = `${b.resume || 80}%`;
+            document.getElementById('valAssessment').innerText = `${b.assessment || 0}%`;
+            document.getElementById('valSkills').innerText = `${b.skills || 0}%`;
+            document.getElementById('valProjects').innerText = `${b.projects || 0}%`;
+            document.getElementById('valEdu').innerText = `${b.education || 0}%`;
+            document.getElementById('valCerts').innerText = `${b.certifications || 0}%`;
+            document.getElementById('valResume').innerText = `${b.resume || 0}%`;
 
             renderReadinessBarChart(b);
           }
@@ -365,7 +365,7 @@
           labels: ['Skills', 'Education', 'Projects', 'Assessment', 'Certifications', 'Resume'],
           datasets: [{
             label: 'Readiness Score (%)',
-            data: [b.skills || 72, b.education || 90, b.projects || 65, b.assessment || 80, b.certifications || 75, b.resume || 80],
+            data: [b.skills || 0, b.education || 0, b.projects || 0, b.assessment || 0, b.certifications || 0, b.resume || 0],
             backgroundColor: 'rgba(157, 92, 255, 0.75)',
             borderColor: '#6531b3',
             borderWidth: 2,

@@ -64,32 +64,38 @@
 .dashboard-hero {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(246, 235, 255, 0.95));
     border-radius: 36px;
-    padding: 50px;
+    padding: 60px 50px;
     border: 1px solid rgba(131, 70, 223, 0.15);
     box-shadow: var(--shadow-card);
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-columns: 1fr 1.1fr;
     gap: 40px;
     align-items: center;
+    min-height: 450px;
 }
 
 .hero-visual {
-    background: linear-gradient(135deg, var(--lilac-100), var(--lilac-200));
+    background: linear-gradient(135deg, #f6eeff, #ebd9ff);
     border-radius: 28px;
     padding: 30px;
     text-align: center;
-    border: 1px solid rgba(131, 70, 223, 0.08);
+    border: 1px solid rgba(131, 70, 223, 0.1);
+    box-shadow: 0 15px 40px rgba(131, 70, 223, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
-.hero-visual svg {
-    width: 140px;
-    height: 140px;
-    animation: rotateDNA 12s linear infinite;
-}
-
-@keyframes rotateDNA {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.hero-visual img {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    object-fit: cover;
+    aspect-ratio: 4/3;
+    box-shadow: 0 12px 24px rgba(131, 70, 223, 0.15);
 }
 
 /* Skills progress container */
@@ -355,27 +361,14 @@
             </div>
             <div class="hero-right">
                 <div class="hero-visual">
-                    <svg viewBox="0 0 100 100">
-                        <path d="M30,20 Q50,50 70,80" stroke="#9d5cff" stroke-width="4" fill="none" stroke-dasharray="2 2" />
-                        <path d="M70,20 Q50,50 30,80" stroke="#6531b3" stroke-width="4" fill="none" stroke-dasharray="2 2" />
-                        <circle cx="30" cy="20" r="6" fill="#9d5cff" />
-                        <circle cx="70" cy="20" r="6" fill="#6531b3" />
-                        <circle cx="40" cy="35" r="6" fill="#bd8cff" />
-                        <circle cx="60" cy="35" r="6" fill="#bd8cff" />
-                        <circle cx="50" cy="50" r="6" fill="#e7d7ff" />
-                        <circle cx="40" cy="65" r="6" fill="#d6b8ff" />
-                        <circle cx="60" cy="65" r="6" fill="#d6b8ff" />
-                        <circle cx="30" cy="80" r="6" fill="#6531b3" />
-                        <circle cx="70" cy="80" r="6" fill="#9d5cff" />
-                        <line x1="30" y1="20" x2="70" y2="20" stroke="#bd8cff" stroke-width="2" />
-                        <line x1="40" y1="35" x2="60" y2="35" stroke="#bd8cff" stroke-width="2" />
-                        <line x1="40" y1="65" x2="60" y2="65" stroke="#bd8cff" stroke-width="2" />
-                        <line x1="30" y1="80" x2="70" y2="80" stroke="#bd8cff" stroke-width="2" />
-                    </svg>
-                    <h3 style="font-size: 1.3rem; margin-top: 15px; color: var(--text-dark); font-weight: 700;">Career Match Preview</h3>
-                    <p style="font-size: 0.9rem; color: var(--lilac-700); font-weight: bold; margin-bottom: 0;">
-                        Current: {{ best_career }}
-                    </p>
+                    <img src="{{ url_for('static', filename='images/career_match_illustration.jpg') }}" alt="Career Match Illustration">
+                    <h3 style="font-size: 1.6rem; margin-top: 5px; color: var(--text-dark); font-weight: 800;">Your Career DNA Match</h3>
+                    <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(157, 92, 255, 0.15); padding: 8px 16px; border-radius: 99px; margin-top: 10px;">
+                        <span style="color: var(--lilac-600); font-size: 1.1rem;">✨</span>
+                        <p style="font-size: 0.95rem; color: var(--lilac-700); font-weight: 500; margin-bottom: 0; font-style: italic;">
+                            "Discover your potential, shape your future."
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -566,120 +559,12 @@
         <!-- 3. PERSONALIZED CAREER MATCH -->
         <section class="dashboard-section">
             <h2 class="section-header">Personalized Career Match</h2>
-            <div class="grid-4-col" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
-                
-                <!-- 1. Software Engineer -->
-                <div class="glass-card" style="display: flex; flex-direction: column;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span class="badge-item badge-purple" style="font-weight: bold;">95% Match</span>
-                        <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ High Demand</span>
-                    </div>
-                    <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">Software Engineer</h3>
-                    <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; margin-bottom: 18px; flex: 1;">
-                        Develop applications and large-scale systems using modern programming logic.
-                    </p>
-                    <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">$115,000/yr</span>
-                        <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
-                    </div>
+            <div class="grid-4-col" id="careerMatchGrid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                <div style="grid-column: 1/-1; background: rgba(255,255,255,0.7); border-radius: 18px; padding: 32px; text-align: center; border: 1px solid rgba(131,70,223,0.12);">
+                    <h3 style="color: var(--text-dark); margin-bottom: 8px;">Career Match Not Calculated</h3>
+                    <p style="color: var(--text-soft); font-size: 0.95rem; margin-bottom: 20px;">Complete your profile and take the career assessment to discover your personalized career matches.</p>
+                    <a href="/assessment" class="nav-btn primary-btn" style="text-decoration:none; display:inline-block;">Take Career Assessment</a>
                 </div>
-
-                <!-- 2. AI Engineer -->
-                <div class="glass-card" style="display: flex; flex-direction: column;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span class="badge-item badge-purple" style="font-weight: bold;">92% Match</span>
-                        <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ High Demand</span>
-                    </div>
-                    <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">AI Engineer</h3>
-                    <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; margin-bottom: 18px; flex: 1;">
-                        Integrate machine learning frameworks and large language models into apps.
-                    </p>
-                    <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">$138,000/yr</span>
-                        <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
-                    </div>
-                </div>
-
-                <!-- 3. Data Scientist -->
-                <div class="glass-card" style="display: flex; flex-direction: column;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span class="badge-item badge-purple" style="font-weight: bold;">88% Match</span>
-                        <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ High Demand</span>
-                    </div>
-                    <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">Data Scientist</h3>
-                    <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; margin-bottom: 18px; flex: 1;">
-                        Analyze complex data structures to model statistical trends and business decisions.
-                    </p>
-                    <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">$122,000/yr</span>
-                        <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
-                    </div>
-                </div>
-
-                <!-- 4. Cybersecurity Analyst -->
-                <div class="glass-card" style="display: flex; flex-direction: column;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span class="badge-item badge-purple" style="font-weight: bold;">85% Match</span>
-                        <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ High Demand</span>
-                    </div>
-                    <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">Cybersecurity Analyst</h3>
-                    <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; margin-bottom: 18px; flex: 1;">
-                        Protect computer networks, servers, and data schemas from unauthorized breaches.
-                    </p>
-                    <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">$102,000/yr</span>
-                        <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
-                    </div>
-                </div>
-
-                <!-- 5. UI/UX Designer -->
-                <div class="glass-card" style="display: flex; flex-direction: column;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span class="badge-item badge-purple" style="font-weight: bold;">82% Match</span>
-                        <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ Stable</span>
-                    </div>
-                    <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">UI/UX Designer</h3>
-                    <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; margin-bottom: 18px; flex: 1;">
-                        Design layouts, map user navigation behaviors, and configure component mockups.
-                    </p>
-                    <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">$95,000/yr</span>
-                        <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
-                    </div>
-                </div>
-
-                <!-- 6. Cloud Engineer -->
-                <div class="glass-card" style="display: flex; flex-direction: column;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span class="badge-item badge-purple" style="font-weight: bold;">78% Match</span>
-                        <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ High Demand</span>
-                    </div>
-                    <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">Cloud Engineer</h3>
-                    <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; margin-bottom: 18px; flex: 1;">
-                        Design and manage cloud setups, scaling parameters, and secure server databases.
-                    </p>
-                    <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">$118,000/yr</span>
-                        <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
-                    </div>
-                </div>
-
-                <!-- 7. Business Analyst -->
-                <div class="glass-card" style="display: flex; flex-direction: column;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span class="badge-item badge-purple" style="font-weight: bold;">75% Match</span>
-                        <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ Stable</span>
-                    </div>
-                    <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">Business Analyst</h3>
-                    <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; margin-bottom: 18px; flex: 1;">
-                        Coordinate business goals and software requirements to plan software delivery.
-                    </p>
-                    <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">$92,000/yr</span>
-                        <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
-                    </div>
-                </div>
-
             </div>
         </section>
 
@@ -687,43 +572,10 @@
         <section class="dashboard-section">
             <h2 class="section-header">Skills Progress</h2>
             <div class="skills-progress-card">
-                <div class="skills-progress-grid">
-                    
-                    <div class="skill-progress-item">
-                        <span><span>Python Programming</span><span>85%</span></span>
-                        <div class="track"><div class="fill" style="width: 85%;"></div></div>
+                <div class="skills-progress-grid" id="skillsProgressGrid">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 24px; color: var(--text-soft); font-size: 0.95rem;">
+                        No skills added yet. <a href="/skills" style="color: var(--lilac-600); font-weight: bold; text-decoration: none;">Add Skills ↗</a>
                     </div>
-                    
-                    <div class="skill-progress-item">
-                        <span><span>Java Systems Development</span><span>65%</span></span>
-                        <div class="track"><div class="fill" style="width: 65%;"></div></div>
-                    </div>
-                    
-                    <div class="skill-progress-item">
-                        <span><span>SQL Database Design</span><span>75%</span></span>
-                        <div class="track"><div class="fill" style="width: 75%;"></div></div>
-                    </div>
-
-                    <div class="skill-progress-item">
-                        <span><span>Professional Communication</span><span>90%</span></span>
-                        <div class="track"><div class="fill" style="width: 90%;"></div></div>
-                    </div>
-
-                    <div class="skill-progress-item">
-                        <span><span>Team Leadership</span><span>80%</span></span>
-                        <div class="track"><div class="fill" style="width: 80%;"></div></div>
-                    </div>
-
-                    <div class="skill-progress-item">
-                        <span><span>Analytical Problem Solving</span><span>95%</span></span>
-                        <div class="track"><div class="fill" style="width: 95%;"></div></div>
-                    </div>
-
-                    <div class="skill-progress-item">
-                        <span><span>Critical System Thinking</span><span>70%</span></span>
-                        <div class="track"><div class="fill" style="width: 70%;"></div></div>
-                    </div>
-
                 </div>
             </div>
         </section>
@@ -851,27 +703,27 @@
                     
                     <div class="resume-checklist">
                         <label class="resume-checklist-item">
-                            <input type="checkbox" class="resume-chk" value="20" checked>
+                            <input type="checkbox" class="resume-chk" value="20" data-section="personal">
                             <span>Personal Details & Contact Info</span>
                         </label>
                         <label class="resume-checklist-item">
-                            <input type="checkbox" class="resume-chk" value="15" checked>
+                            <input type="checkbox" class="resume-chk" value="15" data-section="education">
                             <span>Educational History & Academic Grades</span>
                         </label>
                         <label class="resume-checklist-item">
-                            <input type="checkbox" class="resume-chk" value="20">
+                            <input type="checkbox" class="resume-chk" value="20" data-section="projects">
                             <span>Key Projects with active GitHub links</span>
                         </label>
                         <label class="resume-checklist-item">
-                            <input type="checkbox" class="resume-chk" value="15" checked>
+                            <input type="checkbox" class="resume-chk" value="15" data-section="skills">
                             <span>Curated Skills (Languages, tools)</span>
                         </label>
                         <label class="resume-checklist-item">
-                            <input type="checkbox" class="resume-chk" value="15">
+                            <input type="checkbox" class="resume-chk" value="15" data-section="experience">
                             <span>Work/Internship Experience descriptions</span>
                         </label>
                         <label class="resume-checklist-item">
-                            <input type="checkbox" class="resume-chk" value="15">
+                            <input type="checkbox" class="resume-chk" value="15" data-section="certifications">
                             <span>Professional Certificates & Achievements</span>
                         </label>
                     </div>
@@ -881,11 +733,11 @@
                     <h4 style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 15px;">Your Resume Score</h4>
                     
                     <!-- Circular Score Progress indicator -->
-                    <div style="position: relative; width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(closest-side, white 79%, transparent 80% 100%), conic-gradient(var(--lilac-500) 50%, #eee2ff 0); display: flex; align-items: center; justify-content: center;" id="resumeCircle">
-                        <strong style="font-size: 1.8rem; color: var(--text-dark);" id="resumePercentText">50%</strong>
+                    <div style="position: relative; width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(closest-side, white 79%, transparent 80% 100%), conic-gradient(var(--lilac-500) 0%, #eee2ff 0); display: flex; align-items: center; justify-content: center;" id="resumeCircle">
+                        <strong style="font-size: 1.8rem; color: var(--text-dark);" id="resumePercentText">0%</strong>
                     </div>
 
-                    <a href="https://github.com/fields-of-code/resume-template/raw/main/template.docx" download class="nav-btn primary-btn" style="text-decoration: none; margin-top: 24px; text-align: center; width: 100%;">
+                    <a href="/Career_DNA_Professional_Resume_Template.docx" download class="nav-btn primary-btn" style="text-decoration: none; margin-top: 24px; text-align: center; width: 100%;">
                         Download Resume Template
                     </a>
                 </div>
@@ -1157,33 +1009,89 @@
         });
 
         // Resume completeness checklist calculator
-        const checks = document.querySelectorAll(".resume-chk");
         const percentText = document.getElementById("resumePercentText");
         const circle = document.getElementById("resumeCircle");
 
-        function updateResumeScore() {
-            let sum = 0;
-            checks.forEach(chk => {
-                if (chk.checked) sum += parseInt(chk.value);
-            });
-            percentText.textContent = sum + "%";
-            circle.style.background = `radial-gradient(closest-side, white 79%, transparent 80% 100%), conic-gradient(var(--lilac-500) ${sum}%, #eee2ff 0)`;
+        function setResumeScore(score) {
+            percentText.textContent = score + "%";
+            circle.style.background = `radial-gradient(closest-side, white 79%, transparent 80% 100%), conic-gradient(var(--lilac-500) ${score}%, #eee2ff 0)`;
         }
 
-        checks.forEach(chk => {
-            chk.addEventListener("change", updateResumeScore);
+        const _apiBaseForResume = window.CAREER_DNA_API_BASE || '';
+        const resumeProgressEndpoint = (_apiBaseForResume ? (_apiBaseForResume.endsWith('/') ? _apiBaseForResume.slice(0, -1) : _apiBaseForResume) : '') + '/api/resume-progress';
+        const resumeCheckboxes = document.querySelectorAll('.resume-chk');
+
+        function updateResumeScoreUI(score) {
+            percentText.textContent = score + "%";
+            circle.style.background = `radial-gradient(closest-side, white 79%, transparent 80% 100%), conic-gradient(var(--lilac-500) ${score}%, #eee2ff 0)`;
+        }
+
+        function fetchResumeProgress() {
+            fetch(resumeProgressEndpoint, { credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success) {
+                        updateResumeScoreUI(data.score || 0);
+                        const sections = data.sections || {};
+                        resumeCheckboxes.forEach(chk => {
+                            const section = chk.getAttribute('data-section');
+                            chk.checked = !!sections[section];
+                        });
+                    } else {
+                        updateResumeScoreUI(0);
+                    }
+                })
+                .catch(err => {
+                    console.error("Failed to load resume progress:", err);
+                    updateResumeScoreUI(0);
+                });
+        }
+
+        function updateResumeProgress() {
+            let sections = {};
+            let completed = 0;
+            const totalCount = resumeCheckboxes.length;
+            
+            resumeCheckboxes.forEach(chk => {
+                const section = chk.getAttribute('data-section');
+                sections[section] = chk.checked;
+                if (chk.checked) {
+                    completed++;
+                }
+            });
+            
+            const totalScore = totalCount === 0 ? 0 : Math.round((completed / totalCount) * 100);
+            
+            updateResumeScoreUI(totalScore);
+            
+            fetch(resumeProgressEndpoint, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    score: totalScore,
+                    completed_sections: completed,
+                    total_sections: resumeCheckboxes.length,
+                    sections: sections
+                })
+            }).catch(err => console.error("Failed to save resume progress", err));
+        }
+
+        resumeCheckboxes.forEach(chk => {
+            chk.addEventListener('change', updateResumeProgress);
         });
-        updateResumeScore();
+
+        fetchResumeProgress();
 
         // 11. Career Analytics charts using Chart.js
         const skillsCtx = document.getElementById("skillsRadar").getContext("2d");
-        new Chart(skillsCtx, {
+        const skillsChart = new Chart(skillsCtx, {
             type: 'radar',
             data: {
                 labels: ['Coding', 'Design', 'SQL', 'Communication', 'Leadership', 'Problem Solving'],
                 datasets: [{
                     label: 'Current Skills Matrix',
-                    data: [85, 75, 70, 90, 80, 95],
+                    data: [0, 0, 0, 0, 0, 0],
                     backgroundColor: 'rgba(157, 92, 255, 0.2)',
                     borderColor: '#9d5cff',
                     borderWidth: 2,
@@ -1209,13 +1117,13 @@
         });
 
         const historyCtx = document.getElementById("historyLine").getContext("2d");
-        new Chart(historyCtx, {
+        const historyChart = new Chart(historyCtx, {
             type: 'line',
             data: {
-                labels: ['Test 1', 'Test 2', 'Test 3'],
+                labels: ['Stage 1', 'Stage 2', 'Stage 3'],
                 datasets: [{
                     label: 'Overall Match Score Trend',
-                    data: [78, 88, 92],
+                    data: [0, 0, 0],
                     borderColor: '#6531b3',
                     backgroundColor: 'rgba(101, 49, 179, 0.1)',
                     fill: true,
@@ -1235,7 +1143,7 @@
                     y: {
                         grid: { color: 'rgba(131, 70, 223, 0.08)' },
                         ticks: { color: '#685786' },
-                        suggestedMin: 50,
+                        suggestedMin: 0,
                         suggestedMax: 100
                     },
                     x: {
@@ -1246,8 +1154,84 @@
             }
         });
 
-        // ── Real-Time Dashboard Summary API Call ──
+        // ── Dynamic Analytics Data Load ──
         const apiBase = window.CAREER_DNA_API_BASE || '';
+        fetch((apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career-analytics', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success) {
+                    // Update Radar Chart
+                    if (data.skills_capability) {
+                        const caps = data.skills_capability;
+                        skillsChart.data.datasets[0].data = [
+                            caps.Coding || 0,
+                            caps.Design || 0,
+                            caps.SQL || 0,
+                            caps.Communication || 0,
+                            caps.Leadership || 0,
+                            caps['Problem Solving'] || 0
+                        ];
+                        skillsChart.update();
+                    }
+                    
+                    // Update History Line Chart
+                    if (data.assessment_history && data.assessment_history.length > 0) {
+                        const hist = data.assessment_history;
+                        historyChart.data.labels = hist.map(h => h.stage);
+                        historyChart.data.datasets[0].data = hist.map(h => h.score);
+                        historyChart.update();
+                    } else {
+                        // Empty state for history
+                        const container = document.getElementById("historyLine").parentNode;
+                        container.innerHTML = '<div style="display: flex; height: 100%; align-items: center; justify-content: center; text-align: center; color: var(--text-soft); font-size: 0.95rem; padding: 20px;">No assessment history yet.<br>Complete your first Career Assessment to begin tracking progress.</div>';
+                    }
+                }
+            })
+            .catch(err => console.warn('Analytics load error:', err));
+
+
+        // ── Old Dynamic Skills Progress Load (Dead Code cleanup) ──
+        fetch((apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/skill-progress', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                // Kept for backward compatibility if endpoint gets added later
+            })
+            .catch(err => {});
+
+
+
+        // ── Dynamic Career Recommendations Load ──
+        fetch((apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/career-recommendations', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && data.has_data && data.recommendations && data.recommendations.length > 0) {
+                    const grid = document.getElementById('careerMatchGrid');
+                    grid.innerHTML = '';
+                    data.recommendations.slice(0, 4).forEach(r => {
+                        const card = document.createElement('div');
+                        card.className = 'glass-card';
+                        card.style.cssText = 'display: flex; flex-direction: column;';
+                        card.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span class="badge-item badge-purple" style="font-weight: bold;">${r.match_score}% Match</span>
+                                <span style="font-size: 0.8rem; color: #2e7d32; font-weight: 700;">★ ${r.demand || 'High Demand'}</span>
+                            </div>
+                            <h3 style="font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px;">${r.title || r.career_id}</h3>
+                            <p style="font-size: 0.88rem; color: var(--text-soft); line-height: 1.6; margin-bottom: 18px; flex: 1;">
+                                ${r.description || 'Personalized career path recommendation.'}
+                            </p>
+                            <div style="border-top: 1px solid #f3ecff; padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.88rem; font-weight: bold; color: var(--text-dark);">${r.salary || 'Market Rate'}</span>
+                                <a href="/career-paths" style="font-size: 0.88rem; color: var(--lilac-600); font-weight: 700; text-decoration: none;">Explore ↗</a>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+            })
+            .catch(err => console.warn('Career recommendations load error:', err));
+
+        // ── Real-Time Dashboard Summary API Call ──
         const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/dashboard-summary';
 
         fetch(endpoint, { credentials: 'include' })
@@ -1278,9 +1262,62 @@
                     if (document.getElementById('dashNextAction')) {
                         document.getElementById('dashNextAction').textContent = data.recommended_next_action;
                     }
+                    
+                    // Load actual skill progress
+                    const careerId = data.ideal_career_id || 'software-engineer';
+                    loadSkillsProgress(careerId);
                 }
             })
             .catch(err => console.warn('Dashboard summary load error:', err));
+            
+        function loadSkillsProgress(careerId) {
+            const grid = document.getElementById('skillsProgressGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 24px; color: var(--text-soft); font-size: 0.95rem;">Loading your skills...</div>';
+            
+            fetch(`${apiBase}/api/career/${careerId}/skills`, { credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success && data.skill_analysis) {
+                        const allSkills = [
+                            ...(data.skill_analysis.strong || []),
+                            ...(data.skill_analysis.developing || [])
+                        ];
+                        
+                        if (allSkills.length === 0) {
+                            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 24px; color: var(--text-soft); font-size: 0.95rem;">No skills added yet. <a href="/skills" style="color: var(--lilac-600); font-weight: bold; text-decoration: none;">Add Skills ↗</a></div>';
+                            return;
+                        }
+                        
+                        // Render actual skills
+                        grid.innerHTML = '';
+                        allSkills.forEach(s => {
+                            const name = s.skill || s.name || 'Unknown Skill';
+                            const prof = s.proficiency || 0;
+                            const statusColor = s.status === 'Strong' ? 'var(--lilac-500)' : '#f9ca24';
+                            
+                            grid.innerHTML += `
+                                <div class="skill-progress-item" style="margin-bottom: 15px;">
+                                    <span style="display: flex; justify-content: space-between; font-weight: 600; color: var(--text-main); font-size: 0.95rem; margin-bottom: 8px;">
+                                        ${name} 
+                                        <i style="color: ${statusColor}; font-style: normal;">${prof}%</i>
+                                    </span>
+                                    <div class="progress-bar-bg" style="height: 10px; background: #f0f0f0; border-radius: 99px; overflow: hidden;">
+                                        <div class="progress-fill" style="width: ${prof}%; height: 100%; background: ${statusColor}; border-radius: 99px; transition: width 0.5s ease-out;"></div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 24px; color: var(--text-soft); font-size: 0.95rem;">Failed to load skills. Please try again.</div>';
+                    }
+                })
+                .catch(err => {
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 24px; color: var(--text-soft); font-size: 0.95rem;">Error loading skills. Please check your connection.</div>';
+                    console.error('Skill load error:', err);
+                });
+        }
     });
 </script>
 <script src="/config.js"></script>

@@ -77,6 +77,41 @@
       border: 1px solid rgba(131, 70, 223, 0.15);
       box-shadow: var(--shadow-card);
     }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    .form-input, textarea.form-input, #userAnswerText {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(131, 70, 223, 0.25);
+      background: #ffffff;
+      color: var(--text-dark);
+      font-family: inherit;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      outline: none;
+      resize: vertical;
+      box-sizing: border-box;
+      display: block;
+      cursor: text !important;
+      pointer-events: auto !important;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      position: relative;
+      z-index: 10;
+    }
+    .form-input:focus, textarea.form-input:focus, #userAnswerText:focus {
+      border-color: var(--lilac-600);
+      box-shadow: 0 0 0 3px rgba(131, 70, 223, 0.15);
+      background: #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -147,7 +182,7 @@
               </div>
             </div>
             <div class="prep-card-footer">
-              <a href="https://www.indeed.com/career-advice/interviewing" target="_blank" rel="noopener noreferrer" class="nav-btn secondary-btn" style="width: 100%; text-decoration: none; text-align: center; display: inline-block;">
+              <a href="/hr-question-bank/" class="nav-btn secondary-btn" style="width: 100%; text-decoration: none; text-align: center; display: inline-block;">
                 Read HR Question Bank ↗
               </a>
             </div>
@@ -230,7 +265,7 @@
               </div>
             </div>
             <div class="prep-card-footer">
-              <a href="https://www.geeksforgeeks.org/fundamentals-of-system-design-a-complete-guide/" target="_blank" rel="noopener noreferrer" class="nav-btn secondary-btn" style="width: 100%; text-decoration: none; text-align: center; display: inline-block;">
+              <a href="/system-design-guide/" class="nav-btn secondary-btn" style="width: 100%; text-decoration: none; text-align: center; display: inline-block;">
                 Explore System Design Guide ↗
               </a>
             </div>

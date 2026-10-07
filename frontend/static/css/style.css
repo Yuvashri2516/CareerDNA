@@ -1468,6 +1468,46 @@ body {
     border-color: var(--lilac-500);
 }
 
+/* Global Form Input & Textarea Styling */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(131, 70, 223, 0.2);
+    background: #ffffff;
+    color: var(--text-dark);
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    outline: none;
+    resize: vertical;
+    box-sizing: border-box;
+    display: block;
+    cursor: text !important;
+    pointer-events: auto !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    position: relative;
+    z-index: 5;
+}
+
+.form-input:focus {
+    border-color: var(--lilac-600);
+    box-shadow: 0 0 0 3px rgba(131, 70, 223, 0.15);
+    background: #ffffff;
+}
+
 .profile-badge-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));

@@ -255,7 +255,7 @@ def get_skill_gap_analysis(user_name, career_id):
         elif isinstance(s, str):
             user_skill_map[s.lower().strip()] = 70
 
-    all_req = target.get('skills', []) + target.get('tech_stack', [])[:3]
+    all_req = target.get('skills', []) + target.get('tech_stack', [])
     seen = set()
     req_skills = []
     for s in all_req:
@@ -367,8 +367,9 @@ def add_user_skill(user_name, skill_name, level="Advanced"):
 
     # Get initial top match
     recs_before = get_user_recommendations(user_name)
-    prev_match = recs_before.get('ideal_match', {}).get('overall_match', 70)
-    prev_career = recs_before.get('ideal_match', {}).get('career_name', '')
+    ideal_before = recs_before.get('ideal_match') or {}
+    prev_match = ideal_before.get('overall_match', 70)
+    prev_career = ideal_before.get('career_name', '')
 
     # Update or append skill
     updated = False
@@ -385,7 +386,7 @@ def add_user_skill(user_name, skill_name, level="Advanced"):
 
     # Get updated top match
     recs_after = get_user_recommendations(user_name)
-    new_match_obj = recs_after.get('ideal_match', {})
+    new_match_obj = recs_after.get('ideal_match') or {}
     new_match = new_match_obj.get('overall_match', 70)
     new_career = new_match_obj.get('career_name', '')
 
@@ -402,42 +403,190 @@ def add_user_skill(user_name, skill_name, level="Advanced"):
         "explanation": f"Your match for {new_career} changed from {prev_match}% to {new_match}% because {skill_name} is a key skill."
     }
 
-def get_personalized_chat_response(user_name, message):
+def get_personalized_chat_response(user_name, message, history=None):
     """Inject user's actual profile, assessment, and top career match into AI chat response."""
     msg_lower = message.lower().strip()
+    if history is None:
+        history = []
+        
+    context_text = " ".join([h['content'] for h in history[-4:]] if isinstance(history, list) else []).lower()
+    full_text = context_text + " " + msg_lower
+
+    intent = "unknown"
+    feature_topic = None
     
-    # Fetch profile & recommendations
+    # 1. Check feature explanation first
+    if any(f in msg_lower for f in ["skill tracker", "career assessment", "the assessment", "career match", "career matching", "learning roadmap", "my roadmap", "resume builder", "interview preparation", "certifications", "certification recommendations", "internship opportunities", "internships", "career analytics", "achievements", "profile completion"]):
+        if any(w in msg_lower for w in ["what is", "explain", "how does", "how do", "tell me about", "what does", "what are", "how can i use"]):
+            intent = "feature_explanation"
+            if "skill tracker" in msg_lower: feature_topic = "skill_tracker"
+            elif "assessment" in msg_lower: feature_topic = "assessment"
+            elif "career match" in msg_lower or "career matching" in msg_lower: feature_topic = "career_match"
+            elif "roadmap" in msg_lower: feature_topic = "roadmap"
+            elif "resume builder" in msg_lower: feature_topic = "resume"
+            elif "interview preparation" in msg_lower: feature_topic = "interview"
+            elif "certifications" in msg_lower or "certification recommendations" in msg_lower: feature_topic = "certifications"
+            elif "internship" in msg_lower: feature_topic = "internships"
+            elif "career analytics" in msg_lower: feature_topic = "analytics"
+            elif "achievements" in msg_lower: feature_topic = "achievements"
+            elif "profile" in msg_lower: feature_topic = "profile"
+            
+    if intent == "unknown":
+        if any(k in msg_lower for k in ["what career", "which career", "job suits me", "ideal career", "career is best", "my match", "recommend", "best fit", "choose", "top career"]):
+            intent = "career_recommendation"
+        elif any(k in msg_lower for k in ["why am i matched", "why is", "top match", "tell me about", "what does a", "explain"]):
+            intent = "career_explanation"
+        elif any(k in msg_lower for k in ["what skills", "which skills", "missing", "skills do i need", "skills should i learn", "skills should i improve", "skill", "gap", "skill progress"]):
+            intent = "skills"
+        elif any(k in msg_lower for k in ["how can i improve", "how do i learn", "what should i practice", "improve my", "learn"]):
+            intent = "skill_improvement"
+        elif any(k in msg_lower for k in ["roadmap", "learn first", "what should i do next", "learn next"]):
+            intent = "learning_roadmap"
+        elif any(k in msg_lower for k in ["resume", "cv"]):
+            intent = "resume"
+        elif any(k in msg_lower for k in ["interview", "hr question", "mock", "prepare"]):
+            intent = "interview_preparation"
+        elif any(k in msg_lower for k in ["salary", "companies hire", "in demand", "job demand", "market"]):
+            intent = "salary_market"
+        elif any(k in msg_lower for k in ["certification", "certificate", "cert"]):
+            intent = "certifications"
+        elif any(k in msg_lower for k in ["internship", "apply for", "jobs", "find jobs"]):
+            intent = "internship_jobs"
+        elif any(k in msg_lower for k in ["profile", "information is missing", "what should i update", "complete"]):
+            intent = "profile"
+        
+    if intent == "unknown":
+        if any(k in full_text for k in ["roadmap", "learn first", "what should i do next", "learn next"]):
+            intent = "learning_roadmap"
+        elif any(k in full_text for k in ["interview", "hr question", "mock", "prepare"]):
+            intent = "interview_preparation"
+
     profile = get_user_profile(user_name)
     recs = get_user_recommendations(user_name)
-    ideal = recs.get('ideal_match', {})
+    ideal = recs.get('ideal_match') or {}
     
-    career_name = ideal.get('career_name', 'Software Engineer')
-    match_pct = ideal.get('overall_match', 85)
-    explanations = ideal.get('explanations', [])
-    gaps = ideal.get('skill_gaps', [])
+    default_career = ideal.get('career_name')
+    career_id = ideal.get('career_id')
+    
+    # Try to extract mentioned career
+    mentioned_career = default_career
+    for c in ["data scientist", "ai engineer", "software engineer", "cybersecurity", "cloud engineer", "ui/ux designer", "product manager", "data analyst"]:
+        if c in full_text:
+            mentioned_career = c.title()
+            break
+            
+    career_name = mentioned_career if mentioned_career else default_career
+    match_pct = ideal.get('overall_match', 0)
     
     completion = calculate_profile_completion(profile)
-    comp_pct = completion.get('completion_percentage', 50)
+    comp_pct = completion.get('completion_percentage', 0)
+    
+    if not default_career:
+        if intent == "career_recommendation":
+            return "I don't have enough information to determine your ideal career yet.\n\nComplete your profile and Career Assessment first. Once those are available, I can compare your interests, strengths, skills, work style, and goals and recommend your strongest career matches."
+        if intent == "skills":
+            return "Your personalized skill-gap analysis isn't available yet. Complete your profile and assessment first, then I'll identify the skills you should develop for your strongest career matches."
 
-    if any(k in msg_lower for k in ["which career", "what career", "my match", "recommend", "best fit", "choose"]):
+    if intent == "career_recommendation":
+        explanations = ideal.get('explanations', [])
+        gaps = ideal.get('skill_gaps', [])
         reasons_text = "<br>".join([f"• {e}" for e in explanations[:3]])
         gaps_text = ", ".join([g.replace('⚠ ', '') for g in gaps[:2]]) if gaps else "Advanced specialization"
-        
-        reply = (
-            f"Based on your Career DNA profile and assessment data, <b>{career_name}</b> is currently your strongest match at <b>{match_pct}%</b>!<br><br>"
-            f"<b>Key matching factors:</b><br>{reasons_text}<br><br>"
-            f"<b>Primary areas to focus on next:</b> {gaps_text}.<br><br>"
-        )
+        reply = (f"Based on your Career DNA profile and assessment data, <b>{default_career}</b> is currently your strongest match at <b>{match_pct}%</b>!<br><br>"
+                 f"<b>Key matching factors:</b><br>{reasons_text}<br><br>"
+                 f"<b>Primary areas to focus on next:</b> {gaps_text}.<br><br>")
         if comp_pct < 70:
             reply += f"<i>Tip: Your Career Profile completion is currently {comp_pct}%. Complete missing sections on your dashboard for an even more accurate recommendation!</i>"
         return reply
 
-    if any(k in msg_lower for k in ["skill", "gap", "learn", "improve"]):
-        gaps_text = "<br>".join([f"• {g}" for g in gaps]) if gaps else "• Deep domain projects"
-        return (
-            f"For your top matched path <b>{career_name}</b> ({match_pct}% match), here are your prioritized skill gaps to bridge:<br>"
-            f"{gaps_text}<br><br>"
-            f"Adding these skills to your profile will directly boost your Career Match Score!"
-        )
+    if intent == "feature_explanation":
+        if feature_topic == "skill_tracker":
+            return "The Skill Tracker helps you monitor your current skills and identify the skills you need to improve for your target career. You can update your proficiency level for each skill, and Career DNA uses that information to show which skills are already strong, which are developing, and which skills are missing. Your skill progress also contributes to your personalized career readiness."
+        elif feature_topic == "assessment":
+            return "The Career Assessment evaluates your interests, strengths, and work style through a series of questions. We use this data to match you with careers that align with your natural aptitudes and preferences."
+        elif feature_topic == "career_match":
+            return "Career Matching compares your profile, skills, and assessment results against our database of career requirements. It calculates a compatibility percentage to recommend roles where you are most likely to succeed."
+        elif feature_topic == "roadmap":
+            return "The Learning Roadmap provides a step-by-step personalized guide to reach your target career. It breaks down the required skills, projects, and milestones you need to accomplish over time."
+        elif feature_topic == "resume":
+            return "The Resume Builder helps you craft a professional CV tailored to your target career. It uses your profile data, skills, and achievements to generate a clean, ATS-friendly resume layout."
+        elif feature_topic == "interview":
+            return "Interview Preparation offers role-specific mock questions, HR behavioral guides, and technical challenges (like System Design) to help you practice and succeed in your upcoming job interviews."
+        elif feature_topic == "certifications":
+            return "Certifications are industry-recognized credentials that validate your skills. We recommend specific certifications based on your career path to strengthen your profile and improve your employability."
+        elif feature_topic == "internships":
+            return "Internships provide hands-on experience in your chosen field. We help you identify internship opportunities that align with your current skill level and target career goals."
+        elif feature_topic == "analytics":
+            return "Career Analytics gives you a high-level overview of your progress, showing your profile completeness, skill growth, and how close you are to being fully ready for your target career."
+        elif feature_topic == "achievements":
+            return "Achievements are badges you earn by completing milestones in Career DNA, such as finishing your assessment, adding skills, or completing your profile. They track your active engagement and progress."
+        elif feature_topic == "profile":
+            return "Your Profile is the central hub of your professional data. By completing it with your education, experience, and skills, you enable Career DNA to give you more accurate career matches and personalized advice."
+        else:
+            return "Career DNA offers many personalized tools including the Skill Tracker, Learning Roadmap, Resume Builder, and Interview Prep to guide you to your ideal career."
 
-    return None
+    if intent == "career_explanation":
+        explanations = ideal.get('explanations', [])
+        reasons_text = "<br>".join([f"• {e}" for e in explanations]) if explanations else "Your profile aligns well with this role."
+        return (f"<b>{default_career}</b> is your top match ({match_pct}%) because your profile aligns strongly with its requirements:<br><br>"
+                f"{reasons_text}<br><br>"
+                f"They generally build scalable systems, design architectures, or work with data depending on the specific role.")
+
+    if intent == "skills":
+        gap_analysis = get_skill_gap_analysis(user_name, career_id) if career_id else {}
+        strong = [s['skill'] for s in gap_analysis.get('strong', [])]
+        developing = [s['skill'] for s in gap_analysis.get('developing', [])]
+        missing = [s['skill'] for s in gap_analysis.get('missing', [])]
+        
+        reply = f"For <b>{career_name}</b>, here is your personalized skill profile:<br><br>"
+        if strong: reply += f"<b>Already Strong:</b> {', '.join(strong)}<br>"
+        if developing: reply += f"<b>Developing:</b> {', '.join(developing)}<br>"
+        reply += f"<b>Missing Gaps (Priority):</b> {', '.join(missing) if missing else 'None! You are well prepared.'}<br><br>"
+        reply += "Focus on your missing gaps to increase your match score!"
+        return reply
+
+    if intent == "skill_improvement":
+        return (f"To improve your skills for <b>{career_name}</b>, I recommend following a project-based approach:<br>"
+                "1. Choose a small project related to the skill.<br>"
+                "2. Read the official documentation and follow tutorials.<br>"
+                "3. Apply it to your target career domain.<br>"
+                "4. Add the completed project to your Career DNA portfolio.")
+
+    if intent == "learning_roadmap":
+        roadmap = get_user_roadmap(user_name, career_id) if career_id else []
+        if not roadmap:
+            return f"I suggest starting with the basics for {career_name}."
+        reply = f"Here is your personalized roadmap for <b>{career_name}</b>:<br><br>"
+        for step in roadmap[:3]:
+            reply += f"• <b>{step.get('title')}</b>: {step.get('desc')}<br>"
+        return reply
+
+    if intent == "resume":
+        return ("Based on your profile, ensure your resume highlights your strongest skills and completed projects.<br>"
+                "- Use the STAR method (Situation, Task, Action, Result) for bullet points.<br>"
+                "- Tailor your summary to match your target career.<br>"
+                "- Ensure your contact information and GitHub/LinkedIn are up to date.")
+
+    if intent == "interview_preparation":
+        return (f"To prepare for <b>{career_name}</b> interviews, practice both technical and behavioral questions.<br><br>"
+                "<b>Example Question:</b> 'Can you describe a time you had to optimize a slow-performing system or algorithm?'<br><br>"
+                "Check out the Interview Preparation tab for mock questions and the HR Question Bank.")
+
+    if intent == "salary_market":
+        return (f"Based on available market data, a typical <b>{career_name}</b> sees strong demand globally.<br>"
+                "Salaries vary by location, but generally start around $80k-$100k for entry-level and can exceed $150k for senior roles.<br>"
+                "Top tech companies and financial institutions are actively hiring for these skills.")
+
+    if intent == "certifications":
+        return (f"For <b>{career_name}</b>, industry-recognized certifications can boost your profile.<br>"
+                "Consider looking into AWS, Azure, Google Cloud, or specialized certificates like CompTIA or Meta Developer certificates based on your specific focus.")
+
+    if intent == "internship_jobs":
+        return (f"To find internships for <b>{career_name}</b>, check your university career portal, LinkedIn, and platforms like internships.com.<br>"
+                "Tailor your profile to match the internship description, highlighting your personal projects and related coursework.")
+
+    if intent == "profile":
+        return (f"Your profile is currently <b>{comp_pct}%</b> complete.<br>"
+                "To reach 100%, make sure you have added your Skills, Work Experience, Projects, and completed the Career Assessment.")
+
+    return "I want to make sure I answer the right question. You can ask me about your Skill Tracker, career assessment, career match, learning roadmap, resume, interviews, certifications, internships, or career profile."
