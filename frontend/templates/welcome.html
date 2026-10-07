@@ -1258,22 +1258,22 @@
                         document.getElementById('dashCompletionPill').textContent = 'Profile Completion: ' + data.profile_completion + '%';
                     }
                     if (document.getElementById('dashBestCareer')) {
-                        document.getElementById('dashBestCareer').textContent = data.ideal_career;
+                        document.getElementById('dashBestCareer').textContent = data.has_career_match ? data.ideal_career : 'Not calculated';
                     }
                     if (document.getElementById('dashBestScore')) {
-                        document.getElementById('dashBestScore').textContent = data.ideal_match_score + '% Match';
+                        document.getElementById('dashBestScore').textContent = data.has_career_match ? (data.ideal_match_score + '% Match') : 'Action Required';
                     }
                     if (document.getElementById('dashReadinessScore')) {
                         document.getElementById('dashReadinessScore').textContent = data.career_readiness_score + '%';
                     }
                     if (document.getElementById('dashTopSkills')) {
-                        document.getElementById('dashTopSkills').textContent = data.top_user_skills.join(', ');
+                        document.getElementById('dashTopSkills').textContent = (data.top_user_skills && data.top_user_skills.length > 0) ? data.top_user_skills.join(', ') : 'No skills added yet';
                     }
                     if (document.getElementById('dashSkillsToDevelop')) {
-                        document.getElementById('dashSkillsToDevelop').textContent = data.skills_to_develop.join(', ');
+                        document.getElementById('dashSkillsToDevelop').textContent = (data.skills_to_develop && data.skills_to_develop.length > 0) ? data.skills_to_develop.join(', ') : 'Complete profile to unlock';
                     }
                     if (document.getElementById('dashRoadmapStage')) {
-                        document.getElementById('dashRoadmapStage').textContent = 'Stage ' + data.current_roadmap_stage + ' of ' + data.total_roadmap_stages;
+                        document.getElementById('dashRoadmapStage').textContent = data.current_roadmap_stage > 0 ? ('Stage ' + data.current_roadmap_stage + ' of ' + data.total_roadmap_stages) : 'Not started';
                     }
                     if (document.getElementById('dashNextAction')) {
                         document.getElementById('dashNextAction').textContent = data.recommended_next_action;

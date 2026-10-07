@@ -337,7 +337,7 @@ def match_user_to_career(user_profile, assessment_dims, career):
 
 def calculate_career_readiness(user_profile, assessment_dims):
     """
-    Calculate real Career Readiness Score (0-100%) and factor breakdown.
+    Calculate real Career Readiness Score (0-100%) and factor breakdown based purely on user evidence.
     """
     if not user_profile: user_profile = {}
     if not assessment_dims: assessment_dims = {}
@@ -347,42 +347,49 @@ def calculate_career_readiness(user_profile, assessment_dims):
     if isinstance(tech_skills, str):
         try: tech_skills = json.loads(tech_skills)
         except: tech_skills = []
-    skills_score = min(100, len(tech_skills) * 20) if tech_skills else 30
+    skills_score = min(100, len(tech_skills) * 25) if tech_skills else 0
 
     # 2. Education Readiness
     edu = str(user_profile.get('education_level', '')).lower()
     if 'master' in edu or 'phd' in edu: edu_score = 95
     elif 'bachelor' in edu: edu_score = 85
     elif edu: edu_score = 70
-    else: edu_score = 40
+    else: edu_score = 0
 
     # 3. Projects & Experience
     exp = user_profile.get('experience', [])
     if isinstance(exp, str):
         try: exp = json.loads(exp)
         except: exp = []
-    projects_score = min(100, 30 + (len(exp) * 25))
+    projects_score = min(100, len(exp) * 33) if exp else 0
 
     # 4. Assessment Readiness
     dims_count = sum(1 for v in assessment_dims.values() if v and v != 50)
-    assessment_score = min(100, 40 + (dims_count * 10))
+    assessment_score = min(100, round((dims_count / 13.0) * 60) + 40) if assessment_dims else 0
+
+    # 5. Certifications & Resume
+    certifications_score = 0
+    resume_score = 0
 
     # Overall Weighted Readiness
-    overall_readiness = round(
-        (skills_score * 0.35) +
-        (edu_score * 0.20) +
-        (projects_score * 0.25) +
-        (assessment_score * 0.20)
-    )
+    if skills_score == 0 and edu_score == 0 and projects_score == 0 and assessment_score == 0:
+        overall_readiness = 0
+    else:
+        overall_readiness = round(
+            (skills_score * 0.35) +
+            (edu_score * 0.20) +
+            (projects_score * 0.25) +
+            (assessment_score * 0.20)
+        )
 
     return {
-        "overall_readiness": min(98, max(20, overall_readiness)),
+        "overall_readiness": overall_readiness,
         "breakdown": {
             "skills": skills_score,
             "education": edu_score,
             "projects": projects_score,
             "assessment": assessment_score,
-            "certifications": min(100, skills_score + 10),
-            "resume": min(100, round((skills_score + edu_score) / 2))
+            "certifications": certifications_score,
+            "resume": resume_score
         }
     }

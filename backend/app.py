@@ -1165,7 +1165,7 @@ def api_internships():
 
     user_name = get_auth_user() or 'Guest'
     recs = career_service.get_user_recommendations(user_name)
-    ideal = recs.get('ideal_match', {})
+    ideal = recs.get('ideal_match') or {}
     career_name = ideal.get('career_name', 'Software Development')
 
     opportunities = [
@@ -1263,6 +1263,90 @@ def api_career_compare():
         'comparison': comparison_list
     }), 200
 
+@app.route('/api/achievements', methods=['GET', 'OPTIONS'])
+def api_achievements():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    user_name = get_auth_user() or 'Guest'
+    profile = career_service.get_user_profile(user_name)
+    dims = career_service.get_assessment_dimensions(user_name)
+    
+    completion = career_engine.calculate_profile_completion(profile)
+    comp_pct = completion.get('completion_percentage', 0)
+
+    has_assessment = bool(dims)
+    has_skills = len(profile.get('tech_skills', [])) > 0
+    has_projects = len(profile.get('experience', [])) > 0
+    
+    roadmap_started = False
+    db_path = career_service.get_db_path()
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute("SELECT completed_stages, current_stage FROM roadmap_progress WHERE user_name = ?", (user_name,))
+        row = cursor.fetchone()
+        conn.close()
+        if row:
+            stages = json.loads(row[0]) if row[0] else []
+            if len(stages) > 0 or (row[1] and row[1] > 0):
+                roadmap_started = True
+    except:
+        pass
+
+    badges = [
+        {
+            "id": "first_step",
+            "title": "First Step Done",
+            "desc": "Complete your baseline Career DNA assessment.",
+            "unlocked": has_assessment,
+            "icon": "🎯",
+            "progress": 100 if has_assessment else 0
+        },
+        {
+            "id": "skill_pioneer",
+            "title": "Skill Pioneer",
+            "desc": "Track and maintain technical & soft skills.",
+            "unlocked": has_skills,
+            "icon": "⚡",
+            "progress": 100 if has_skills else 0
+        },
+        {
+            "id": "roadmap_runner",
+            "title": "Roadmap Runner",
+            "desc": "Start your personalized learning roadmap.",
+            "unlocked": roadmap_started,
+            "icon": "🚩",
+            "progress": 100 if roadmap_started else 0
+        },
+        {
+            "id": "profile_complete",
+            "title": "Profile Master",
+            "desc": "Reach 100% profile completeness.",
+            "unlocked": comp_pct >= 100,
+            "icon": "👑",
+            "progress": comp_pct
+        },
+        {
+            "id": "first_project",
+            "title": "Builder & Maker",
+            "desc": "Add portfolio projects to your profile.",
+            "unlocked": has_projects,
+            "icon": "🔬",
+            "progress": 100 if has_projects else 0
+        }
+    ]
+
+    unlocked_count = sum(1 for b in badges if b['unlocked'])
+
+    return jsonify({
+        'success': True,
+        'user_name': user_name,
+        'unlocked_count': unlocked_count,
+        'total_badges': len(badges),
+        'badges': badges
+    }), 200
+
 @app.route('/api/dashboard-summary', methods=['GET', 'OPTIONS'])
 def api_dashboard_summary():
     if request.method == 'OPTIONS':
@@ -1273,29 +1357,45 @@ def api_dashboard_summary():
     dims = career_service.get_assessment_dimensions(user_name)
     
     completion = career_engine.calculate_profile_completion(profile)
-    recs = career_service.get_user_recommendations(user_name)
-    readiness = career_engine.calculate_career_readiness(profile, dims)
+    comp_pct = completion.get('completion_percentage', 0)
 
-    ideal = recs.get('ideal_match', {})
-    career_id = ideal.get('career_id', 'software-engineer')
+    recs = career_service.get_user_recommendations(user_name)
+    has_match = recs.get('has_data', False)
+    ideal = recs.get('ideal_match', {}) if has_match and recs.get('ideal_match') else {}
+
+    readiness = career_engine.calculate_career_readiness(profile, dims)
+    
+    career_id = ideal.get('career_id', 'software-engineer') if ideal else 'software-engineer'
     roadmap = career_service.get_user_roadmap(user_name, career_id)
 
     top_skills = [s['name'] if isinstance(s, dict) else s for s in profile.get('tech_skills', [])[:3]]
-    if not top_skills:
-        top_skills = ["Python", "Problem Solving", "Communication"]
+
+    if comp_pct < 50:
+        recommended_action = "Complete your Career Profile"
+    elif not dims:
+        recommended_action = "Take the Career Assessment"
+    elif has_match and (not roadmap.get('has_progress') or roadmap.get('current_stage', 0) == 0):
+        recommended_action = "Start your personalized learning roadmap"
+    elif ideal and ideal.get('skill_gaps'):
+        gap_clean = ideal.get('skill_gaps')[0].replace('⚠ ', '')
+        recommended_action = f"Learn {gap_clean} fundamentals"
+    else:
+        recommended_action = "Review your career progress & analytics"
 
     return jsonify({
         'success': True,
         'user_name': user_name,
-        'profile_completion': completion.get('completion_percentage', 50),
-        'ideal_career': ideal.get('career_name', 'Software Engineer'),
-        'ideal_match_score': ideal.get('overall_match', 85),
-        'career_readiness_score': readiness.get('overall_readiness', 75),
+        'profile_completion': comp_pct,
+        'has_assessment': bool(dims),
+        'has_career_match': has_match,
+        'ideal_career': ideal.get('career_name', 'Not calculated') if has_match else 'Not calculated',
+        'ideal_match_score': ideal.get('overall_match', 0) if has_match else 0,
+        'career_readiness_score': readiness.get('overall_readiness', 0),
         'top_user_skills': top_skills,
-        'skills_to_develop': [g.replace('⚠ ', '') for g in ideal.get('skill_gaps', [])[:3]],
-        'current_roadmap_stage': roadmap.get('current_stage', 1),
-        'total_roadmap_stages': roadmap.get('total_stages', 5),
-        'recommended_next_action': f"Complete {ideal.get('skill_gaps', ['Machine Learning'])[0].replace('⚠ ', '')} fundamentals"
+        'skills_to_develop': [g.replace('⚠ ', '') for g in ideal.get('skill_gaps', [])[:3]] if has_match else [],
+        'current_roadmap_stage': roadmap.get('current_stage', 0) if has_match else 0,
+        'total_roadmap_stages': roadmap.get('total_stages', 0) if has_match else 0,
+        'recommended_next_action': recommended_action
     }), 200
 
 

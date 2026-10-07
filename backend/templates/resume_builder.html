@@ -359,18 +359,37 @@
   </div>
 
   <script>
-    let expData = [
-      { role: 'Software Engineer', company: 'TechCorp Labs', dates: '2023 – Present', desc: 'Designed high-throughput REST APIs using Python & FastAPI. Reduced database query latency by 35% through indexing and caching.' },
-      { role: 'Associate Developer Intern', company: 'DataScale Inc', dates: '2022 – 2023', desc: 'Assisted in building full-stack analytics dashboards and writing automated integration test suites.' }
-    ];
+    let expData = [];
+    let eduData = [];
+    let projData = [];
 
-    let eduData = [
-      { degree: 'B.S. in Computer Science', school: 'University of Technology', year: '2023' }
-    ];
+    document.addEventListener("DOMContentLoaded", function() {
+      // Auto-populate from user profile if available
+      const apiBase = window.CAREER_DNA_API_BASE || '';
+      const endpoint = (apiBase ? (apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase) : '') + '/api/profile';
 
-    let projData = [
-      { name: 'Career DNA Platform', tech: 'Python, Flask, SQLite, Vite JS', desc: 'Developed a personalized career assessment engine that matches user profiles with salary trends and roadmaps.' }
-    ];
+      fetch(endpoint, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.profile) {
+            const p = data.profile;
+            if (p.full_name) document.getElementById('rbFullName').value = p.full_name;
+            if (p.education_level && p.education_level !== 'Not specified') {
+              eduData = [{ degree: p.degree || p.education_level, school: 'University', year: p.grad_year || '2024' }];
+              renderEduInputs();
+            }
+            if (p.tech_skills) {
+              let skillsArr = p.tech_skills;
+              if (typeof skillsArr === 'string') { try { skillsArr = JSON.parse(skillsArr); } catch(e) {} }
+              if (Array.isArray(skillsArr) && skillsArr.length > 0) {
+                document.getElementById('rbTechSkills').value = skillsArr.map(s => typeof s === 'object' ? s.name : s).join(', ');
+              }
+            }
+            updateResumePreview();
+          }
+        })
+        .catch(err => {});
+    });
 
     function renderExpInputs() {
       const container = document.getElementById('expContainer');

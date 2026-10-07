@@ -150,11 +150,7 @@ def get_assessment_dimensions(user_name):
                 "learning_preference": row[12]
             }
         else:
-            return {
-                "analytical_thinking": 65, "creativity": 60, "communication": 60, "leadership": 55,
-                "problem_solving": 65, "technical_interest": 70, "social_interest": 55, "business_interest": 55,
-                "research_interest": 65, "design_interest": 55, "risk_tolerance": 50, "work_style_score": 60, "learning_preference": 65
-            }
+            return {}
     except Exception as e:
         print(f"[CareerService] get_assessment_dimensions error: {e}")
         return {}
@@ -173,11 +169,11 @@ def save_assessment_dimensions(user_name, dims):
         exists = cursor.fetchone()
 
         vals = (
-            dims.get('analytical_thinking', 65), dims.get('creativity', 60), dims.get('communication', 60),
-            dims.get('leadership', 55), dims.get('problem_solving', 65), dims.get('technical_interest', 70),
-            dims.get('social_interest', 55), dims.get('business_interest', 55), dims.get('research_interest', 65),
-            dims.get('design_interest', 55), dims.get('risk_tolerance', 50), dims.get('work_style_score', 60),
-            dims.get('learning_preference', 65)
+            dims.get('analytical_thinking', 50), dims.get('creativity', 50), dims.get('communication', 50),
+            dims.get('leadership', 50), dims.get('problem_solving', 50), dims.get('technical_interest', 50),
+            dims.get('social_interest', 50), dims.get('business_interest', 50), dims.get('research_interest', 50),
+            dims.get('design_interest', 50), dims.get('risk_tolerance', 50), dims.get('work_style_score', 50),
+            dims.get('learning_preference', 50)
         )
 
         if exists:
@@ -204,10 +200,15 @@ def save_assessment_dimensions(user_name, dims):
         print(f"[CareerService] save_assessment_dimensions error: {e}")
 
 def get_user_recommendations(user_name):
-    """Calculate and return ranked career recommendations for user."""
+    """Calculate and return ranked career recommendations for user based strictly on stored data."""
     profile = get_user_profile(user_name)
     dims = get_assessment_dimensions(user_name)
     careers = get_careers_data()
+
+    has_skills = bool(profile.get('tech_skills'))
+    has_edu = bool(profile.get('education_level'))
+    has_dims = bool(dims)
+    has_data = has_dims or has_skills or has_edu
 
     results = []
     for c in careers:
@@ -216,13 +217,15 @@ def get_user_recommendations(user_name):
 
     results.sort(key=lambda x: x['overall_match'], reverse=True)
 
-    ideal_match = results[0] if results else None
     top_5 = results[:5]
+    ideal_match = results[0] if (results and has_data) else None
 
     return {
+        "has_data": has_data,
         "ideal_match": ideal_match,
         "top_careers": top_5,
-        "total_careers_evaluated": len(careers)
+        "total_careers_evaluated": len(careers),
+        "message": "Complete your profile and assessment to unlock your personalized ideal match." if not has_data else ""
     }
 
 def get_skill_gap_analysis(user_name, career_id):
@@ -253,7 +256,6 @@ def get_skill_gap_analysis(user_name, career_id):
             user_skill_map[s.lower().strip()] = 70
 
     all_req = target.get('skills', []) + target.get('tech_stack', [])[:3]
-    # Remove duplicates preserving order
     seen = set()
     req_skills = []
     for s in all_req:
@@ -304,10 +306,10 @@ def get_user_roadmap(user_name, career_id):
     if not target and careers:
         target = careers[0]
 
-    # Fetch saved progress
     db_path = get_db_path()
     completed_stages = []
-    current_stage = 1
+    current_stage = 0
+    has_progress = False
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -315,8 +317,9 @@ def get_user_roadmap(user_name, career_id):
         row = cursor.fetchone()
         conn.close()
         if row:
+            has_progress = True
             completed_stages = json.loads(row[0]) if row[0] else []
-            current_stage = row[1] or 1
+            current_stage = row[1] if row[1] is not None else 0
     except Exception as e:
         print(f"[CareerService] get_user_roadmap error: {e}")
 
@@ -330,22 +333,27 @@ def get_user_roadmap(user_name, career_id):
 
     stages = []
     for idx, step_title in enumerate(raw_roadmap, start=1):
-        is_completed = idx in completed_stages or idx < current_stage
-        is_current = idx == current_stage
+        is_completed = idx in completed_stages
+        is_current = (idx == current_stage) and current_stage > 0 and not is_completed
         
+        status_label = "Completed" if is_completed else ("Current" if is_current else "Not Started")
         stages.append({
             "stage_number": idx,
             "title": f"Stage {idx}: {step_title}",
             "description": f"Focus on mastering {step_title} to build essential career competence.",
-            "status": "Completed" if is_completed else ("Current" if is_current else "Upcoming"),
+            "status": status_label,
             "completed": is_completed
         })
+
+    completion_pct = round((len(completed_stages) / float(len(stages))) * 100) if stages else 0
 
     return {
         "career_id": target.get('id', slugify(target.get('name', ''))),
         "career_name": target.get('name', ''),
         "current_stage": current_stage,
         "total_stages": len(stages),
+        "completion_percentage": completion_pct,
+        "has_progress": has_progress,
         "stages": stages
     }
 
