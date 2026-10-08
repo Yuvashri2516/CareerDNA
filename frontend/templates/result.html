@@ -204,6 +204,7 @@
         </div>
 
         <nav class="nav-links">
+            <button type="button" id="backToDashboard" class="nav-btn secondary-btn" style="margin-right: 15px; font-weight: bold; background: none; border: none; cursor: pointer; font-size: 16px;">←</button>
             <a href="/welcome">Dashboard</a>
             <a href="/assessment" class="nav-take-test-link">Take Test</a>
             <a href="/career-paths">Career Paths</a>
@@ -468,6 +469,12 @@
                     }
                 }
             }
+        });
+
+        document.getElementById("backToDashboard").addEventListener("click", function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            window.location.href = "/welcome";
         });
     });
 </script>

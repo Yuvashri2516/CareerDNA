@@ -504,8 +504,7 @@
                     { title: "Analyzing Response Patterns...", sub: "Extracting skills, interests, and personality variables." },
                     { title: "Mapping Professional Archetypes...", sub: "Weighting logic, design, analytical, and marketing factors." },
                     { title: "Calculating Match Scores...", sub: "Cross-referencing parameters across our catalog of 25+ careers." },
-                    { title: "Structuring Custom Roadmap...", sub: "Selecting ideal beginner, intermediate, and advanced certifications." },
-                    { title: "Generating PDF Report...", sub: "Finalizing career profile DNA details." }
+                    { title: "Structuring Custom Roadmap...", sub: "Selecting ideal beginner, intermediate, and advanced certifications." }
                 ];
 
                 let idx = 0;
@@ -532,6 +531,12 @@
         });
 
         updateWizard();
+    });
+
+    document.getElementById("backToDashboard").addEventListener("click", function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        window.location.href = "/welcome";
     });
 </script>
 </body>

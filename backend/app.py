@@ -1449,6 +1449,9 @@ def api_career_analytics():
     coding_score = 0
     sql_score = 0
     design_score = 0
+    comm_score = 0
+    lead_score = 0
+    prob_score = 0
     
     tech_skills = profile.get('tech_skills', [])
     if isinstance(tech_skills, str):
@@ -1466,17 +1469,19 @@ def api_career_analytics():
             sql_score = max(sql_score, val)
         if 'design' in skill_name or 'ui' in skill_name or 'ux' in skill_name or 'figma' in skill_name:
             design_score = max(design_score, val)
+        if 'communication' in skill_name:
+            comm_score = max(comm_score, val)
+        if 'leadership' in skill_name:
+            lead_score = max(lead_score, val)
+        if 'problem solving' in skill_name:
+            prob_score = max(prob_score, val)
 
     if dims:
-        comm_score = min(100, dims.get('communication', 0))
-        lead_score = min(100, dims.get('leadership', 0))
-        prob_score = min(100, dims.get('problem_solving', 0) + (dims.get('analytical_thinking', 0)/2))
+        comm_score = min(100, comm_score + (dims.get('communication', 0) * 0.5))
+        lead_score = min(100, lead_score + (dims.get('leadership', 0) * 0.5))
+        prob_score = min(100, prob_score + (dims.get('problem_solving', 0) * 0.5) + (dims.get('analytical_thinking', 0) / 4))
         coding_score = min(100, coding_score + (dims.get('technical_interest', 0) * 0.5))
         design_score = min(100, design_score + (dims.get('design_interest', 0) * 0.5))
-    else:
-        comm_score = 0
-        lead_score = 0
-        prob_score = 0
 
     soft_skills = profile.get('soft_skills', [])
     if isinstance(soft_skills, str):
